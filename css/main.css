@@ -1,0 +1,42 @@
+/* Read from popup.html */
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+.content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.shortcut-area {
+    flex-shrink: 0;
+}
+.textarea-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+textarea {
+    flex: 1;
+    resize: none;
+}
+
+/* Styles for overlay navigation bar */
+.navbar-overlay {
+    /* position: fixed; */
+    display: block; /* Always display hamburger menu */
+    width: 100%;
+    z-index: 1030; /* Set higher than Bootstrap's z-index */
+}
+
+/* Styles for navigation bar */
+.navbar-overlay {
+    display: block; /* Always display */
+    /* position: fixed; */
+    width: 100%;
+    z-index: 1030;
+}

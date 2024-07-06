@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" href="/img/icon_256.png" type="image/png">
+
+    <meta property="og:title" content="Fast logbook lite" data-translate="popup_title">
+    <meta property="og:description" content="Time-stamped work notes PWA" data-translate="popup_description">
+    <meta property="og:image" content="/images/ogp.png">
+
+    <script src="/js/lib/bootstrap.bundle.min.js"></script>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+
+    <script src="/js/main.js" type="module"></script>
+    <title data-translate="popup_title"></title>
+</head>
+
+<body class="dc6a3b0594269eefaeb">
+    <nav class="navbar navbar-dark bg-dark navbar-overlay">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" aria-expanded="false" aria-label="Open menu" style="display: block;">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="#" data-translate="popup_title"></a>
+        </div>
+    </nav>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sideMenuLabel" data-translate="popup_title"></h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="d-flex flex-column">
+                <a id="configure" href="config.html" class="btn btn-outline-dark mb-2" data-translate="configure"></a>
+                <a id="view_formatted_log" class="btn btn-outline-dark mb-2" data-translate="view_formatted_log"></a>
+                <a id="download_formatted_log" class="btn btn-outline-dark" data-translate="download_formatted_log"></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shortcut keys and log output & editing area -->
+    <div class="content-wrapper">
+        <div class="container-fluid shortcut-area">
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div class="input-group input-group-sm pt-2">
+                        <span class="input-group-text">1</span>
+                        <label class="form-control" data-translate="shortcut_1" data-shortcut-key="1"></label>
+                    </div>
+                    <div class="input-group input-group-sm pt-2">
+                        <span class="input-group-text">2</span>
+                        <label class="form-control" data-translate="shortcut_2" data-shortcut-key="2"></label>
+                    </div>
+                    <div class="input-group input-group-sm pt-2">
+                        <span class="input-group-text">3</span>
+                        <label class="form-control" data-translate="shortcut_3" data-shortcut-key="3"></label>
+                    </div>
+                    <div class="input-group input-group-sm pt-2">
+                        <span class="input-group-text">4</span>
+                        <label class="form-control" data-translate="shortcut_4" data-shortcut-key="4"></label>
+                    </div>
+                    <div class="input-group input-group-sm pt-2">
+                        <span class="input-group-text">5</span>
+                        <label class="form-control" data-translate="shortcut_5" data-shortcut-key="5"></label>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="input-group input-group-sm pt-2">
+                        <span class="input-group-text">6</span>
+                        <label class="form-control" data-translate="shortcut_6" data-shortcut-key="6"></label>
+                    </div>
+                    <div class="input-group input-group-sm pt-2">
+                        <span class="input-group-text">7</span>
+                        <label class="form-control" data-translate="shortcut_7" data-shortcut-key="7"></label>
+                    </div>
+                    <div class="input-group input-group-sm pt-2">
+                        <span class="input-group-text">8</span>
+                        <label class="form-control" data-translate="shortcut_8" data-shortcut-key="8"></label>
+                    </div>
+                    <div class="input-group input-group-sm pt-2">
+                        <span class="input-group-text">9</span>
+                        <label class="form-control" data-translate="shortcut_9" data-shortcut-key="9"></label>
+                    </div>
+                    <div class="input-group input-group-sm pt-2">
+                        <span class="input-group-text">0</span>
+                        <input type="text" class="form-control" placeholder="">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="textarea-container pt-2">
+            <textarea class="form-control" placeholder=""></textarea>
+        </div>
+    </div>
+</body>
+
+</html>
+
