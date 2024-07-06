@@ -7,9 +7,11 @@
 
     <link rel="icon" href="/img/icon_256.png" type="image/png">
 
+    <link rel="manifest" href="manifest.json">
+    
     <meta property="og:title" content="Fast logbook lite" data-translate="popup_title">
     <meta property="og:description" content="Time-stamped work notes PWA" data-translate="popup_description">
-    <meta property="og:image" content="/images/ogp.png">
+    <meta property="og:image" content="/images/icon_256.png">
 
     <script src="/js/lib/bootstrap.bundle.min.js"></script>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
@@ -38,7 +40,8 @@
             <div class="d-flex flex-column">
                 <a id="configure" href="config.html" class="btn btn-outline-dark mb-2" data-translate="configure"></a>
                 <a id="view_formatted_log" class="btn btn-outline-dark mb-2" data-translate="view_formatted_log"></a>
-                <a id="download_formatted_log" class="btn btn-outline-dark" data-translate="download_formatted_log"></a>
+                <a id="download_formatted_log" class="btn btn-outline-dark mb-2" data-translate="download_formatted_log"></a>
+                <a id="delete_log" href="#" class="btn btn-danger" data-translate="delete_log"></a>
             </div>
         </div>
     </div>

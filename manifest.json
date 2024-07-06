@@ -1,24 +1,21 @@
 {
-    "name": "Fast logbook lite",
-    "short_name": "Fast logbook lite",
+    "name": "Fast logbook PWA",
+    "short_name": "Fast logbook",
     "version": "1.0.0",
     "description": "Time-stamped work notes PWA",
     "start_url": "/index.html",
     "display": "standalone",
     "background_color": "#fff",
     "theme_color": "#000",
-    "id": "Fast-logbook-lite_eeaea1ca-42b1-40d0-bbda-27093abf9df7",
+    "id": "Fast-logbook-PWA_eeaea1ca-42b1-40d0-bbda-27093abf9df7",
     "icons": [
         {
             "src": "img/icon_256.png",
             "sizes": "256x256",
             "type": "image/png"
-        },
-        {
-            "src": "img/icon_256.png",
-            "sizes": "512x512",
-            "type": "image/png"
         }
     ],
-    "categories": ["productivity", "utilities"]
+    "lang": ["ja", "en"],
+    "scope": "/",
+    "categories": ["productivity", "utilities", "logging", "pwa", "work"]
 }

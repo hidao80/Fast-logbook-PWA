@@ -9,20 +9,20 @@ const CACHE_NAME = APP_NAME + "_" + VERSION;
 // It's good to list js files, css files, image files, etc. if there are any
 // Here, "/" refers to the directory where the JavaScript file that becomes the service worker is located
 const assets = [
-  "/fast-logbook-lite/",
-  "/fast-logbook-lite/index.html",
-  "/fast-logbook-lite/config.html",
-  "/fast-logbook-lite/img/icon256x256.png",
-  "/fast-logbook-lite/css/bootstrap.min.css",
-  "/fast-logbook-lite/css/config.css",
-  "/fast-logbook-lite/css/main.css",
-  "/fast-logbook-lite/js/main.js",
-  "/fast-logbook-lite/js/config.js",
-  "/fast-logbook-lite/js/lib/bootstrap.bundle.min.js",
-  "/fast-logbook-lite/js/lib/download.js",
-  "/fast-logbook-lite/js/lib/indolence.min.js",
-  "/fast-logbook-lite/js/lib/multilingualization.js",
-  "/fast-logbook-lite/js/lib/utils.js",
+  "/",
+  "/index.html",
+  "/config.html",
+  "/img/icon_256.png",
+  "/css/bootstrap.min.css",
+  "/css/config.css",
+  "/css/main.css",
+  "/js/main.js",
+  "/js/config.js",
+  "/js/lib/bootstrap.bundle.min.js",
+  "/js/lib/download.js",
+  "/js/lib/indolence.min.js",
+  "/js/lib/multilingualization.js",
+  "/js/lib/utils.js",
 ];
 
 /**
@@ -32,8 +32,10 @@ self.addEventListener("install", (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       // Download and cache the specified file group locally
-      // This allows the app to start even when offline
-      return cache.addAll(assets);
+      // This allows the app to be launched offline
+      return cache.addAll(assets).catch(error => {
+        console.error('Failed to add to cache:', error);
+      });
     })
   );
 });
@@ -45,7 +47,7 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(
     caches.match(e.request).then((response) => {
       // If cached, refer to the local file without communicating
-      return response ? response : fetch(e.request);
+      return response || fetch(e.request);
     })
   );
 });

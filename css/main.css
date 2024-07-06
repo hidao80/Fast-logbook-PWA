@@ -27,7 +27,6 @@ textarea {
 
 /* Styles for overlay navigation bar */
 .navbar-overlay {
-    /* position: fixed; */
     display: block; /* Always display hamburger menu */
     width: 100%;
     z-index: 1030; /* Set higher than Bootstrap's z-index */
@@ -36,7 +35,10 @@ textarea {
 /* Styles for navigation bar */
 .navbar-overlay {
     display: block; /* Always display */
-    /* position: fixed; */
     width: 100%;
     z-index: 1030;
+}
+
+#delete_log {
+    margin-top: 3em;
 }

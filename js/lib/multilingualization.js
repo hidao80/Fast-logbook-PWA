@@ -9,7 +9,8 @@ export default class Multilingualization {
      */
     static dictionaries = {
         "en": {
-            "popup_title": "Fast logbook lite",
+            "app_name": "Fast logbook PWA",
+            "popup_title": "Fast logbook PWA",
             "popup_description": "Time-stamped work notes PWA",
             "configure": "Configure",
             "view_formatted_log": "View formatted log",
@@ -46,9 +47,12 @@ export default class Multilingualization {
             "work_time_total": "Total",
             "mins": "min(s).",
             "back": "Back",
+            "delete_log": "Delete log",
+            "delete_log_confirm": "Are you sure you want to delete the log?",
         },
         "ja": {
-            "popup_title": "Fast logbook lite",
+            "app_name": "Fast logbook PWA",
+            "popup_title": "Fast logbook PWA",
             "popup_description": "開始時間付き作業メモPWA",
             "configure": "設定",
             "view_formatted_log": "ログを表示",
@@ -85,6 +89,8 @@ export default class Multilingualization {
             "work_time_total": "総計",
             "mins": "分",
             "back": "戻る",
+            "delete_log": "ログ削除",
+            "delete_log_confirm": "本当にログを削除しますか？",
         }
     }
 

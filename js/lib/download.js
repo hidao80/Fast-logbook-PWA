@@ -8,7 +8,7 @@ import { getTodayString, LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, fetchHourFromTi
  * @param {string} extension File extension
  * @param {string} mimeType mime type
  */
-export function download(outputDataString, extension = '.html', mimeType = 'text/html') {
+export function download(outputDataString, extension = 'html', mimeType = 'text/html') {
     const blob = new Blob([outputDataString], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const filename = Multilingualization.translate("app_name") + "_" + getTodayString() + "." + extension;
@@ -58,32 +58,35 @@ export function generateFormattedLog(log, mins) {
         { title: 'markdown_summary', content: toMarkdown(log, mins), isCode: true }
     ];
 
-    return `<html lang="ja" lang="en"><head>
+    return `<html><head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${Multilingualization.translate("log_viewer")}</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js" integrity="sha512-i9cEfJwUwViEPFKdC1enz4ZRGBj8YQo6QByFTF92YXHi7waCqyexvRD75S5NVTsSiTv7rKWqG9Y5eFxmRsOn0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/css/bootstrap.min.css" integrity="sha512-72OVeAaPeV8n3BdZj7hOkaPSEk/uwpDkaGyP4W2jSzAC8tfiO4LMEDWoL3uFp5mcZu+8Eehb4GhZWFwvrss69Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head><body>
 <h2>${Multilingualization.translate('html_summary')}</h2>
-<i id="html-log" class="fa-sharp fa-regular fa-copy btn btn-outline-secondary"
+<i id="html-log-copy" class="fa-sharp fa-regular fa-copy btn btn-outline-secondary d-none"
 data-bs-trigger="manual" data-bs-toggle="tooltip" data-bs-placement="top" title="copy!"></i>
 <div>
 ${toHtml(log, mins)}
 </div>
 <h2 class="pt-5">${Multilingualization.translate('plaintext_log')}</h2>
-<i id="plain-text-log" class="fa-sharp fa-regular fa-copy btn btn-outline-secondary"
+<i id="plain-text-log-copy" class="fa-sharp fa-regular fa-copy btn btn-outline-secondary d-none"
 data-bs-trigger="manual" data-bs-toggle="tooltip" data-bs-placement="top" title="copy!"></i>
 <div class="form-control"><pre><code id="plain-text-log-source">
 ${log}
 </code></pre></div>
 <h2 class="pt-5">${Multilingualization.translate('markdown_summary')}</h2>
-<i id="markdown-table-log" class="fa-sharp fa-regular fa-copy btn btn-outline-secondary"
+<i id="markdown-table-log-copy" class="fa-sharp fa-regular fa-copy btn btn-outline-secondary d-none"
 data-bs-trigger="manual" data-bs-toggle="tooltip" data-bs-placement="top" title="copy!"></i>
 <div class="form-control"><pre><code id="markdown-table-log-source">
 ${toMarkdown(log, mins)}
 </code></pre></div>
 <script>
-document.querySelectorAll("#html-log,#plain-text-log,#markdown-table-log").forEach((t=>{const e=new bootstrap.Tooltip(t);t.addEventListener("click",(async t=>{let o;t.preventDefault(),t.stopPropagation(),e.show(),setTimeout((()=>e.hide()),1e3),o="plain-text-log"===t.target.id?document.querySelector("#plain-text-log-source").textContent:"markdown-table-log"===t.target.id?document.querySelector("#markdown-table-log-source").textContent:document.querySelector("#html-log-source").textContent.replace(/\\n\\n/g,"\\a").replace(/\\n/g,"\\t").replace(/\\a/g,"\\n"),await(navigator?.clipboard?.writeText(o.trim()))}))}));
+(async()=>{const t=await(navigator?.permissions?.query({name:"clipboard-write"}));"granted"!==t?.state&&"prompt"!==t?.state||document.querySelectorAll("#html-log-copy,#plain-text-log-copy,#markdown-table-log-copy").forEach((t=>{const e=new bootstrap.Tooltip(t);t.classList.remove("d-none"),t.addEventListener("click",(async t=>{let o;t.preventDefault(),t.stopPropagation(),o="plain-text-log-copy"===t.target.id?document.querySelector("#plain-text-log-source").textContent:"markdown-table-log-copy"===t.target.id?document.querySelector("#markdown-table-log-source").textContent:document.querySelector("#html-log-source").textContent.replace(/\\n\\n/g,"\\a").replace(/\\n/g,"\\t").replace(/\\a/g,"\\n"),await(navigator?.clipboard?.writeText(o.trim())),e.show(),setTimeout((()=>e.hide()),1e3)}))}))})();
 </script>
 </body></html>`;
 }
@@ -166,12 +169,7 @@ export function toHtml(log, mins) {
     let sum = 0;
     let total = 0;
     let output =
-`<html lang="ja" lang="en"><head>
-<title>${Multilingualization.translate("log_viewer")}</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js" integrity="sha512-i9cEfJwUwViEPFKdC1enz4ZRGBj8YQo6QByFTF92YXHi7waCqyexvRD75S5NVTsSiTv7rKWqG9Y5eFxmRsOn0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/css/bootstrap.min.css" integrity="sha512-72OVeAaPeV8n3BdZj7hOkaPSEk/uwpDkaGyP4W2jSzAC8tfiO4LMEDWoL3uFp5mcZu+8Eehb4GhZWFwvrss69Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" /><table class="table table-striped-columns">
-</head><body><table class="table table-striped-columns"><thead class="table-light"><thead class="table-light">
+`</head><body><table class="table table-striped-columns"><thead class="table-light"><thead class="table-light">
 <tr>
 <th class="text-center">${Multilingualization.translate("work_category")}</th>
 <th class="text-center">${Multilingualization.translate("work_detail")}</th>

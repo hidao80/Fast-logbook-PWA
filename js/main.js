@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    //
+    // Save when Enter key is pressed in textarea
     $$one('textarea').addEventListener('keydown', async function(e) {
         if ("Enter" == e.code) {
             // Ignore events processed by IME
@@ -135,6 +135,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         event.preventDefault();  // Prevent default event
         event.stopPropagation(); // Stop event propagation
 
+        // Save the content of textarea
+        (async () => {
+            await saveLogs();
+        })();
+
         // Toggle visibility of navbar content
         const navbarContent = $$one('.navbar-collapse');
         if (navbarContent) {
@@ -152,7 +157,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     // When view_formatted_log link is pressed, display the content of downloadLog() in a new tab without downloading
     $$one('a#view_formatted_log').addEventListener('click', async () => {
         const log = localStorage.getItem(LOG_DATA_KEY);
-        const mins = localStorage.getItem(ROUNDING_UNIT_MINUTE_KEY);
+        let mins = localStorage.getItem(ROUNDING_UNIT_MINUTE_KEY);
+        if (!mins) {
+            // Set default value to 1 if not set
+            mins = 1;
+            localStorage.setItem(ROUNDING_UNIT_MINUTE_KEY, mins);
+        }
         const outputStr = generateFormattedLog(log, mins);
         const newTab = window.open(Multilingualization.translate('log_viewer'), '_blank');
         newTab.document.write(outputStr);
@@ -164,12 +174,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         await downloadLog();
     });
 
-    // Register service worker
-    document.addEventListener("DOMContentLoaded", () => {
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("./sw.js");
+    // When delete_log link is pressed, delete the log
+    $$one('a#delete_log').addEventListener('click', async () => {
+        if(confirm(Multilingualization.translate('delete_log_confirm'))) {
+            $$one('textarea').value = '';
+            await saveLogs();
+
+            // Toggle visibility of navbar content
+            $$one('.navbar-toggler').click();
         }
     });
+
+    // Register service worker
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js");
+    }
 
     // Load the last saved log
     await loadLogs();
