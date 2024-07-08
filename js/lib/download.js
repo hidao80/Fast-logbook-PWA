@@ -176,8 +176,8 @@ export function toHtml(log, mins) {
     for (const category of Object.keys(dataJson).sort()) {
         output +=
 `<tr>
-<td>${escapeHtml(category) ? escapeHtml(category) : " "}</td>
-<td>${escapeHtml(dataJson[category].detail) ? escapeHtml(dataJson[category].detail) : " "}</td>
+<td>${escapeHtml(category) ? escapeHtml(category) : '-'}</td>
+<td>${escapeHtml(dataJson[category].detail) ? escapeHtml(dataJson[category].detail) : ' '}</td>
 <td class="text-end">${dataJson[category].round}</td>
 <td class="text-end">${dataJson[category].time}</td>
 </tr>`;
