@@ -1,6 +1,11 @@
 import Multilingualization from "./multilingualization.js";
 import { getTodayString, LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, fetchHourFromTime, fetchMinFromTime, escapeHtml } from "./utils.js";
 
+const HTML_SUMMARY = 'html_summary';
+const PLAINTEXT_LOG = 'plaintext_log';
+const MARKDOWN_SUMMARY = 'markdown_summary';
+
+
 /**
  * Download a string with a file type
  *
@@ -53,9 +58,9 @@ window.addEventListener('startDownload', () => {
  */
 export function generateFormattedLog(log, mins) {
     const sections = [
-        { title: 'html_summary', content: toHtml(log, mins) },
-        { title: 'plaintext_log', content: log, isCode: true },
-        { title: 'markdown_summary', content: toMarkdown(log, mins), isCode: true }
+        { title: HTML_SUMMARY, content: toHtml(log, mins) },
+        { title: PLAINTEXT_LOG, content: log, isCode: true },
+        { title: MARKDOWN_SUMMARY, content: toMarkdown(log, mins), isCode: true }
     ];
 
     return `<html><head>
@@ -67,26 +72,16 @@ export function generateFormattedLog(log, mins) {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/css/bootstrap.min.css" integrity="sha512-72OVeAaPeV8n3BdZj7hOkaPSEk/uwpDkaGyP4W2jSzAC8tfiO4LMEDWoL3uFp5mcZu+8Eehb4GhZWFwvrss69Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head><body>
-<h2>${Multilingualization.translate('html_summary')}</h2>
-<i id="html-log-copy" class="fa-sharp fa-regular fa-copy btn btn-outline-secondary d-none"
+${sections.map(section => `
+<h2>${Multilingualization.translate(section.title)}</h2>
+<i id="${section.title}-copy" class="fa-sharp fa-regular fa-copy btn btn-outline-secondary d-none"
 data-bs-trigger="manual" data-bs-toggle="tooltip" data-bs-placement="top" title="copy!"></i>
 <div>
-${toHtml(log, mins)}
+${section.isCode ? `<pre><code id="${section.title}-source">${section.content}</code></pre>` : section.content}
 </div>
-<h2 class="pt-5">${Multilingualization.translate('plaintext_log')}</h2>
-<i id="plain-text-log-copy" class="fa-sharp fa-regular fa-copy btn btn-outline-secondary d-none"
-data-bs-trigger="manual" data-bs-toggle="tooltip" data-bs-placement="top" title="copy!"></i>
-<div class="form-control"><pre><code id="plain-text-log-source">
-${log}
-</code></pre></div>
-<h2 class="pt-5">${Multilingualization.translate('markdown_summary')}</h2>
-<i id="markdown-table-log-copy" class="fa-sharp fa-regular fa-copy btn btn-outline-secondary d-none"
-data-bs-trigger="manual" data-bs-toggle="tooltip" data-bs-placement="top" title="copy!"></i>
-<div class="form-control"><pre><code id="markdown-table-log-source">
-${toMarkdown(log, mins)}
-</code></pre></div>
+`).join('')}
 <script>
-(async()=>{const t=await(navigator?.permissions?.query({name:"clipboard-write"}));"granted"!==t?.state&&"prompt"!==t?.state||document.querySelectorAll("#html-log-copy,#plain-text-log-copy,#markdown-table-log-copy").forEach((t=>{const e=new bootstrap.Tooltip(t);t.classList.remove("d-none"),t.addEventListener("click",(async t=>{let o;t.preventDefault(),t.stopPropagation(),o="plain-text-log-copy"===t.target.id?document.querySelector("#plain-text-log-source").textContent:"markdown-table-log-copy"===t.target.id?document.querySelector("#markdown-table-log-source").textContent:document.querySelector("#html-log-source").textContent.replace(/\\n\\n/g,"\\a").replace(/\\n/g,"\\t").replace(/\\a/g,"\\n"),await(navigator?.clipboard?.writeText(o.trim())),e.show(),setTimeout((()=>e.hide()),1e3)}))}))})();
+(async()=>{const e=await(navigator?.permissions?.query({name:"clipboard-write"}));"granted"!==e?.state&&"prompt"!==e?.state||document.querySelectorAll("#${HTML_SUMMARY}-copy,#${PLAINTEXT_LOG}-copy,#${MARKDOWN_SUMMARY}-copy").forEach((e=>{const t=new bootstrap.Tooltip(e);e.classList.remove("d-none"),e.addEventListener("click",(async e=>{let a;e.preventDefault(),e.stopPropagation(),(a=document.querySelector(\`#\${e.target.id.replace("-copy","-source")}\`).textContent),"${HTML_SUMMARY}-copy"===e.target.id&&(a=a.replace(/\\n\\n/g,"\\a").replace(/\\n/g,"\\t").replace(/\\a/g,"\\n")),await(navigator?.clipboard?.writeText(a.trim())),t.show(),setTimeout((()=>t.hide()),1e3)}))}))})();
 </script>
 </body></html>`;
 }
@@ -176,13 +171,13 @@ export function toHtml(log, mins) {
 <th class="text-center">${Multilingualization.translate("work_time_hour")}</th>
 <th class="text-center">${Multilingualization.translate("work_time_min")}</th>
 </tr>
-</thead><tbody id="html-log-source" class="table-group-divider">`;
+</thead><tbody id="${HTML_SUMMARY}-source" class="table-group-divider">`;
 
     for (const category of Object.keys(dataJson).sort()) {
         output +=
 `<tr>
 <td>${escapeHtml(category)}</td>
-<td>${escapeHtml(dataJson[category].detail ?? "\t")}</td>
+<td>${escapeHtml(dataJson[category].detail) ? escapeHtml(escapeHtml(dataJson[category].detail)) : " "}</td>
 <td class="text-end">${dataJson[category].round}</td>
 <td class="text-end">${dataJson[category].time}</td>
 </tr>`;
