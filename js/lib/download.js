@@ -1,5 +1,5 @@
 import Multilingualization from "./multilingualization.js";
-import { getTodayString, LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, fetchHourFromTime, fetchMinFromTime } from "./utils.js";
+import { getTodayString, LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, fetchHourFromTime, fetchMinFromTime, escapeHtml } from "./utils.js";
 
 /**
  * Download a string with a file type
@@ -181,8 +181,8 @@ export function toHtml(log, mins) {
     for (const category of Object.keys(dataJson).sort()) {
         output +=
 `<tr>
-<td>${category}</td>
-<td>${dataJson[category].detail}</td>
+<td>${escapeHtml(category)}</td>
+<td>${escapeHtml(dataJson[category].detail ?? "\t")}</td>
 <td class="text-end">${dataJson[category].round}</td>
 <td class="text-end">${dataJson[category].time}</td>
 </tr>`;
@@ -221,7 +221,7 @@ export function toMarkdown(log, mins) {
 `;
 
     for (const category of Object.keys(dataJson).sort()) {
-        output += `${category} | ${dataJson[category].detail} | ${dataJson[category].round} | ${dataJson[category].time}\n`;
+        output += `${escapeHtml(category)} | ${escapeHtml(dataJson[category].detail)} | ${dataJson[category].round} | ${dataJson[category].time}\n`;
         if (category[0] != breakMark) sum += dataJson[category].time;
         total += dataJson[category].time;
     }
