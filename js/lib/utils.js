@@ -89,3 +89,17 @@ export function appendTime(tag) {
 export function trimNewLine(text) {
     return text.replace(/\n{2,}/g, '\n').replace(/(^\n|\n$)/, '');
 }
+
+/**
+ * Escape HTML special characters
+ * @param {string} unsafe
+ * @returns {string} escaped string
+ */
+export function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
