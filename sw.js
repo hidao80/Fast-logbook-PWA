@@ -1,5 +1,5 @@
 const APP_NAME = "Fast logbook lite";
-const VERSION = "202407090643JST";
+const VERSION = "202407090655JST";
 
 // Key string indicating that this is cache data for this service worker
 // By including the version number, we aim to update cache files when the source is updated
