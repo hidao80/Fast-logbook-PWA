@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // When view_formatted_log link is pressed, display the content of downloadLog() in a new tab without downloading
-    $$one('a#view_formatted_log').addEventListener('click', async () => {
+    $$one('a#view_formatted_log').addEventListener('click', () => {
         const log = localStorage.getItem(LOG_DATA_KEY);
         let mins = localStorage.getItem(ROUNDING_UNIT_MINUTE_KEY);
         if (!mins) {
@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             localStorage.setItem(ROUNDING_UNIT_MINUTE_KEY, mins);
         }
         const outputStr = generateFormattedLog(log, mins);
-        const newTab = window.open(Multilingualization.translate('log_viewer'), '_blank');
+        const newTab = window.open(Multilingualization.translate('log_viewer'), '_log_viewer');
         newTab.document.write(outputStr);
         newTab.document.close();
     });
