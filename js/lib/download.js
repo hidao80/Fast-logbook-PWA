@@ -81,7 +81,7 @@ ${section.isCode ? `<pre><code id="${section.title}-source">${section.content}</
 </div>
 `).join('')}
 <script>
-(async()=>{const e=await(navigator?.permissions?.query({name:"clipboard-write"}));"granted"!==e?.state&&"prompt"!==e?.state||document.querySelectorAll("#${HTML_SUMMARY}-copy,#${PLAINTEXT_LOG}-copy,#${MARKDOWN_SUMMARY}-copy").forEach((e=>{const t=new bootstrap.Tooltip(e);e.classList.remove("d-none"),e.addEventListener("click",(async e=>{let a;e.preventDefault(),e.stopPropagation(),(a=document.querySelector(\`#\${e.target.id.replace("-copy","-source")}\`).textContent),"${HTML_SUMMARY}-copy"===e.target.id&&(a=a.replace(/\\n\\n/g,"\\a").replace(/\\n/g,"\\t").replace(/\\a/g,"\\n")),await(navigator?.clipboard?.writeText(a.trim())),t.show(),setTimeout((()=>t.hide()),1e3)}))}))})();
+(async()=>{const e=await(navigator?.permissions?.query({name:"clipboard-write"}));"granted"!==e?.state&&"prompt"!==e?.state||document.querySelectorAll("#${HTML_SUMMARY}-copy,#${PLAINTEXT_LOG}-copy,#${MARKDOWN_SUMMARY}-copy").forEach((e=>{const t=new bootstrap.Tooltip(e);e.classList.remove("d-none"),e.addEventListener("click",(async e=>{let a;e.preventDefault(),e.stopPropagation(),(a=document.querySelector(\`#\${e.target.id.replace("-copy","-source")}\`).textContent),"${HTML_SUMMARY}-copy"===e.target.id&&(a=a.replace(/\\n\\n/g,"<></>").replace(/\\n/g,"\\t").replace(/<><\\/>/g,"\\n")),await(navigator?.clipboard?.writeText(a.trim())),t.show(),setTimeout((()=>t.hide()),1e3)}))}))})();
 </script>
 </body></html>`;
 }

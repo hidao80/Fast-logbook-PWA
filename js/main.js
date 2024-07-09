@@ -2,6 +2,7 @@ import { $$one, $$all, $$disableConsole } from "./lib/indolence.min.js";
 import { LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine, appendTime } from "./lib/utils.js";
 import Multilingualization from "./lib/multilingualization.js";
 import { downloadLog, generateFormattedLog } from "./lib/download.js";
+const VERSION = "202407091919JST";
 
 /**
  * Add one log entry
@@ -48,7 +49,7 @@ function saveLogs() {
  * Code executed when form loading is complete
  */
 document.addEventListener("DOMContentLoaded", async () => {
-    // $$disableConsole();
+    $$disableConsole();
     Multilingualization.translateAll();
 
     // When a preset tag is clicked
@@ -184,6 +185,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             $$one('.navbar-toggler').click();
         }
     });
+
+    $$one('#version_number').textContent = VERSION;
 
     // Register service worker
     if ("serviceWorker" in navigator) {
