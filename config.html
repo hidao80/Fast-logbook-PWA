@@ -15,6 +15,33 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-dark bg-dark navbar-overlay">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu"
+                aria-controls="sideMenu" aria-expanded="false" aria-label="Open menu" style="display: block;">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="#" data-translate="popup_title"></a>
+        </div>
+    </nav>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sideMenuLabel" data-translate="popup_title"></h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="d-flex flex-column h-100">
+                <a id="view_formatted_log" class="btn btn-outline-dark mb-2" data-translate="view_formatted_log"></a>
+                <a id="download_formatted_log" class="btn btn-outline-dark mb-2"
+                    data-translate="download_formatted_log"></a>
+                <a id="logs" href="index.html" class="btn btn-success mb-2" data-translate="logs_page"></a>
+                <a id="delete_log" href="#" class="btn btn-danger" data-translate="delete_log"></a>
+                <span id="version_label" class="outline-dark mb-2 mt-auto">ver. <span id="version_number"></span></span>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="row pt-5">
             <h5 data-translate="rounding_unit"></h5>
@@ -73,11 +100,6 @@
             </div>
         </div>
     </div>
-
-    <div class="position-fixed bottom-0 end-0 p-3">
-        <a href="index.html" class="btn btn-secondary" id="backButton" role="button" data-translate="back">Back</a>
-    </div>
-
 </body>
 
 </html>

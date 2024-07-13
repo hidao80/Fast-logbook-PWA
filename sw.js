@@ -1,5 +1,5 @@
 const APP_NAME = "Fast logbook PWA";
-const VERSION = "202407091919JST";
+const VERSION = "24.07.14.1";
 
 // Key string indicating that this is cache data for this service worker
 // By including the version number, we aim to update cache files when the source is updated
@@ -12,7 +12,12 @@ const assets = [
   "/",
   "/index.html",
   "/config.html",
-  "/img/icon_256.png",
+  "/img/android-launchericon-48-48.png",
+  "/img/android-launchericon-72-72.png",
+  "/img/android-launchericon-96-96.png",
+  "/img/android-launchericon-144-144.png",
+  "/img/android-launchericon-192-192.png",
+  "/img/android-launchericon-512-512.png",
   "/css/bootstrap.min.css",
   "/css/config.css",
   "/css/main.css",

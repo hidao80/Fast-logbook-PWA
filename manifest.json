@@ -1,7 +1,7 @@
 {
     "name": "Fast logbook PWA",
     "short_name": "Fast logbook",
-    "version": "202407091919JST",
+    "version": "24.07.14.1",
     "description": "Time-stamped work notes PWA",
     "start_url": "/index.html",
     "display": "standalone",
@@ -40,7 +40,16 @@
             "type": "image/png"
         }
     ],
-    "lang": ["ja", "en"],
+    "lang": [
+        "ja",
+        "en"
+    ],
     "scope": "/",
-    "categories": ["productivity", "utilities", "logging", "pwa", "work"]
+    "categories": [
+        "productivity",
+        "utilities",
+        "logging",
+        "pwa",
+        "work"
+    ]
 }
