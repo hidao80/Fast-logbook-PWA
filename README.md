@@ -20,7 +20,7 @@ It is possible to use the PWA without installing it.
 Option settings are saved automatically.
 
 1. Open the config screen.
-2. Fill in the tasks corresponding to the numeric keypad shortcut keys from 1 to 9 keys. Tasks can be changed after stamping.
+2. Enter the tasks corresponding to numbers 1 to 9. You can change the tasks even after stamping.
 3. If you prefix a task name with "^", it will be excluded from the actual working hours during that task. Please use this function for measuring break time, etc.
 
 ### 2. Stamp
