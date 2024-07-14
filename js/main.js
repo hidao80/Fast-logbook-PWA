@@ -1,5 +1,5 @@
 import { $$one, $$all, $$disableConsole } from "./lib/indolence.min.js";
-import { LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine, appendTime } from "./lib/utils.js";
+import { LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine, appendTime, installPWA } from "./lib/utils.js";
 import Multilingualization from "./lib/multilingualization.js";
 import { downloadLog, generateFormattedLog } from "./lib/download.js";
 
@@ -199,4 +199,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Load the last saved log
     await loadLogs();
+
+    // When install_pwa is pressed, install the PWA
+    installPWA($$one("#install_pwa"));
 });

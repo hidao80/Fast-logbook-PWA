@@ -1,4 +1,4 @@
-import { getRoundingUnit, ROUNDING_UNIT_MINUTE_KEY } from "./lib/utils.js";
+import { getRoundingUnit, ROUNDING_UNIT_MINUTE_KEY, installPWA } from "./lib/utils.js";
 import Multilingualization from "./lib/multilingualization.js";
 import { $$one, $$all } from "./lib/indolence.min.js";
 
@@ -44,4 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     });
+
+    // When install_pwa is pressed, install the PWA
+    installPWA($$one("#install_pwa"));
 });

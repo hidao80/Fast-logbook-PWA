@@ -103,3 +103,28 @@ export function escapeHtml(unsafe) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+/**
+ * When install_pwa is pressed, install the PWA
+ * @param {HTMLElement} elem
+ */
+export function installPWA(elem) {
+    // display the install button when the install prompt is displayed
+    window.addEventListener('beforeinstallprompt', function (event) {
+        event.preventDefault();
+        elem.promptEvent = event;
+        elem.classList.remove("d-none"); // display the button
+        return false;
+    });
+
+    // display the install button when the install prompt is displayed
+    elem.addEventListener("click", () => {
+        if (elem.promptEvent) {
+            elem.promptEvent.prompt(); // display dialog box
+            elem.promptEvent.userChoice.then(function (choice) {
+                elem.classList.add("d-none"); // hide the button
+                elem.promptEvent = null; // release the event
+            });
+        }
+    });
+}
