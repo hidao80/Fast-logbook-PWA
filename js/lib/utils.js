@@ -128,3 +128,15 @@ export function installPWA(elem) {
         }
     });
 }
+
+/**
+ * Set the theme automatically
+ */
+export function autoSetTheme() {
+    const theme = document.documentElement.getAttribute('data-bs-theme') ?? "light";
+    if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-bs-theme', 'dark')
+    } else {
+        document.documentElement.setAttribute('data-bs-theme', theme)
+    }
+}

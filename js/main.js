@@ -1,5 +1,5 @@
 import { $$one, $$all, $$disableConsole } from "./lib/indolence.min.js";
-import { LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine, appendTime, installPWA } from "./lib/utils.js";
+import { LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine, appendTime, installPWA, autoSetTheme } from "./lib/utils.js";
 import Multilingualization from "./lib/multilingualization.js";
 import { downloadLog, generateFormattedLog } from "./lib/download.js";
 
@@ -49,6 +49,10 @@ function saveLogs() {
  */
 document.addEventListener("DOMContentLoaded", async () => {
     $$disableConsole();
+
+    // Set the theme automatically
+    autoSetTheme();
+
     Multilingualization.translateAll();
 
     // Get the version number from manifest.json.

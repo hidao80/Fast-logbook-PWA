@@ -1,4 +1,4 @@
-import { getRoundingUnit, ROUNDING_UNIT_MINUTE_KEY } from "./lib/utils.js";
+import { getRoundingUnit, ROUNDING_UNIT_MINUTE_KEY, autoSetTheme } from "./lib/utils.js";
 import Multilingualization from "./lib/multilingualization.js";
 import { $$one, $$all } from "./lib/indolence.min.js";
 
@@ -6,6 +6,9 @@ import { $$one, $$all } from "./lib/indolence.min.js";
  * Code to be executed upon completion of form loading
  */
 document.addEventListener("DOMContentLoaded", async () => {
+    // Set the theme automatically
+    autoSetTheme();
+
     Multilingualization.translateAll();
 
     // Get the version number from manifest.json.
