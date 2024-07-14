@@ -9,9 +9,9 @@ export const ROUNDING_UNIT_MINUTE_KEY = 'rounding_mins';
  */
 export function getTodayString() {
     var date = new Date();
-    var yyyy = date.getFullYear().toString().padStart(4,"0");
-    var mm = (date.getMonth() + 1).toString().padStart(2,"0");
-    var dd = date.getDate().toString().padStart(2,"0");
+    var yyyy = date.getFullYear().toString().padStart(4, "0");
+    var mm = (date.getMonth() + 1).toString().padStart(2, "0");
+    var dd = date.getDate().toString().padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
 }
 
@@ -26,7 +26,7 @@ export function getTodayString() {
  */
 export function fetchHourFromTime(time = null, isInt = true) {
     const date = time === null ? new Date() : new Date(time);
-    const hour = date.getHours().toString().padStart(2,"0");
+    const hour = date.getHours().toString().padStart(2, "0");
     return isInt ? parseInt(hour) : hour;
 }
 
@@ -41,7 +41,7 @@ export function fetchHourFromTime(time = null, isInt = true) {
  */
 export function fetchMinFromTime(time = null, isInt = true) {
     const date = time === null ? new Date() : new Date(time);
-    const min = date.getMinutes().toString().padStart(2,"0");
+    const min = date.getMinutes().toString().padStart(2, "0");
     return isInt ? parseInt(min) : min;
 }
 

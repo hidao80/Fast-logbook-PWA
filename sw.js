@@ -1,9 +1,4 @@
 const APP_NAME = "Fast logbook PWA";
-const VERSION = "24.07.14.1";
-
-// Key string indicating that this is cache data for this service worker
-// By including the version number, we aim to update cache files when the source is updated
-const CACHE_NAME = APP_NAME + "_" + VERSION;
 
 // Specify the relative paths of static files and list the files to be downloaded and cached at installation
 // It's good to list js files, css files, image files, etc. if there are any
@@ -21,6 +16,7 @@ const assets = [
   "/css/bootstrap.min.css",
   "/css/config.css",
   "/css/main.css",
+  "/css/dark-theme.css",
   "/js/main.js",
   "/js/config.js",
   "/js/lib/bootstrap.bundle.min.js",
@@ -29,6 +25,22 @@ const assets = [
   "/js/lib/multilingualization.js",
   "/js/lib/utils.js",
 ];
+
+// Key string indicating that this is cache data for this service worker
+// By including the version number, we aim to update cache files when the source is updated
+let CACHE_NAME = "";
+
+/**
+ * Get the cache name
+ */
+(() => {
+  // Get the version number from manifest.json.
+  fetch('/manifest.json')
+    .then(response => response.json())
+    .then(manifestData => {
+      CACHE_NAME = APP_NAME + "_" + manifestData.version;
+    });
+})();
 
 /**
  * Processing when the service worker installation event occurs

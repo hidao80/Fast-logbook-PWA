@@ -1,8 +1,7 @@
-import { $$one, $$all, $$disableConsole } from "./lib/indolence.min.js"; 
+import { $$one, $$all, $$disableConsole } from "./lib/indolence.min.js";
 import { LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine, appendTime } from "./lib/utils.js";
 import Multilingualization from "./lib/multilingualization.js";
 import { downloadLog, generateFormattedLog } from "./lib/download.js";
-const VERSION = "202407091919JST";
 
 /**
  * Add one log entry
@@ -52,6 +51,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     $$disableConsole();
     Multilingualization.translateAll();
 
+    // Get the version number from manifest.json.
+    fetch('/manifest.json')
+        .then(response => response.json())
+        .then(manifest => {
+            $$one('#version_number').textContent = manifest.version;
+        });
+
     // When a preset tag is clicked
     for (const node of $$all('label[data-shortcut-key]')) {
         const key = 'shortcut_' + node.dataset.shortcutKey;
@@ -62,7 +68,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             node.textContent = Multilingualization.translate(node.dataset.translate);
         }
 
-        node.addEventListener('click', async function(e) {
+        node.addEventListener('click', async function (e) {
             e.stopPropagation();
             if (document.activeElement.value) return;
             await appendLog(appendTime(this.textContent));
@@ -100,7 +106,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // When input to the 0th element is confirmed, stamp the entered log
-    $$one('input').addEventListener('keydown', async function(e) {
+    $$one('input').addEventListener('keydown', async function (e) {
         if ("Enter" == e.code) {
             // Ignore events processed by IME
             if (e.isComposing || e.keyCode === 229) {
@@ -114,7 +120,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Save when Enter key is pressed in textarea
-    $$one('textarea').addEventListener('keydown', async function(e) {
+    $$one('textarea').addEventListener('keydown', async function (e) {
         if ("Enter" == e.code) {
             // Ignore events processed by IME
             if (e.isComposing || e.keyCode === 229) {
@@ -126,13 +132,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // When the popup loses focus, save the content of textarea
     [$$one('input'), window].forEach((node) => {
-        node.addEventListener('blur', async function() {
+        node.addEventListener('blur', async function () {
             await saveLogs();
         });
     });
 
     // Add click event listener to the toggle button
-    $$one('.navbar-toggler').addEventListener('click', function(event) {
+    $$one('.navbar-toggler').addEventListener('click', function (event) {
         event.preventDefault();  // Prevent default event
         event.stopPropagation(); // Stop event propagation
 
@@ -147,7 +153,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             navbarContent.classList.toggle('show');
         }
     });
-    
+
     // When textarea content changes, synchronize
     window.addEventListener('storage', (event) => {
         if (event.key === LOG_DATA_KEY) {
@@ -177,7 +183,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // When delete_log link is pressed, delete the log
     $$one('a#delete_log').addEventListener('click', async () => {
-        if(confirm(Multilingualization.translate('delete_log_confirm'))) {
+        if (confirm(Multilingualization.translate('delete_log_confirm'))) {
             $$one('textarea').value = '';
             await saveLogs();
 
@@ -185,8 +191,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             $$one('.navbar-toggler').click();
         }
     });
-
-    $$one('#version_number').textContent = VERSION;
 
     // Register service worker
     if ("serviceWorker" in navigator) {

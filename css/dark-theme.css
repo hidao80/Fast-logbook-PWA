@@ -1,0 +1,43 @@
+:root {
+    color-scheme: light dark;
+}
+
+body,
+div.navbar,
+div.navbar *,
+div.offcanvas,
+div.offcanvas :not(a),
+h5,
+.form-select,
+.form-select>option,
+.form-select>option:focus,
+.form-select>option:active,
+label.form-control,
+label.form-control:focus,
+label.form-control:active,
+textarea.form-control,
+textarea.form-control:focus,
+textarea.form-control:active,
+input.form-control,
+input.form-control:focus,
+input.form-control:active {
+    color: light-dark(var(--bs-dark), var(--bs-light));
+    background-color: light-dark(var(--bs-light), var(--bs-dark));
+}
+
+a.btn-outline-dark {
+    color: light-dark(var(--bs-dark), var(--bs-light));
+    border-color: light-dark(var(--bs-dark), var(--bs-light));
+}
+
+a.btn-outline-dark:hover {
+    color: light-dark(var(--bs-light), var(--bs-dark));
+    border-color: light-dark(var(--bs-light), var(--bs-dark));
+    background-color: light-dark(var(--bs-dark), var(--bs-light));
+}
+
+textarea.form-control::placeholder,
+input.form-control::placeholder,
+textarea.form-control::placeholder {
+    color: var(--bs-gray);
+}

@@ -8,13 +8,20 @@ import { $$one, $$all } from "./lib/indolence.min.js";
 document.addEventListener("DOMContentLoaded", async () => {
     Multilingualization.translateAll();
 
+    // Get the version number from manifest.json.
+    fetch('/manifest.json')
+        .then(response => response.json())
+        .then(manifest => {
+            $$one('#version_number').textContent = manifest.version;
+        });
+
     // Initialize tags
     $$all('input').forEach(node => {
         const str = localStorage.getItem(node.dataset.translate);
         node.value = (str && str != "undefined") ? str : Multilingualization.translate(node.dataset.translate);
 
         // Save the input when focus is removed or changed
-        node.addEventListener('change', function(e) {
+        node.addEventListener('change', function (e) {
             localStorage.setItem(this.dataset.translate, this.value.trim());
         });
     });
@@ -24,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     $$one('select').value = getRoundingUnit(min);
 
     // Save the value when the rounding unit is changed
-    $$one('select').addEventListener('change', function(e) {
+    $$one('select').addEventListener('change', function (e) {
         localStorage.setItem(ROUNDING_UNIT_MINUTE_KEY, this.value);
     });
 

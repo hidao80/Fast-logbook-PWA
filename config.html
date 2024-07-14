@@ -9,9 +9,10 @@
     <link href="/css/bootstrap.min.css" rel="stylesheet">
 
     <link href="/css/config.css" rel="stylesheet">
+    <link href="/css/dark-theme.css" rel="stylesheet">
     <script src="/js/config.js" type="module"></script>
 
-    <title>Config - </title>
+    <title id="title" data-translate="config_title"></title>
 </head>
 
 <body>
@@ -21,22 +22,18 @@
                 aria-controls="sideMenu" aria-expanded="false" aria-label="Open menu" style="display: block;">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="#" data-translate="popup_title"></a>
+            <a class="navbar-brand" href="#" data-translate="config_title"></a>
         </div>
     </nav>
 
     <div class="offcanvas offcanvas-start" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="sideMenuLabel" data-translate="popup_title"></h5>
+            <h5 class="offcanvas-title" id="sideMenuLabel" data-translate="config_title"></h5>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
             <div class="d-flex flex-column h-100">
-                <a id="view_formatted_log" class="btn btn-outline-dark mb-2" data-translate="view_formatted_log"></a>
-                <a id="download_formatted_log" class="btn btn-outline-dark mb-2"
-                    data-translate="download_formatted_log"></a>
-                <a id="logs" href="index.html" class="btn btn-success mb-2" data-translate="logs_page"></a>
-                <a id="delete_log" href="#" class="btn btn-danger" data-translate="delete_log"></a>
+                <a id="logs" href="index.html" class="btn btn-outline-success mb-2" data-translate="back"></a>
                 <span id="version_label" class="outline-dark mb-2 mt-auto">ver. <span id="version_number"></span></span>
             </div>
         </div>
