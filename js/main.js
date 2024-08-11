@@ -132,10 +132,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
             await saveLogs();
-        } else {
-            // When the content of textarea is changed, change the icon
-            $$one('.navbar-save-status').classList.toggle('saved', false);
         }
+    });
+
+    $$one('textarea').addEventListener('input', function () {
+        $$one('.navbar-save-status').classList.remove('saved');
     });
 
     // When the popup loses focus, save the content of textarea
