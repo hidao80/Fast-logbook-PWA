@@ -42,6 +42,7 @@ async function loadLogs() {
  */
 function saveLogs() {
     localStorage.setItem(LOG_DATA_KEY, trimNewLine($$one('textarea').value));
+    $$one('.navbar-save-status').classList.toggle('saved', true);
 }
 
 /**
@@ -131,6 +132,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return;
             }
             await saveLogs();
+        } else {
+            // When the content of textarea is changed, change the icon
+            $$one('.navbar-save-status').classList.toggle('saved', false);
         }
     });
 

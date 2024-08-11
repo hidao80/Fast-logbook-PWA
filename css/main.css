@@ -42,3 +42,16 @@ textarea {
 #delete_log {
     margin-top: 3em;
 }
+
+.navbar-save-status {
+    display: inline-block;
+    font-size: 0.5em;
+    width: 1em;
+    height: 1em;
+    margin: auto 1em auto auto;
+    color: #f33; /* dirty color */
+}
+
+.navbar-save-status.saved {
+    color: lightgreen; /* saved color */
+}
