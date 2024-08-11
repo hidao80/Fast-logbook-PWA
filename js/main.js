@@ -135,10 +135,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    $$one('textarea').addEventListener('input', function (e) {
-        if (e.inputType !== 'insertLineBreak') {
+    let debounceTimeout;
+    $$one('textarea').addEventListener('input', async function (e) {
+        // Set to dirty state when IME conversion is confirmed
+        if (e.isComposing && e.inputType === 'insertCompositionText') {
+            $$one('.navbar-save-status').classList.remove('saved');
+        } else if (e.inputType !== 'insertLineBreak') {
             $$one('.navbar-save-status').classList.remove('saved');
         }
+    
+        // 300 milliseconds debounce time
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(async () => {
+            await saveLogs();
+        }, 300);
+    });
+
+    // Save the log when the input in the textarea is confirmed
+    $$one('textarea').addEventListener('compositionend', async function () {
+        clearTimeout(debounceTimeout);
+        await saveLogs();
     });
 
     // When the popup loses focus, save the content of textarea
