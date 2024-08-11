@@ -135,8 +135,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    $$one('textarea').addEventListener('input', function () {
-        $$one('.navbar-save-status').classList.remove('saved');
+    $$one('textarea').addEventListener('input', function (e) {
+        if (e.inputType !== 'insertLineBreak') {
+            $$one('.navbar-save-status').classList.remove('saved');
+        }
     });
 
     // When the popup loses focus, save the content of textarea
