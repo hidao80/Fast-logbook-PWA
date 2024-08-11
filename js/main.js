@@ -210,13 +210,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // When delete_log link is pressed, delete the log
     $$one('a#delete_log').addEventListener('click', async () => {
-        if (confirm(Multilingualization.translate('delete_log_confirm'))) {
-            $$one('textarea').value = '';
-            await saveLogs();
+        // 削除確認モーダルを表示
+        const deleteConfirmModal = new bootstrap.Modal($$one('#deleteConfirmModal'));
+        deleteConfirmModal.show();
+    });
 
-            // Toggle visibility of navbar content
-            $$one('.navbar-toggler').click();
-        }
+    $$one('#confirmDeleteButton').addEventListener('click', async () => {
+        const textarea = $$one('textarea');
+        textarea.value = '';
+        await saveLogs();
+
+        // モーダルを閉じる
+        const deleteConfirmModal = bootstrap.Modal.getInstance($$one('#deleteConfirmModal'));
+        deleteConfirmModal.hide();
+
+        // ナビゲーションバーのコンテンツの表示を切り替える
+        $$one('.navbar-toggler').click();
+
+        setTimeout(() => {
+            textarea.focus();
+        }, 500);
     });
 
     // Register service worker
