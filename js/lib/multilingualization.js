@@ -51,6 +51,10 @@ export default class Multilingualization {
             "delete_log": "Delete log",
             "delete_log_confirm": "Are you sure you want to delete the log?",
             "install_pwa": "Install PWA",
+            "delete_log_confirm_title": "Delete log",
+            "delete_log_confirm_message": "Are you sure you want to delete the log?",
+            "cancel": "Cancel",
+            "delete": "Delete",  
         },
         "ja": {
             "app_name": "Fast logbook PWA",
@@ -95,6 +99,10 @@ export default class Multilingualization {
             "delete_log": "ログ削除",
             "delete_log_confirm": "本当にログを削除しますか？",
             "install_pwa": "PWAをインストール",
+            "delete_log_confirm_title": "ログ削除",
+            "delete_log_confirm_message": "本当にログを削除しますか？",
+            "cancel": "キャンセル",
+            "delete": "削除",  
         }
     }
 

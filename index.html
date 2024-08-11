@@ -115,6 +115,24 @@
             <textarea class="form-control" placeholder=""></textarea>
         </div>
     </div>
+
+    <!-- 削除確認モーダル -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel" data-translate="delete_log_confirm_title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" data-translate="delete_log_confirm_message">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel"></button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteButton" data-translate="delete"></button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
