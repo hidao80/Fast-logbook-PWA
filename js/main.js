@@ -42,6 +42,7 @@ async function loadLogs() {
  */
 function saveLogs() {
     localStorage.setItem(LOG_DATA_KEY, trimNewLine($$one('textarea').value));
+    $$one('.navbar-save-status').classList.toggle('saved', true);
 }
 
 /**
@@ -132,6 +133,28 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             await saveLogs();
         }
+    });
+
+    let debounceTimeout;
+    $$one('textarea').addEventListener('input', async function (e) {
+        // Set to dirty state when IME conversion is confirmed
+        if (e.isComposing && e.inputType === 'insertCompositionText') {
+            $$one('.navbar-save-status').classList.remove('saved');
+        } else if (e.inputType !== 'insertLineBreak') {
+            $$one('.navbar-save-status').classList.remove('saved');
+        }
+    
+        // 300 milliseconds debounce time
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(async () => {
+            await saveLogs();
+        }, 300);
+    });
+
+    // Save the log when the input in the textarea is confirmed
+    $$one('textarea').addEventListener('compositionend', async function () {
+        clearTimeout(debounceTimeout);
+        await saveLogs();
     });
 
     // When the popup loses focus, save the content of textarea
