@@ -97,15 +97,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
     // When input to the 0th element is confirmed, stamp the entered log for Android
-    $$one('input').addEventListener('input', async function (e) {
-        alert("input: " + e.inputType);
-        // Ignore events processed by IME
-        if ("insertLineBreak" == e.inputType || (e.data === null && !e.isComposing)) {
-            const str = this.value.trim();
-            if (str.length === 0) return;
-            await appendLog(appendTime(str));
-            this.value = '';
-        }
+    $$one('input').addEventListener('change', async function (e) {
+        alert("change: " + e.target.value);
     });
 
     // Save when Enter key is pressed in textarea
