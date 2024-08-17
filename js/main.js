@@ -85,22 +85,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     $$one('input[placeholder]').placeholder = Multilingualization.translate('input_placeholder');
     $$one('textarea[placeholder]').placeholder = Multilingualization.translate('textarea_placeholder');
 
-    async function processInput(str) {
+    /**
+     * Processes the input from a given element, appends it to a log with a timestamp, and clears the input.
+     * 
+     * @async
+     * @function processInput
+     * @param {HTMLInputElement} elem - The input element to process.
+     * @returns {Promise<void>} A promise that resolves when the input has been processed and logged.
+     * @throws {Error} If appendLog or appendTime functions fail.
+     * 
+     * @example
+     * // Assuming we have an input element with id 'myInput'
+     * const inputElem = document.getElementById('myInput');
+     * await processInput(inputElem);
+     */
+    async function processInput(elem) {
+        const str = elem.value.trim();
         if (str.length === 0) return;
         await appendLog(appendTime(str));
-        this.value = '';
+        elem.value = '';
     }
 
     // When input to the 0th element is confirmed, stamp the entered log for PC
     $$one('input').addEventListener('keydown', async function (e) {
         // Ignore events processed by IME
         if ("Enter" === e.key && (e.keyCode === 229 || !e.isComposing)) {
-            processInput(this.value.trim());
+            processInput(this);
         }
     });
     // When input to the 0th element is confirmed, stamp the entered log for Android
     $$one('input').addEventListener('blur', async function (e) {
-        processInput(this.value.trim());
+        processInput(this);
     });
 
     // Save when Enter key is pressed in textarea
