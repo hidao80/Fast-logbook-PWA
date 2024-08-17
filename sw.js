@@ -59,33 +59,6 @@ self.addEventListener("install", (e) => {
 /** 
  * Processing when the service worker accesses the server
  */
-Improved PWA Service Worker with Timestamp Check
-Click to open code
-このコードの主な変更点と動作について説明します：
-
-キャッシュされたレスポンスがある場合、それを即座に返すのではなく、ネットワークリクエストも並行して行います。
-ネットワークレスポンスが得られたら、そのレスポンスのヘッダーにある date フィールドを取得し、キャッシュされたレスポンスの date と比較します。
-ネットワークレスポンスの方が新しい場合は、そちらを返し、キャッシュも更新します。
-キャッシュされたレスポンスの方が新しい場合や、ネットワークリクエストが失敗した場合は、キャッシュされたレスポンスを返します。
-キャッシュがない場合は、単純にネットワークレスポンスを返し、新たにキャッシュします。
-このアプローチにより、常に最新のコンテンツを提供しつつ、ネットワーク接続が不安定な場合でもキャッシュを活用してアプリケーションの動作を保証します。
-
-なお、このコードはベーシックな実装例です。実際の使用時には、キャッシュの名前やストラテジー、エラーハンドリングなどを、あなたのアプリケーションの要件に合わせて調整する必要があるかもしれません。
-
-このコードについて、さらに詳しい説明や改善点があればお知らせください。
-
-Claude can make mistakes. Please double-check responses.
-
-
-
-ファイルが選択されていません
-
-
-
-3.5 Sonnet
-
-Improved PWA Service Worker with Timestamp Check
-
 self.addEventListener("fetch", (e) => {
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
