@@ -110,15 +110,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    // When input to the 0th element is confirmed, stamp the entered log
+    // When input to the 0th element is confirmed, stamp the entered log for PC
     $$one('input').addEventListener('keydown', async function (e) {
-        if ("Enter" == e.code) {
-            // Ignore events processed by IME
-            if (e.isComposing || e.keyCode === 229) {
-                return;
-            }
-
-            if (this.value.length == 0) return;
+        // Ignore events processed by IME
+        if (this.value.tri().length > 0 && "Enter" === e.key && (e.keyCode === 229 || !e.isComposing)) {
+            await appendLog(appendTime(this.value));
+            this.value = '';
+        }
+    });
+    // When input to the 0th element is confirmed, stamp the entered log for Android
+    $$one('input').addEventListener('input', async function (e) {
+        // Ignore events processed by IME
+        if (this.value.tri().length > 0 && "insertLineBreak" == e.inputType || (e.data === null && !e.isComposing)) {
             await appendLog(appendTime(this.value));
             this.value = '';
         }
