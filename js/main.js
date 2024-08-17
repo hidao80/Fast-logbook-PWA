@@ -85,20 +85,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     $$one('input[placeholder]').placeholder = Multilingualization.translate('input_placeholder');
     $$one('textarea[placeholder]').placeholder = Multilingualization.translate('textarea_placeholder');
 
+    async function processInput(str) {
+        if (str.length === 0) return;
+        await appendLog(appendTime(str));
+        this.value = '';
+    }
+
     // When input to the 0th element is confirmed, stamp the entered log for PC
     $$one('input').addEventListener('keydown', async function (e) {
-        alert("keydown: " + e.key);
         // Ignore events processed by IME
         if ("Enter" === e.key && (e.keyCode === 229 || !e.isComposing)) {
-            const str = this.value.trim();
-            if (str.length === 0) return;
-            await appendLog(appendTime(str));
-            this.value = '';
+            processInput(this.value.trim());
         }
     });
     // When input to the 0th element is confirmed, stamp the entered log for Android
-    $$one('input').addEventListener('change', async function (e) {
-        alert("change: " + e.target.value);
+    $$one('input').addEventListener('blur', async function (e) {
+        processInput(this.value.trim());
     });
 
     // Save when Enter key is pressed in textarea
