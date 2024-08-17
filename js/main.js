@@ -85,6 +85,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     $$one('input[placeholder]').placeholder = Multilingualization.translate('input_placeholder');
     $$one('textarea[placeholder]').placeholder = Multilingualization.translate('textarea_placeholder');
 
+    // When a key is entered into the PWA
+    document.body.addEventListener('keydown', async (e) => {
+        if (document.activeElement.value) return;
+
+        // When a number key is pressed
+        const matches = e.code.match(/Digit(\d)/);
+        if (matches?.length == 2) {
+            const inputDigit = matches[1];
+            if (inputDigit == '0') {
+                // When 0 is pressed, focus on the input field
+                e.preventDefault();
+                e.stopPropagation();
+                $$one('input').focus();
+                $$one('input').value = '';
+            } else {
+                // For 1-9, stamp the preset tag
+                const node = $$one(`label[data-shortcut-key="${inputDigit}"]`);
+                await appendLog(appendTime(node.textContent));
+            }
+        }
+    });
+    
     /**
      * Processes the input from a given element, appends it to a log with a timestamp, and clears the input.
      * 
