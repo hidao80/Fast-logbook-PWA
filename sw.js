@@ -59,11 +59,76 @@ self.addEventListener("install", (e) => {
 /** 
  * Processing when the service worker accesses the server
  */
+Improved PWA Service Worker with Timestamp Check
+Click to open code
+このコードの主な変更点と動作について説明します：
+
+キャッシュされたレスポンスがある場合、それを即座に返すのではなく、ネットワークリクエストも並行して行います。
+ネットワークレスポンスが得られたら、そのレスポンスのヘッダーにある date フィールドを取得し、キャッシュされたレスポンスの date と比較します。
+ネットワークレスポンスの方が新しい場合は、そちらを返し、キャッシュも更新します。
+キャッシュされたレスポンスの方が新しい場合や、ネットワークリクエストが失敗した場合は、キャッシュされたレスポンスを返します。
+キャッシュがない場合は、単純にネットワークレスポンスを返し、新たにキャッシュします。
+このアプローチにより、常に最新のコンテンツを提供しつつ、ネットワーク接続が不安定な場合でもキャッシュを活用してアプリケーションの動作を保証します。
+
+なお、このコードはベーシックな実装例です。実際の使用時には、キャッシュの名前やストラテジー、エラーハンドリングなどを、あなたのアプリケーションの要件に合わせて調整する必要があるかもしれません。
+
+このコードについて、さらに詳しい説明や改善点があればお知らせください。
+
+Claude can make mistakes. Please double-check responses.
+
+
+
+ファイルが選択されていません
+
+
+
+3.5 Sonnet
+
+Improved PWA Service Worker with Timestamp Check
+
 self.addEventListener("fetch", (e) => {
   e.respondWith(
-    caches.match(e.request).then((response) => {
-      // If cached, refer to the local file without communicating
-      return response || fetch(e.request);
+    caches.match(e.request).then((cachedResponse) => {
+      const fetchPromise = fetch(e.request).then((networkResponse) => {
+        // Check if we received a valid response
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          return networkResponse;
+        }
+
+        // Clone the response as it's a stream and can only be consumed once
+        const responseToCache = networkResponse.clone();
+
+        // Open the cache and put the new response there
+        caches.open('my-cache').then((cache) => {
+          cache.put(e.request, responseToCache);
+        });
+
+        return networkResponse;
+      });
+
+      // If we have a cached response, compare its date with the network response
+      if (cachedResponse) {
+        return fetchPromise.then((networkResponse) => {
+          if (!networkResponse) {
+            return cachedResponse;
+          }
+
+          const networkDate = new Date(networkResponse.headers.get('date'));
+          const cachedDate = new Date(cachedResponse.headers.get('date'));
+
+          if (networkDate > cachedDate) {
+            return networkResponse;
+          } else {
+            return cachedResponse;
+          }
+        }).catch(() => {
+          // If the network request fails, fall back to the cached response
+          return cachedResponse;
+        });
+      }
+
+      // If there's no cached response, just return the network response
+      return fetchPromise;
     })
   );
 });
