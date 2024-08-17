@@ -85,31 +85,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     $$one('input[placeholder]').placeholder = Multilingualization.translate('input_placeholder');
     $$one('textarea[placeholder]').placeholder = Multilingualization.translate('textarea_placeholder');
 
-    // When a key is entered in the popup
-    document.body.addEventListener('keydown', async (e) => {
-        if (document.activeElement.value) return;
-
-        // When a number key is pressed
-        const matches = e.code.match(/Digit(\d)/);
-        if (matches?.length == 2) {
-            const inputDigit = matches[1];
-            if (inputDigit == '0') {
-                // When 0 is pressed, focus on the input field
-                e.preventDefault();
-                e.stopPropagation();
-                $$one('input').focus();
-                $$one('input').value = '';
-            } else {
-                // For 1-9, stamp the preset tag
-                const node = $$one(`label[data-shortcut-key="${inputDigit}"]`);
-                await appendLog(appendTime(node.textContent));
-            }
-        } else if (["Escape", "Alt+Shift+0"].includes(e.code)) {
-            await saveLogs();
-            window.close();
-        }
-    });
-
     // When input to the 0th element is confirmed, stamp the entered log for PC
     $$one('input').addEventListener('keydown', async function (e) {
         // Ignore events processed by IME
