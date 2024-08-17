@@ -49,7 +49,7 @@ function saveLogs() {
  * Code executed when form loading is complete
  */
 document.addEventListener("DOMContentLoaded", async () => {
-    $$disableConsole();
+    // $$disableConsole();
 
     // Set the theme automatically
     autoSetTheme();
