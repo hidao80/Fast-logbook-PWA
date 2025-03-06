@@ -1,7 +1,7 @@
 {
     "name": "Fast logbook PWA",
     "short_name": "Fast logbook",
-    "version": "24.08.02",
+    "version": "25.03.06",
     "description": "Time-stamped work notes PWA",
     "start_url": "/index.html",
     "display": "standalone",
