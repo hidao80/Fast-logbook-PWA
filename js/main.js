@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     $$one('input[placeholder]').placeholder = Multilingualization.translate('input_placeholder');
     $$one('textarea[placeholder]').placeholder = Multilingualization.translate('textarea_placeholder');
 
-    // When a key is entered in the popup
+    // When a key is entered into the PWA
     document.body.addEventListener('keydown', async (e) => {
         if (document.activeElement.value) return;
 
@@ -104,24 +104,40 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const node = $$one(`label[data-shortcut-key="${inputDigit}"]`);
                 await appendLog(appendTime(node.textContent));
             }
-        } else if (["Escape", "Alt+Shift+0"].includes(e.code)) {
-            await saveLogs();
-            window.close();
         }
     });
+    
+    /**
+     * Processes the input from a given element, appends it to a log with a timestamp, and clears the input.
+     * 
+     * @async
+     * @function processInput
+     * @param {HTMLInputElement} elem - The input element to process.
+     * @returns {Promise<void>} A promise that resolves when the input has been processed and logged.
+     * @throws {Error} If appendLog or appendTime functions fail.
+     * 
+     * @example
+     * // Assuming we have an input element with id 'myInput'
+     * const inputElem = document.getElementById('myInput');
+     * await processInput(inputElem);
+     */
+    async function processInput(elem) {
+        const str = elem.value.trim();
+        if (str.length === 0) return;
+        await appendLog(appendTime(str));
+        elem.value = '';
+    }
 
-    // When input to the 0th element is confirmed, stamp the entered log
+    // When input to the 0th element is confirmed, stamp the entered log for PC
     $$one('input').addEventListener('keydown', async function (e) {
-        if ("Enter" == e.code) {
-            // Ignore events processed by IME
-            if (e.isComposing || e.keyCode === 229) {
-                return;
-            }
-
-            if (this.value.length == 0) return;
-            await appendLog(appendTime(this.value));
-            this.value = '';
+        // Ignore events processed by IME
+        if ("Enter" === e.key && (e.keyCode === 229 || !e.isComposing)) {
+            processInput(this);
         }
+    });
+    // When input to the 0th element is confirmed, stamp the entered log for Android
+    $$one('input').addEventListener('blur', async function (e) {
+        processInput(this);
     });
 
     // Save when Enter key is pressed in textarea

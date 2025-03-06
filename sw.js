@@ -61,9 +61,47 @@ self.addEventListener("install", (e) => {
  */
 self.addEventListener("fetch", (e) => {
   e.respondWith(
-    caches.match(e.request).then((response) => {
-      // If cached, refer to the local file without communicating
-      return response || fetch(e.request);
+    caches.match(e.request).then((cachedResponse) => {
+      const fetchPromise = fetch(e.request).then((networkResponse) => {
+        // Check if we received a valid response
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          return networkResponse;
+        }
+
+        // Clone the response as it's a stream and can only be consumed once
+        const responseToCache = networkResponse.clone();
+
+        // Open the cache and put the new response there
+        caches.open('my-cache').then((cache) => {
+          cache.put(e.request, responseToCache);
+        });
+
+        return networkResponse;
+      });
+
+      // If we have a cached response, compare its date with the network response
+      if (cachedResponse) {
+        return fetchPromise.then((networkResponse) => {
+          if (!networkResponse) {
+            return cachedResponse;
+          }
+
+          const networkDate = new Date(networkResponse.headers.get('date'));
+          const cachedDate = new Date(cachedResponse.headers.get('date'));
+
+          if (networkDate > cachedDate) {
+            return networkResponse;
+          } else {
+            return cachedResponse;
+          }
+        }).catch(() => {
+          // If the network request fails, fall back to the cached response
+          return cachedResponse;
+        });
+      }
+
+      // If there's no cached response, just return the network response
+      return fetchPromise;
     })
   );
 });
