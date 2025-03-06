@@ -38,10 +38,10 @@
             <span class="navbar-save-status saved" aria-label="Save status: saved">●</span>
             <a class="navbar-brand" href="#" data-translate="popup_title"></a>
 
-            <!-- ヘルプボタンを追加 -->
+            <!-- Add help button -->
             <a id="help_button" class="btn btn-link text-white" href="#" data-bs-toggle="modal"
                 data-bs-target="#helpModal">
-                <i class="bi bi-question-circle"></i> ヘルプ
+                <i class="bi bi-question-circle"></i> <span data-translate="help"></span>
             </a>
         </div>
     </nav>
@@ -123,7 +123,7 @@
         </div>
     </div>
 
-    <!-- 削除確認モーダル -->
+    <!-- Delete confirm modal -->
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -144,12 +144,12 @@
         </div>
     </div>
 
-    <!-- ヘルプモーダル -->
+    <!-- Help modal -->
     <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="helpModalLabel">Fast Logbook PWA 取扱説明書</h5>
+                    <h5 class="modal-title" id="helpModalLabel" data-translate="help_title"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -160,221 +160,170 @@
                                     <div class="nav nav-tabs mb-4" id="nav-tab" role="tablist">
                                         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab"
                                             data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
-                                            aria-selected="true">メイン画面</button>
+                                            aria-selected="true" data-translate="help_tab_main_screeen"></button>
                                         <button class="nav-link" id="nav-config-tab" data-bs-toggle="tab"
                                             data-bs-target="#nav-config" type="button" role="tab"
-                                            aria-controls="nav-config" aria-selected="false">設定画面</button>
+                                            aria-controls="nav-config" aria-selected="false" data-translate="help_tab_config_screen"></button>
                                     </div>
                                 </nav>
 
                                 <div class="tab-content" id="nav-tabContent">
-                                    <!-- メイン画面のヘルプ -->
-                                    <div class="tab-pane fade show active" id="nav-home" role="tabpanel"
-                                        aria-labelledby="nav-home-tab">
+                                    <!-- Help of main screen-->
+                                    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                                         <section class="mb-4">
-                                            <h2 class="h3">概要</h2>
-                                            <p>Fast Logbook PWAは、タイムスタンプ付きの作業記録を簡単に作成・管理できるWebアプリケーションです。PWA（Progressive
-                                                Web App）として実装されているため、インストールしてオフラインでも使用できます。</p>
+                                            <h2 class="h3" data-translate="help_overview_title"></h2>
+                                            <p data-translate="help_overview_content"></p>
                                         </section>
 
                                         <section class="mb-4">
-                                            <h2 class="h3">基本操作</h2>
-                                            <h3 class="h4">メイン画面</h3>
+                                            <h2 class="h3" data-translate="help_basic_operations_title"></h2>
+                                            <h3 class="h4" data-translate="help_main_screen_title"></h3>
                                             <ol>
-                                                <li><strong>メモ入力</strong>：画面下部のテキストエリアに、作業内容や記録したい情報を入力します。</li>
-                                                <li><strong>ショートカット機能</strong>：画面上部に表示されている1〜9のボタンを押すことで、よく使うフレーズや記録内容をワンタッチで入力できます。
-                                                </li>
-                                                <li><strong>保存状態</strong>：画面上部のナビゲーションバーに表示される「●」マークで保存状態を確認できます。</li>
+                                                <li data-translate="help_main_screen_memo"></li>
+                                                <li data-translate="help_main_screen_shortcut"></li>
+                                                <li data-translate="help_main_screen_save_status"></li>
                                             </ol>
                                         </section>
 
                                         <section class="mb-4">
-                                            <h3 class="h4">メニュー操作</h3>
-                                            <p>左上のハンバーガーメニュー（≡）をタップすると、サイドメニューが開きます。</p>
+                                            <h3 class="h4" data-translate="help_main_screen_menu_operations_title"></h3>
+                                            <p data-translate="help_main_screen_menu_operations_content"></p>
                                             <ul>
-                                                <li><strong>フォーマット済みログの表示</strong>：記録した内容を整形して表示します。</li>
-                                                <li><strong>フォーマット済みログのダウンロード</strong>：記録内容をファイルとしてダウンロードできます。</li>
-                                                <li><strong>設定</strong>：アプリの設定を変更します。</li>
-                                                <li><strong>ログの削除</strong>：記録内容をすべて削除します（確認ダイアログが表示されます）。</li>
-                                                <li><strong>PWAのインストール</strong>：ブラウザからアプリとしてインストールできます（対応デバイスのみ表示）。</li>
+                                                <li data-translate="help_main_screen_show_formated_log"></li>
+                                                <li data-translate="help_main_screen_download_formated_log"></li>
+                                                <li data-translate="help_main_screen_config"></li>
+                                                <li data-translate="help_main_screen_delete_log"></li>
+                                                <li data-translate="help_main_screen_install_pwd"></li>
                                             </ul>
                                         </section>
 
                                         <section class="mb-4">
-                                            <h2 class="h3">ショートカット設定</h2>
-                                            <p>1〜9のショートカットキーには、よく使うフレーズを設定できます。設定画面から編集可能です。0のフィールドには、一時的に使用するフレーズを入力できます。
-                                            </p>
+                                            <h2 class="h3" data-translate="help_main_screen_shortcut_settings_title"></h2>
+                                            <p data-translate="help_main_screen_shortcut_settings_content"></p>
                                         </section>
 
                                         <section class="mb-4">
-                                            <h2 class="h3">集計フォーマット記述例</h2>
-                                            <p>Fast Logbookでは、特定のフォーマットで記録することで自動集計が可能になります。集計機能では以下のルールが適用されます：</p>
+                                            <h2 class="h3" data-translate="help_main_screen_example_of_summary_format"></h2>
+                                            <p data-translate="help_main_screen_example_1"></p>
                                             <ul>
-                                                <li><strong>「^」で始まるタグ</strong>：カウント対象外のコメントやメタデータとして扱われます</li>
-                                                <li><strong>「;」区切り</strong>：セミコロン前の文字列がグループ化され、セミコロン後が詳細情報として扱われます</li>
+                                                <li data-translate="help_main_screen_example_2"></li>
+                                                <li data-translate="help_main_screen_example_3"></li>
                                             </ul>
 
                                             <div class="card mb-3">
                                                 <div class="card-body">
-                                                    <h4 class="h5 card-title">基本的な集計フォーマット例</h4>
-                                                    <pre class="bg-light p-2 rounded"><code>2025-03-06 10:00会議;プロジェクトA進捗確認
-2025-03-06 11:30開発;ログイン画面実装
-2025-03-06 13:00会議;週次チームMTG
-2025-03-06 15:30レビュー;コードレビュー対応
-2025-03-06 16:45^明日のタスクメモ：API開発を継続する
-2025-03-06 17:00開発;バグ修正 #42</code></pre>
-                                                    <p class="text-muted mt-2">
-                                                        ※「会議」「開発」「レビュー」がグループとして集計され、「^」から始まる行はカウントされません。</p>
+                                                    <h4 class="h5 card-title" data-translate="help_main_screen_example_4"></h4>
+                                                    <pre class="bg-light p-2 rounded"><code data-translate="help_main_screen_example_5"></code></pre>
+                                                    <p class="text-muted mt-2" data-translate="help_main_screen_example_6"></p>
                                                 </div>
                                             </div>
 
                                             <div class="card mb-3">
                                                 <div class="card-body">
-                                                    <h4 class="h5 card-title">プロジェクト別集計フォーマット例</h4>
-                                                    <pre class="bg-light p-2 rounded"><code>2025-03-06 09:15プロジェクトA;仕様書レビュー
-2025-03-06 10:30プロジェクトA;フィードバック作成
-2025-03-06 10:45^このプロジェクトは今週中に完了予定
-2025-03-06 11:00プロジェクトB;チームMTG
-2025-03-06 13:30プロジェクトA;修正作業</code></pre>
-                                                    <p class="text-muted mt-2">
-                                                        ※「プロジェクトA」「プロジェクトB」がグループとして集計され、各プロジェクトの作業時間が算出できます。</p>
+                                                    <h4 class="h5 card-title" data-translate="help_main_screen_example_of_project"></h4>
+                                                    <pre class="bg-light p-2 rounded"><code data-translate="help_main_screen_example_7"></code></pre>
+                                                    <p class="text-muted mt-2" data-translate="help_main_screen_example_8"></p>
                                                 </div>
                                             </div>
 
                                             <div class="card mb-3">
                                                 <div class="card-body">
-                                                    <h4 class="h5 card-title">顧客別集計フォーマット例</h4>
-                                                    <pre class="bg-light p-2 rounded"><code>2025-03-06 09:00顧客A;デザインレビューMTG
-2025-03-06 10:30^次回は来週水曜日に予定
-2025-03-06 10:45顧客B;提案資料作成
-2025-03-06 13:00顧客A;修正対応
-2025-03-06 15:00顧客C;初回ヒアリング</code></pre>
-                                                    <p class="text-muted mt-2">※「顧客A」「顧客B」「顧客C」ごとに時間が集計されます。</p>
+                                                    <h4 class="h5 card-title" data-translate="help_main_screen_example_of_customer_summary_format"></h4>
+                                                    <pre class="bg-light p-2 rounded"><code data-translate="help_main_screen_example_9"></code></pre>
+                                                    <p class="text-muted mt-2" data-translate="help_main_screen_example_10"></p>
                                                 </div>
                                             </div>
 
                                             <div class="card mb-3">
                                                 <div class="card-body">
-                                                    <h4 class="h5 card-title">タスクタイプ別集計フォーマット例</h4>
-                                                    <pre class="bg-light p-2 rounded"><code>2025-03-06 09:00開発;データベース設計
-2025-03-06 11:30会議;週次定例 
-2025-03-06 12:00^今週のKPIを確認する
-2025-03-06 13:00開発;API実装
-2025-03-06 15:45テスト;単体テスト作成
-2025-03-06 16:00ドキュメント;API仕様書作成</code></pre>
-                                                    <p class="text-muted mt-2">
-                                                        ※「開発」「会議」「テスト」「ドキュメント」という作業タイプごとに時間が集計されます。</p>
+                                                    <h4 class="h5 card-title" data-translate="help_main_screen_example_of_summary_format_by_task_type"></h4>
+                                                    <pre class="bg-light p-2 rounded"><code data-translate="help_main_screen_example_11"></code></pre>
+                                                    <p class="text-muted mt-2" data-translate="help_main_screen_example_12"></p>
                                                 </div>
                                             </div>
 
                                             <div class="card mb-3">
                                                 <div class="card-body">
-                                                    <h4 class="h5 card-title">案件番号付き集計フォーマット例</h4>
-                                                    <pre class="bg-light p-2 rounded"><code>2025-03-06 10:15PRJ-001;顧客ミーティング
-2025-03-06 11:30PRJ-001;要件整理
-2025-03-06 13:00^重要なポイントをメモしておく
-2025-03-06 14:00PRJ-002;コード実装
-2025-03-06 16:30PRJ-001;仕様書作成</code></pre>
-                                                    <p class="text-muted mt-2">※「PRJ-001」「PRJ-002」などの案件番号ごとに時間が集計されます。
-                                                    </p>
+                                                    <h4 class="h5 card-title" data-translate="help_main_screen_example_of_summary_format_with_case_number"></h4>
+                                                    <pre class="bg-light p-2 rounded"><code data-translate="help_main_screen_example_13"></code></pre>
+                                                    <p class="text-muted mt-2" data-translate="help_main_screen_example_14"></p>
                                                 </div>
                                             </div>
 
                                             <div class="card mb-3">
                                                 <div class="card-body">
-                                                    <h4 class="h5 card-title">組み合わせ集計フォーマット例</h4>
-                                                    <pre class="bg-light p-2 rounded"><code>2025-03-06 09:30開発 PRJ-001;ダッシュボード実装
-2025-03-06 10:00^モバイル対応は後日実施
-2025-03-06 11:00会議 PRJ-001;クライアントMTG
-2025-03-06 14:15開発 PRJ-002;認証機能実装
-2025-03-06 17:00テスト PRJ-001;テストケース作成</code></pre>
-                                                    <p class="text-muted mt-2">
-                                                        ※スペースで区切ることで複数の分類を組み合わせることも可能です。この例では作業タイプとプロジェクト番号の組み合わせで集計できます。
-                                                    </p>
+                                                    <h4 class="h5 card-title" data-translate="help_main_screen_example_of_combined_tabulation_format"></h4>
+                                                    <pre class="bg-light p-2 rounded"><code data-translate="help_main_screen_example_15"></code></pre>
+                                                    <p class="text-muted mt-2" data-translate="help_main_screen_example_16"></p>
                                                 </div>
                                             </div>
 
-                                            <p class="alert alert-info">
-                                                <strong>ヒント：</strong>
-                                                集計をスムーズに行うためには、一貫した形式でグループ名を記録することが重要です。「会議」と「ミーティング」のように似た意味でも異なる表記を使うと別グループとして集計されるため注意しましょう。日付と時刻は自動的に記録されますが、上記の例のように明示的に入力することもできます。
-                                            </p>
+                                            <p class="alert alert-info" data-translate="help_main_screen_hint"></p>
                                         </section>
 
                                         <section class="mb-4">
-                                            <h2 class="h3">ログの削除について</h2>
-                                            <p>「ログの削除」ボタンを押すと確認ダイアログが表示されます。削除を実行すると、記録内容はすべて消去され元に戻せませんのでご注意ください。</p>
+                                            <h2 class="h3" data-translate="help_main_screen_delete_log_title"></h2>
+                                            <p data-translate="help_main_screen_delete_log_content"></p>
                                         </section>
 
                                         <section class="mb-4">
-                                            <h2 class="h3">オフライン機能</h2>
-                                            <p>PWAとしてインストールすると、インターネット接続がない環境でも利用できます。データは端末上に保存されます。</p>
+                                            <h2 class="h3" data-translate="help_main_screen_offline_features_title"></h2>
+                                            <p data-translate="help_main_screen_offline_features_content"></p>
                                         </section>
 
                                         <section class="mb-4">
-                                            <h2 class="h3">バージョン情報</h2>
-                                            <p>現在のバージョンは、サイドメニュー下部の「ver.」の横に表示されています。</p>
+                                            <h2 class="h3" data-translate="help_main_screen_version_info_title"></h2>
+                                            <p data-translate="help_main_screen_version_info_content"></p>
                                         </section>
                                     </div>
 
-                                    <!-- 設定画面のヘルプ -->
-                                    <div class="tab-pane fade" id="nav-config" role="tabpanel"
-                                        aria-labelledby="nav-config-tab">
+                                    <!-- Help of config screen -->
+                                    <div class="tab-pane fade" id="nav-config" role="tabpanel" aria-labelledby="nav-config-tab">
                                         <section class="mb-4">
-                                            <h2 class="h3">設定画面の使い方</h2>
-                                            <p>設定画面では、アプリの動作や表示をカスタマイズすることができます。</p>
+                                            <h2 class="h3" data-translate="help_config_screen_title"></h2>
+                                            <p data-translate="help_config_screen_customizable_behavior"></p>
                                         </section>
 
                                         <section class="mb-4">
-                                            <h3 class="h4">時間丸め単位の設定</h3>
-                                            <p>タイムスタンプの時間を指定した単位で丸めることができます。以下の選択肢から選ぶことができます：</p>
+                                            <h3 class="h4" data-translate="help_config_screen_setting_time_rounding_unit"></h3>
+                                            <p data-translate="help_config_screen_choice_available_timestamp_rounding"></p>
                                             <ul>
-                                                <li><strong>1分</strong>：時間を1分単位で記録します（デフォルト）</li>
-                                                <li><strong>5分</strong>：時間を5分単位で丸めます</li>
-                                                <li><strong>10分</strong>：時間を10分単位で丸めます</li>
-                                                <li><strong>15分</strong>：時間を15分単位で丸めます</li>
-                                                <li><strong>30分</strong>：時間を30分単位で丸めます</li>
-                                                <li><strong>60分</strong>：時間を1時間単位で丸めます</li>
+                                                <li data-translate="help_config_screen_example_1"></li>
+                                                <li data-translate="help_config_screen_example_2"></li>
+                                                <li data-translate="help_config_screen_example_3"></li>
+                                                <li data-translate="help_config_screen_example_4"></li>
+                                                <li data-translate="help_config_screen_example_5"></li>
+                                                <li data-translate="help_config_screen_example_6"></li>
                                             </ul>
-                                            <p>この設定は、時間の精度とログの見やすさのバランスを取るのに役立ちます。例えば、15分単位に設定すると、10:07の記録は10:00または10:15のいずれか近い方に丸められます。
-                                            </p>
+                                            <p data-translate="help_config_screen_log_readability_balance"></p>
                                         </section>
 
                                         <section class="mb-4">
-                                            <h3 class="h4">ショートカットアイテムの設定</h3>
-                                            <p>メイン画面で使用するショートカットキー（1〜9）に割り当てるテキストを設定できます。</p>
-                                            <p>例えば：</p>
+                                            <h3 class="h4" data-translate="help_config_screen_setting_shortcut"></h3>
+                                            <p data-translate="help_config_screen_shortcut_key_text"></p>
+                                            <p data-translate="help_config_screen_example_7"></p>
                                             <ul>
-                                                <li>「会議開始」</li>
-                                                <li>「休憩」</li>
-                                                <li>「作業再開」</li>
-                                                <li>「タスク完了」</li>
+                                                <li data-translate="help_config_screen_example_8"></li>
+                                                <li data-translate="help_config_screen_example_9"></li>
+                                                <li data-translate="help_config_screen_example_10"></li>
+                                                <li data-translate="help_config_screen_example_11"></li>
                                             </ul>
-                                            <p>これらのショートカットを設定しておくことで、繰り返し入力する内容をワンタッチで記録できるようになります。</p>
-                                            <div class="alert alert-info" role="alert">
-                                                <strong>ヒント：</strong> 効率的な作業記録のために、よく使うフレーズや定型文をショートカットに登録しておくことをお勧めします。
-                                            </div>
+                                            <p data-translate="help_config_screen_repeated_input_one_touch_recording"></p>
+                                            <div class="alert alert-info" role="alert" data-translate="help_config_screen_hint"></div>
                                         </section>
 
                                         <section class="mb-4">
-                                            <h3 class="h4">設定の保存</h3>
-                                            <p>設定内容は自動的に保存されます。変更後はメイン画面に戻ると、すぐに新しい設定が適用されます。</p>
+                                            <h3 class="h4" data-translate="help_config_screen_save_setting"></h3>
+                                            <p data-translate="help_config_screen_auto_save"></p>
                                         </section>
                                     </div>
                                 </div>
-
-                                <section class="mb-4 mt-5">
-                                    <h2 class="h3">システム要件</h2>
-                                    <ul>
-                                        <li>モダンなWebブラウザ（Chrome、Firefox、Safari、Edgeなど）</li>
-                                        <li>PWA機能をサポートするブラウザ（インストール機能を使用する場合）</li>
-                                    </ul>
-                                </section>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">閉じる</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-translate="help_close_button"></button>
                 </div>
             </div>
         </div>
