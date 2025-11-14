@@ -4,7 +4,7 @@
     "version": "25.03.06",
     "description": "Time-stamped work notes PWA",
     "start_url": "/index.html",
-    "display": "fullscreen",
+    "display": "standalone",
     "background_color": "#fff",
     "theme_color": "#62BF04",
     "id": "Fast-logbook-PWA_eeaea1ca-42b1-40d0-bbda-27093abf9df7",
