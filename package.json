@@ -1,0 +1,19 @@
+{
+  "name": "fast-logbook-pwa",
+  "version": "25.03.06",
+  "description": "Time-stamped work notes PWA",
+  "scripts": {
+    "lint": "eslint js/**/*.js",
+    "lint:fix": "eslint js/**/*.js --fix"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  },
+  "keywords": [
+    "pwa",
+    "logbook",
+    "productivity"
+  ],
+  "author": "",
+  "license": "MIT"
+}
