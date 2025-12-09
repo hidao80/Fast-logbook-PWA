@@ -34,6 +34,35 @@ Option settings are saved automatically.
 1. Clicking the View Log button at the top of the sidebar will open an HTML file in another tab with an HTML table, plain text, and Markdown table all in one.
 2. Click the Download Log button at the top of the sidebar to download an HTML file with the HTML table, plain text, and Markdown table all in one.
 
+## Screenshots
+
+<details>
+<summary>Details</summary>
+  
+<img width="400" alt="input screen" src="https://github.com/user-attachments/assets/748b4f02-452a-4fee-8642-27c035245d03" /><br>
+*Input screen*
+
+---
+
+<img width="400" alt="Main menu" src="https://github.com/user-attachments/assets/b5c36eef-f33a-42c0-a60b-1eca16b388a7" /><br>
+*Main menu*
+
+---
+
+<img width="400" alt="スクリーンショット 2025-10-31 073332" src="https://github.com/user-attachments/assets/ccc564a6-bff9-407c-ba66-974193939823" /><br>
+*Configuration screen*
+
+---
+
+<img width="400" alt="スクリーンショット 2025-10-31 073658" src="https://github.com/user-attachments/assets/02b80a59-dfad-4dc1-ab26-00de9f7fe59a" /><br>
+*Help modal dialog*
+
+---
+
+<img width="400" alt="スクリーンショット 2025-10-31 073723" src="https://github.com/user-attachments/assets/650c8fd4-dc39-4c16-ae6b-d92ba7ddc236" /><br>
+*Exported summary HTML file*  
+</details>
+
 ## License
 
 MIT
