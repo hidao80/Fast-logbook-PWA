@@ -1,3 +1,5 @@
+<img style="width:100%" alt="Gemini_Generated_Image_katrrtkatrrtkatr_small" src="https://github.com/user-attachments/assets/d33e186d-af99-4bef-b1cd-477d69a502d5" />
+
 # Fast Logbook PWA
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)&emsp;![PWA](https://img.shields.io/badge/PWA-Yes-4BC51D.svg)&emsp;[![ESLint](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/eslint.yml/badge.svg)](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/eslint.yml)&emsp;[![Netlify Status](https://api.netlify.com/api/v1/badges/e764aaa6-ad23-4945-8b6e-17a802224243/deploy-status)](https://app.netlify.com/sites/fast-logbook/deploys)
