@@ -2,7 +2,6 @@ import { $$one, $$all, $$disableConsole } from './lib/indolence.min.js';
 import { LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine, appendTime, installPWA, autoSetTheme } from './lib/utils.js';
 import Multilingualization from './lib/multilingualization.js';
 import { downloadLog, generateFormattedLog } from './lib/download.js';
-import { bootstrap } from 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';
 
 /**
  * Add one log entry
