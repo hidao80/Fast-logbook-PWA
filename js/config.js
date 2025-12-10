@@ -1,7 +1,6 @@
 import { getRoundingUnit, ROUNDING_UNIT_MINUTE_KEY, autoSetTheme } from './lib/utils.js';
 import Multilingualization from './lib/multilingualization.js';
 import { $$one, $$all } from './lib/indolence.min.js';
-import { $ } from 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';
 
 /**
  * Code to be executed upon completion of form loading
@@ -41,6 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Synchronize when the setting changes
   window.addEventListener('storage', (event) => {
+    const $ = bootstrap.$;
     if (event.storageArea === localStorage) {
       const target = event.key === ROUNDING_UNIT_MINUTE_KEY ? $('select') : $(`[data-translate='${event.key}']`);
       if (target) {
