@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     node.value = (str && str != 'undefined') ? str : Multilingualization.translate(node.dataset.translate);
 
     // Save the input when focus is removed or changed
-    node.addEventListener('change', () => {
-      localStorage.setItem(this.dataset.translate, this.value.trim());
+    node.addEventListener('change', e => {
+      localStorage.setItem(e.target.dataset.translate, e.target.value.trim());
     });
   });
 

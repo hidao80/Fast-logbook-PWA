@@ -75,9 +75,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     node.addEventListener('click', async e => {
       e.stopPropagation();
-      const shortcutElement = document.activeElement;
-      if (shortcutElement.value) return;
-      await appendLog(appendTime(shortcutElement.textContent));
+      if (!e.target.textContent) return;
+      await appendLog(appendTime(e.target.textContent));
       await saveLogs();
     });
   }
@@ -133,12 +132,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   $$one('input').addEventListener('keydown', async e => {
     // Ignore events processed by IME
     if ('Enter' === e.key && (e.keyCode === 229 || !e.isComposing)) {
-      processInput(this);
+      processInput(e.target);
     }
   });
   // When input to the 0th element is confirmed, stamp the entered log for Android
-  $$one('input').addEventListener('blur', async () => {
-    processInput(this);
+  $$one('input').addEventListener('blur', async (e) => {
+    processInput(e.target);
   });
 
   // Save when Enter key is pressed in textarea
