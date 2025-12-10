@@ -75,8 +75,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     node.addEventListener('click', async e => {
       e.stopPropagation();
-      if (document.activeElement.value) return;
-      await appendLog(appendTime(this.textContent));
+      const shortcutElement = document.activeElement;
+      if (shortcutElement.value) return;
+      await appendLog(appendTime(shortcutElement.textContent));
       await saveLogs();
     });
   }
