@@ -228,7 +228,7 @@ document.body.addEventListener('keydown', async (e) => {
 ```
 
 **Key 0 Behavior** ([js/main.js:139-148](js/main.js#L139-L148)):
-- **PC**: Press Enter to confirm (keydown event, ignore IME composition)
+- **PC**: Press Enter to confirm (keydown event with explicit Enter key check, ignore IME composition)
 - **Android**: Confirm on blur event
 - Calls `processInput()` to append timestamped log and clear input
 

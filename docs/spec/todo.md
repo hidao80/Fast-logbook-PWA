@@ -2,21 +2,13 @@
 
 ## Immediate Fixes (High Priority)
 
-### 1. Fix IME Composition Handling
+### 1. ~~Fix IME Composition Handling~~ ✓ COMPLETED
 **Issue**: [known_bugs.md#2](known_bugs.md#2-ime-composition-handling)
 **File**: [js/main.js:141-143](js/main.js#L141-L143)
 
-**Current Code**:
-```javascript
-$$one('input').addEventListener('keydown', async e => {
-  // Ignore events processed by IME
-  if (!e.isComposing && e.keyCode !== 229) {
-    processInput(e.target);
-  }
-});
-```
+**Status**: ✓ Completed in version 25.12.13
 
-**Fix**:
+**Applied Fix**:
 ```javascript
 $$one('input').addEventListener('keydown', async e => {
   // Only process on Enter key, ignore IME composition
@@ -26,8 +18,7 @@ $$one('input').addEventListener('keydown', async e => {
 });
 ```
 
-**Effort**: 5 minutes
-**Impact**: Fixes incorrect input processing
+**Impact**: Fixed incorrect input processing behavior
 
 ---
 
@@ -117,26 +108,26 @@ caches.open(CACHE_NAME).then((cache) => {
 
 ---
 
-### 5. Fix or Remove Textarea Enter Key Handler
+### 5. ~~Fix or Remove Textarea Enter Key Handler~~ ✓ COMPLETED
 **Issue**: [known_bugs.md#6](known_bugs.md#6-textarea-enter-key-handling)
 **File**: [js/main.js:151-158](js/main.js#L151-L158)
 
-**Option 1**: Remove (debounced save already handles this)
-```javascript
-// Delete lines 151-158
-```
+**Status**: ✓ Completed in version 25.12.13
 
-**Option 2**: Fix logic
+**Applied Fix**: Fixed the logic with explicit Enter key check
 ```javascript
 $$one('textarea').addEventListener('keydown', async e => {
-  if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) {
+  if ('Enter' == e.code) {
+    // Ignore events processed by IME
+    if (!e.isComposing && e.keyCode !== 229 && e.key === 'Enter') {
+      return;
+    }
     await saveLogs();
   }
 });
 ```
 
-**Effort**: 5 minutes
-**Impact**: Removes confusing code
+**Impact**: Properly handles Enter key events with IME composition
 
 ---
 
@@ -669,11 +660,11 @@ Add i18n for status text, use Bootstrap Icons for visual + text indicator
 ## Priority Roadmap
 
 ### Phase 1: Bug Fixes (1-2 weeks)
-- [ ] #1: Fix IME composition handling
+- [x] #1: Fix IME composition handling ✓ COMPLETED (v25.12.13)
 - [ ] #2: Internationalize error messages
 - [ ] #3: Fix service worker cache name race condition
 - [ ] #4: Fix hard-coded cache name in fetch handler
-- [ ] #5: Fix or remove textarea Enter key handler
+- [x] #5: Fix or remove textarea Enter key handler ✓ COMPLETED (v25.12.13)
 - [ ] #7: Add color-blind friendly save indicator
 
 ### Phase 2: Essential Features (1 month)

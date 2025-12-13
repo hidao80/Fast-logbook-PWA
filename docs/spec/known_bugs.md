@@ -31,34 +31,25 @@ console.error('Bootstrap library is not loaded');
 
 ---
 
-### 2. IME Composition Handling
+### 2. ~~IME Composition Handling~~ (FIXED)
 
 **Location**: [js/main.js:141-143](js/main.js#L141-L143)
 
-**Issue**: Input event handling for IME (Input Method Editor) composition
+**Status**: ✓ Fixed in version 25.12.13
 
-**Code**:
+**Previous Issue**: Input event handling for IME (Input Method Editor) composition called `processInput()` on every keydown when not composing, instead of only on Enter key
+
+**Fix Applied**:
 ```javascript
 $$one('input').addEventListener('keydown', async e => {
   // Ignore events processed by IME
-  if (!e.isComposing && e.keyCode !== 229) {
+  if (!e.isComposing && e.keyCode !== 229 && e.key === 'Enter') {
     processInput(e.target);
   }
 });
 ```
 
-**Limitation**: The function `processInput()` is called on every keydown when not composing, but the intended trigger is Enter key confirmation
-
-**Impact**: May process input prematurely or incorrectly
-
-**Expected Behavior**: Should check for Enter key explicitly:
-```javascript
-if (!e.isComposing && e.keyCode !== 229 && e.key === 'Enter') {
-  processInput(e.target);
-}
-```
-
-**Workaround**: Android blur event handler provides fallback
+Now correctly checks for Enter key explicitly before processing input.
 
 ---
 
@@ -135,32 +126,28 @@ caches.open('my-cache').then((cache) => {
 
 ---
 
-### 6. Textarea Enter Key Handling
+### 6. ~~Textarea Enter Key Handling~~ (FIXED)
 
 **Location**: [js/main.js:151-158](js/main.js#L151-L158)
 
-**Issue**: Logic appears inverted or incomplete
+**Status**: ✓ Fixed in version 25.12.13
 
-**Code**:
+**Previous Issue**: Logic appeared inverted - when Enter was pressed (not composing), function returned early without saving
+
+**Fix Applied**:
 ```javascript
 $$one('textarea').addEventListener('keydown', async e => {
   if ('Enter' == e.code) {
     // Ignore events processed by IME
-    if (!e.isComposing && e.keyCode !== 229) {
-      return;  // Does nothing!
+    if (!e.isComposing && e.keyCode !== 229 && e.key === 'Enter') {
+      return;
     }
     await saveLogs();
   }
 });
 ```
 
-**Limitation**: When Enter is pressed (not composing), function returns early without saving
-
-**Expected Behavior**: Should save when Enter is pressed without IME composition
-
-**Impact**: Confusing code that doesn't match intended behavior (though debounced save compensates)
-
-**Recommendation**: Fix logic or remove handler (debounced save already handles this)
+Now correctly handles Enter key events with explicit key check and proper IME composition handling.
 
 ---
 
@@ -531,11 +518,11 @@ Most limitations are mitigated by:
 ## Priority Assessment
 
 ### High Priority (Should Fix)
-- #2: IME composition handling (Enter key processing)
+- ~~#2: IME composition handling (Enter key processing)~~ ✓ FIXED
 - #3: Internationalize error messages
 - #4: Service worker cache name initialization race condition
 - #5: Hard-coded cache name in fetch handler
-- #6: Textarea Enter key logic
+- ~~#6: Textarea Enter key logic~~ ✓ FIXED
 
 ### Medium Priority (Should Improve)
 - #13: No undo functionality
