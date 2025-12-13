@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // When input to the 0th element is confirmed, stamp the entered log for PC
   $$one('input').addEventListener('keydown', async e => {
     // Ignore events processed by IME
-    if (!e.isComposing && e.keyCode !== 229) {
+    if (!e.isComposing && e.keyCode !== 229 && e.key === 'Enter') {
       processInput(e.target);
     }
   });
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   $$one('textarea').addEventListener('keydown', async e => {
     if ('Enter' == e.code) {
       // Ignore events processed by IME
-      if (!e.isComposing && e.keyCode !== 229) {
+      if (!e.isComposing && e.keyCode !== 229 && e.key === 'Enter') {
         return;
       }
       await saveLogs();
