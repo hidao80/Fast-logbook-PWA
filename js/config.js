@@ -9,9 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Set the theme automatically
   autoSetTheme();
 
-  // 翻訳はi18n-init.jsで既に完了しているため、ここでは不要
-  // Multilingualization.translateAll();
-
   // Get the version number from manifest.json.
   fetch('/manifest.json')
     .then(response => response.json())
@@ -26,7 +23,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Save the input when focus is removed or changed
     node.addEventListener('change', e => {
-      localStorage.setItem(e.target.dataset.translate, e.target.value.trim());
+      try {
+        localStorage.setItem(e.target.dataset.translate, e.target.value.trim());
+      } catch (e) {
+        if (e.name === 'QuotaExceededError') {
+          alert('ストレージ容量が不足しています');
+        }
+      }
     });
   });
 
@@ -35,15 +38,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   $$one('select').value = getRoundingUnit(min);
 
   // Save the value when the rounding unit is changed
-  $$one('select').addEventListener('change', () => {
-    localStorage.setItem(ROUNDING_UNIT_MINUTE_KEY, this.value);
+  $$one('select').addEventListener('change', e => {
+    localStorage.setItem(ROUNDING_UNIT_MINUTE_KEY, e.target.value);
   });
 
   // Synchronize when the setting changes
   window.addEventListener('storage', (event) => {
-    const $ = bootstrap.$;
     if (event.storageArea === localStorage) {
-      const target = event.key === ROUNDING_UNIT_MINUTE_KEY ? $('select') : $(`[data-translate='${event.key}']`);
+      const target = event.key === ROUNDING_UNIT_MINUTE_KEY ? $$one('select') : $$one(`[data-translate='${event.key}']`);
       if (target) {
         target.value = event.newValue;
       }

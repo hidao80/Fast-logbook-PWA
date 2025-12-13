@@ -30,8 +30,5 @@
     ],
     "no-unused-vars": "warn",
     "no-console": "off"
-  },
-  "globals": {
-    "bootstrap": "readonly"
   }
 }

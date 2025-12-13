@@ -2,6 +2,7 @@ import { $$one, $$all, $$disableConsole } from './lib/indolence.min.js';
 import { LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine, appendTime, installPWA, autoSetTheme } from './lib/utils.js';
 import Multilingualization from './lib/multilingualization.js';
 import { downloadLog, generateFormattedLog } from './lib/download.js';
+import * as bootstrap from 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';
 
 /**
  * Add one log entry
@@ -41,7 +42,13 @@ async function loadLogs() {
  * @return {Promise}
  */
 function saveLogs() {
-  localStorage.setItem(LOG_DATA_KEY, trimNewLine($$one('textarea').value));
+  try {
+    localStorage.setItem(LOG_DATA_KEY, trimNewLine($$one('textarea').value));
+  } catch (e) {
+    if (e.name === 'QuotaExceededError') {
+      alert('ストレージ容量が不足しています');
+    }
+  }
   $$one('.navbar-save-status').classList.toggle('saved', true);
 }
 
@@ -131,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // When input to the 0th element is confirmed, stamp the entered log for PC
   $$one('input').addEventListener('keydown', async e => {
     // Ignore events processed by IME
-    if ('Enter' === e.key && (e.keyCode === 229 || !e.isComposing)) {
+    if (!e.isComposing && e.keyCode !== 229) {
       processInput(e.target);
     }
   });
@@ -144,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   $$one('textarea').addEventListener('keydown', async e => {
     if ('Enter' == e.code) {
       // Ignore events processed by IME
-      if (e.isComposing || e.keyCode === 229) {
+      if (!e.isComposing && e.keyCode !== 229) {
         return;
       }
       await saveLogs();
