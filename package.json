@@ -1,6 +1,6 @@
 {
   "name": "fast-logbook-pwa",
-  "version": "25.03.06",
+  "version": "25.12.13",
   "description": "Time-stamped work notes PWA",
   "scripts": {
     "lint": "eslint js/**/*.js",

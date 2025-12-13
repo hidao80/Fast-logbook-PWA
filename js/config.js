@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Set the theme automatically
   autoSetTheme();
 
-  Multilingualization.translateAll();
+  // 翻訳はi18n-init.jsで既に完了しているため、ここでは不要
+  // Multilingualization.translateAll();
 
   // Get the version number from manifest.json.
   fetch('/manifest.json')

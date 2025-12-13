@@ -5,6 +5,66 @@
  */
 export default class Multilingualization {
   /**
+   * Initialize i18n with early translation (before DOMContentLoaded)
+   * This method should be called synchronously in <head> to prevent translation flicker
+   */
+  static init() {
+    const currentLang = this.language();
+
+    // グローバル翻訳関数を設定
+    window.__i18n_t = (key) => {
+      const dict = this.dictionaries[currentLang];
+      return dict ? dict[key] || key : key;
+    };
+
+    // DOM要素が追加された瞬間に翻訳を適用
+    const translateElement = (elem) => {
+      if (elem.nodeType !== 1) return; // 要素ノードのみ
+
+      // data-translate属性を持つ要素を翻訳
+      if (elem.hasAttribute && elem.hasAttribute('data-translate')) {
+        const key = elem.dataset.translate;
+        const translated = window.__i18n_t(key);
+        if (elem.tagName === 'TITLE') {
+          elem.textContent = translated;
+        } else {
+          elem.innerHTML = translated;
+        }
+      }
+
+      // 子要素も翻訳
+      if (elem.querySelectorAll) {
+        elem.querySelectorAll('[data-translate]').forEach(translateElement);
+      }
+    };
+
+    // MutationObserverでDOM追加を監視
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach(translateElement);
+      });
+    });
+
+    // 監視開始
+    if (document.documentElement) {
+      observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+      });
+    }
+
+    // 既存の要素も翻訳(スクリプト読み込み時点で存在する要素用)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-translate]').forEach(translateElement);
+        observer.disconnect(); // 翻訳完了後は監視停止
+      });
+    } else {
+      document.querySelectorAll('[data-translate]').forEach(translateElement);
+      observer.disconnect();
+    }
+  }
+  /**
    *  @var dictionaries Multilingual dictionary object
    */
   static dictionaries = {
