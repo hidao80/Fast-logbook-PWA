@@ -2,7 +2,7 @@
 
 # Fast Logbook PWA
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)&emsp;![PWA](https://img.shields.io/badge/PWA-Yes-4BC51D.svg)&emsp;[![ESLint](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/eslint.yml/badge.svg)](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/eslint.yml)&emsp;[![Netlify Status](https://api.netlify.com/api/v1/badges/e764aaa6-ad23-4945-8b6e-17a802224243/deploy-status)](https://app.netlify.com/sites/fast-logbook/deploys)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)&emsp;![PWA](https://img.shields.io/badge/PWA-Yes-4BC51D.svg)&emsp;[![CI](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/eslint.yml/badge.svg)](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/eslint.yml)&emsp;[![Netlify Status](https://api.netlify.com/api/v1/badges/e764aaa6-ad23-4945-8b6e-17a802224243/deploy-status)](https://app.netlify.com/sites/fast-logbook/deploys)
 
 ## How to Install
 
