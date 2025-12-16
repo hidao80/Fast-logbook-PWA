@@ -1,4 +1,4 @@
-name: CI
+name: ESLint & Security
 
 on:
   push:
