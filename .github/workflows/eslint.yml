@@ -35,12 +35,3 @@ jobs:
       - name: Run ESLint
         run: npm run lint
         continue-on-error: false
-
-      - name: Annotate code with ESLint results
-        if: always()
-        uses: ataylorme/eslint-annotate-action@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          report-json: eslint-report.json
-          only-pr-files: false
-        continue-on-error: true
