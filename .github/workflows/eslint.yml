@@ -1,4 +1,4 @@
-name: CI(ESLint, Security audit)
+name: CI
 
 on:
   push:
