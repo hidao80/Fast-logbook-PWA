@@ -6,7 +6,6 @@
 ![PWA](https://img.shields.io/badge/PWA-Yes-4BC51D.svg)&emsp;
 ![Lint](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/lint.yml/badge.svg)&emsp;
 ![Audit](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/audit.yml/badge.svg)&emsp;
-![Docker](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/docker.yml/badge.svg)&emsp;
 [![Netlify Status](https://api.netlify.com/api/v1/badges/e764aaa6-ad23-4945-8b6e-17a802224243/deploy-status)](https://app.netlify.com/sites/fast-logbook/deploys)
 
 ## Quick Start
