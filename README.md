@@ -4,8 +4,31 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)&emsp;
 ![PWA](https://img.shields.io/badge/PWA-Yes-4BC51D.svg)&emsp;
-![CI](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/eslint.yml/badge.svg?event=push)&emsp;
+![Lint](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/lint.yml/badge.svg)&emsp;
+![Audit](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/audit.yml/badge.svg)&emsp;
+![Docker](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/docker.yml/badge.svg)&emsp;
 [![Netlify Status](https://api.netlify.com/api/v1/badges/e764aaa6-ad23-4945-8b6e-17a802224243/deploy-status)](https://app.netlify.com/sites/fast-logbook/deploys)
+
+## Quick Start
+
+### Run with Docker
+
+```bash
+# Development
+docker compose up
+
+# Production build
+docker build -t fast-logbook-pwa .
+docker run -p 8080:80 fast-logbook-pwa
+```
+
+### Run locally
+
+```bash
+npm install
+# Open index.html in your browser or use a local server
+npx serve .
+```
 
 ## How to Install
 
