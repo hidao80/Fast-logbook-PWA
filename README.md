@@ -88,6 +88,10 @@ Option settings are saved automatically.
 *Exported summary HTML file*  
 </details>
 
+## Lighthost scores
+
+![Accessibility](https://img.shields.io/badge/Accessibility-94-brightgreen?style=flat-square)&emsp;![Best_Practices](https://img.shields.io/badge/Best_Practices-100-brightgreen?style=flat-square)&emsp;![Performance](https://img.shields.io/badge/Performance-93-brightgreen?style=flat-square)&emsp;![SEO](https://img.shields.io/badge/SEO-90-brightgreen?style=flat-square)
+
 ## License
 
 MIT
