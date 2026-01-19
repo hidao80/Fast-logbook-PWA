@@ -10,11 +10,25 @@
 
 ![Accessibility](https://img.shields.io/badge/Accessibility-94-brightgreen?style=flat-square)&emsp;![Best_Practices](https://img.shields.io/badge/Best_Practices-100-brightgreen?style=flat-square)&emsp;![Performance](https://img.shields.io/badge/Performance-93-brightgreen?style=flat-square)&emsp;![SEO](https://img.shields.io/badge/SEO-90-brightgreen?style=flat-square)&emsp;<sub>Measured on Jan 17, 2026 by [Lighthouse-badges](https://github.com/hidao80/lighthouse-badges) — [Measure now!](https://pagespeed.web.dev/analysis?url=https://fast-logbook.netlify.app/)</sub>
 
+---
+
+A lightweight PWA for logging work activities with timestamps. Export your logs as HTML, Markdown, or plain text.
+
 [🚀 **Live Demo**](https://fast-logbook.netlify.app/)
 
-<img width="30%" alt="input screen" src="https://github.com/user-attachments/assets/748b4f02-452a-4fee-8642-27c035245d03" />&emsp;<img width="30%" alt="スクリーンショット 2025-10-31 073723" src="https://github.com/user-attachments/assets/650c8fd4-dc39-4c16-ae6b-d92ba7ddc236" />
+<img width="30%" alt="input screen" src="https://github.com/user-attachments/assets/c990ed5d-1973-42c5-b36c-1c9910ca0e7a" />&emsp;<img width="30%" alt="スクリーンショット 2025-10-31 073723" src="https://github.com/user-attachments/assets/650c8fd4-dc39-4c16-ae6b-d92ba7ddc236" />
 
-## Quick Start
+## ✨ Features
+
+- **No account required; data remains only in your browser**
+- PWA with offline support; installable as an app on both PC and mobile
+- Totals and grand totals calculated by category
+- One-tap stamping with number keys (1-9), free input also available
+- **Download as HTML with copy buttons**, including HTML/Markdown/plain text formats
+- Exclude break time from working hours
+- Internationalization (en, ja)
+
+## 🚀 Quick Start
 
 ### Run with Docker
 
@@ -35,7 +49,7 @@ npm install
 npx serve .
 ```
 
-## How to Install
+## 📲 How to Install
 
 It is possible to use the PWA without installing it.
 
@@ -44,7 +58,7 @@ It is possible to use the PWA without installing it.
 3. Click the "Install PWA" button at the bottom of the sidebar.
 4. When the installation dialog is displayed, click the "Install" button.
 
-## Usage
+## 📖 Usage
 
 ### 1. Setup
 
@@ -65,7 +79,13 @@ Option settings are saved automatically.
 1. Clicking the View Log button at the top of the sidebar will open an HTML file in another tab with an HTML table, plain text, and Markdown table all in one.
 2. Click the Download Log button at the top of the sidebar to download an HTML file with the HTML table, plain text, and Markdown table all in one.
 
-## Screenshots
+## 🛠️ Tech Stack
+
+- HTML5 / CSS3 / Vanilla JavaScript
+- Service Worker (PWA)
+- Local Storage
+
+## 📸 Screenshots
 
 <details>
 <summary>Details</summary>
@@ -94,6 +114,10 @@ Option settings are saved automatically.
 *Exported summary HTML file*  
 </details>
 
-## License
+## 🤝 Contributing
+
+Bug reports and pull requests are welcome.
+
+## 📄 License
 
 MIT
