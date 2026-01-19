@@ -8,6 +8,12 @@
 ![Audit](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/audit.yml/badge.svg)&emsp;
 [![Netlify Status](https://api.netlify.com/api/v1/badges/e764aaa6-ad23-4945-8b6e-17a802224243/deploy-status)](https://app.netlify.com/sites/fast-logbook/deploys)
 
+![Accessibility](https://img.shields.io/badge/Accessibility-94-brightgreen?style=flat-square)&emsp;![Best_Practices](https://img.shields.io/badge/Best_Practices-100-brightgreen?style=flat-square)&emsp;![Performance](https://img.shields.io/badge/Performance-93-brightgreen?style=flat-square)&emsp;![SEO](https://img.shields.io/badge/SEO-90-brightgreen?style=flat-square)
+
+[🚀 **Live Demo**](https://fast-logbook.netlify.app/)
+
+<img width="30%" alt="input screen" src="https://github.com/user-attachments/assets/748b4f02-452a-4fee-8642-27c035245d03" />&emsp;<img width="30%" alt="スクリーンショット 2025-10-31 073723" src="https://github.com/user-attachments/assets/650c8fd4-dc39-4c16-ae6b-d92ba7ddc236" />
+
 ## Quick Start
 
 ### Run with Docker
@@ -87,10 +93,6 @@ Option settings are saved automatically.
 <img width="400" alt="スクリーンショット 2025-10-31 073723" src="https://github.com/user-attachments/assets/650c8fd4-dc39-4c16-ae6b-d92ba7ddc236" /><br>
 *Exported summary HTML file*  
 </details>
-
-## Lighthouse scores
-
-![Accessibility](https://img.shields.io/badge/Accessibility-94-brightgreen?style=flat-square)&emsp;![Best_Practices](https://img.shields.io/badge/Best_Practices-100-brightgreen?style=flat-square)&emsp;![Performance](https://img.shields.io/badge/Performance-93-brightgreen?style=flat-square)&emsp;![SEO](https://img.shields.io/badge/SEO-90-brightgreen?style=flat-square)
 
 ## License
 
