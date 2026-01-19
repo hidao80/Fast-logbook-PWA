@@ -26,6 +26,7 @@ A lightweight PWA for logging work activities with timestamps. Export your logs 
 - One-tap stamping with number keys (1-9), free input also available
 - **Download as HTML with copy buttons**, including HTML/Markdown/plain text formats
 - Exclude break time from working hours
+- Dark mode support
 - Internationalization (en, ja)
 
 ## 🚀 Quick Start
