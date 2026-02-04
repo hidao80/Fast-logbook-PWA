@@ -7,6 +7,7 @@
 ![Lint](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/lint.yml/badge.svg)&emsp;
 ![Audit](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/audit.yml/badge.svg)&emsp;
 [![Netlify Status](https://api.netlify.com/api/v1/badges/e764aaa6-ad23-4945-8b6e-17a802224243/deploy-status)](https://app.netlify.com/sites/fast-logbook/deploys)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hidao80/Fast-logbook-PWA)
 
 ![Accessibility](https://img.shields.io/badge/Accessibility-94-brightgreen?style=flat-square)&emsp;![Best_Practices](https://img.shields.io/badge/Best_Practices-100-brightgreen?style=flat-square)&emsp;![Performance](https://img.shields.io/badge/Performance-93-brightgreen?style=flat-square)&emsp;![SEO](https://img.shields.io/badge/SEO-90-brightgreen?style=flat-square)&emsp;<sub>Measured on Jan 17, 2026 by [Lighthouse-badges](https://github.com/hidao80/lighthouse-badges) — [Measure now!](https://pagespeed.web.dev/analysis?url=https://fast-logbook.netlify.app/)</sub>
 
