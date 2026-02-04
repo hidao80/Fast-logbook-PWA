@@ -2,7 +2,7 @@
 
 # Fast Logbook PWA
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)&emsp;
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)&emsp;
 ![PWA](https://img.shields.io/badge/PWA-Yes-4BC51D.svg)&emsp;
 ![Lint](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/lint.yml/badge.svg)&emsp;
 ![Audit](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/audit.yml/badge.svg)&emsp;
