@@ -9,6 +9,15 @@ export function initAnalytics() {
     }
   }
 
+  /**
+   * Get formatted log events
+   */
+  document.querySelector('#view_formatted_log')?.addEventListener('click', function () {
+    sendGAEvent('view_formatted_log', {
+      'event_category': 'engagement',
+      'event_label': 'view_formatted_log_button'
+    });
+  });
 
   /**
    * Get configure events
@@ -46,7 +55,7 @@ export function initAnalytics() {
   window.addEventListener('appinstalled', () => {
     sendGAEvent('pwa_install', {
       'event_category': 'engagement',
-      'event_label': 'install_pwa'
+      'event_label': 'pwa_install'
     });
   });
 } 
