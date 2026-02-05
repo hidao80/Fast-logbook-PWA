@@ -2,6 +2,7 @@ import { $$one, $$all, $$disableConsole } from './lib/indolence.min.js';
 import { LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine, appendTime, installPWA, autoSetTheme } from './lib/utils.js';
 import Multilingualization from './lib/multilingualization.js';
 import { downloadLog, generateFormattedLog } from './lib/download.js';
+import { initAnalytics } from './lib/analytics.js';
 
 /* global bootstrap */
 
@@ -58,6 +59,7 @@ function saveLogs() {
  */
 document.addEventListener('DOMContentLoaded', async () => {
   $$disableConsole();
+  initAnalytics();
 
   // Set the theme automatically
   autoSetTheme();
