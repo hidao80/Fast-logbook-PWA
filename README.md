@@ -10,7 +10,7 @@
 ![Accessibility](https://img.shields.io/badge/Accessibility-94-brightgreen?style=flat-square)&emsp;![Best_Practices](https://img.shields.io/badge/Best_Practices-100-brightgreen?style=flat-square)&emsp;![Performance](https://img.shields.io/badge/Performance-93-brightgreen?style=flat-square)&emsp;![SEO](https://img.shields.io/badge/SEO-90-brightgreen?style=flat-square)&emsp;<sub>Measured on Jan 17, 2026 by [Lighthouse-badges](https://github.com/hidao80/lighthouse-badges) — [Measure now!](https://pagespeed.web.dev/analysis?url=https://fast-logbook.netlify.app/)</sub>
 
 ## Overview
-Fast-logbook-PWA is a lightweight PWA for recording and aggregating daily work logs quickly, securely, and anywhere.
+Fast-logbook-PWA is a lightweight PWA for recording and aggregating daily work logs quickly and securely, on any device with a browser.
 
 ## Issue & Reason
 Existing work log management tools require installation or account creation, or lack aggregation features, making daily recording cumbersome.
