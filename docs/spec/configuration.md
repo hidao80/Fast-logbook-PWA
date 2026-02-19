@@ -292,3 +292,5 @@ Currently, there is no configuration migration logic. The app relies on:
 3. Version displayed to user but not used for data migration
 
 **Future Consideration**: Add version-based migration if localStorage schema changes.
+
+<!-- commit: ef46e13 -->

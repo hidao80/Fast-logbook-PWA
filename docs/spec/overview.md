@@ -3,7 +3,7 @@
 ## Project Information
 
 **Project Name:** Fast logbook PWA
-**Version:** 25.12.13
+**Version:** 26.02.05
 **Description:** Time-stamped work notes Progressive Web Application
 **License:** MIT
 **Author:** hidao80
@@ -31,13 +31,16 @@ Fast Logbook PWA is a productivity tool designed to help users track time-stampe
 ### Frontend
 - **HTML5**: Semantic markup with Bootstrap 5.3.0
 - **CSS3**: Custom styling with Bootstrap framework
-- **JavaScript (ES Modules)**: Modern ES2020+ features
+- **JavaScript (ES Modules)**: Modern ES2020+ features, `"type": "module"` in package.json
 - **Bootstrap 5.3.0**: UI framework for responsive design
 - **Bootstrap Icons 1.11.1**: Icon library
 
 ### Build & Development
-- **ESLint 8.57.0**: Code linting and quality
-- **Package Manager**: npm/pnpm
+- **Biome 2.4.2**: Unified linter and formatter (replaced ESLint + Prettier)
+- **Package Manager**: npm (primary), pnpm supported
+
+### CI/CD
+- **GitHub Actions**: `lint.yml` (biome check) and `audit.yml` (npm audit --audit-level=high)
 
 ### PWA Features
 - **Service Worker**: Offline caching and asset management
@@ -52,10 +55,12 @@ Fast Logbook PWA is a productivity tool designed to help users track time-stampe
 Fast-logbook-PWA/
 ├── index.html              # Main application page
 ├── config.html             # Configuration page
-├── manifest.json           # PWA manifest
+├── manifest.json           # PWA manifest (version: 26.02.05)
 ├── sw.js                   # Service worker
-├── package.json            # Project dependencies
-├── .eslintrc.json          # ESLint configuration
+├── package.json            # Project dependencies ("type": "module")
+├── biome.json              # Biome lint + format configuration
+├── Dockerfile              # Multi-stage Docker build (node → nginx:alpine)
+├── docker-compose.yml      # Local development compose
 ├── css/                    # Stylesheets
 │   ├── main.css           # Main page styles
 │   └── config.css         # Config page styles
@@ -63,13 +68,15 @@ Fast-logbook-PWA/
 │   ├── main.js            # Main application logic
 │   ├── config.js          # Configuration page logic
 │   └── lib/               # Library modules
+│       ├── analytics.js   # Google Analytics event tracking
 │       ├── download.js    # Log formatting and download
-│       ├── indolence.min.js # DOM utility functions
+│       ├── indolence.min.js # DOM utility functions (minified)
 │       ├── multilingualization.js # i18n support
 │       └── utils.js       # Utility functions
 ├── img/                    # PWA icons (48-512px)
 └── docs/                   # Documentation
-    └── spec/              # Memory documentation
+    ├── design.md           # Technical design document
+    └── spec/              # API / component specifications
 ```
 
 ## Data Storage
@@ -127,7 +134,7 @@ Target browsers: Modern evergreen browsers (Chrome, Firefox, Safari, Edge)
 - **Client-side Only**: No server communication, all data stays local
 - **localStorage Quota**: Handles QuotaExceededError gracefully
 - **No Sensitive Data**: Designed for work logging, not confidential information
-- **XSS Protection**: HTML escaping in log output functions
+- **XSS Protection**: HTML escaping in log output functions (`escapeHtml()`)
 
 ## Deployment
 
@@ -135,6 +142,10 @@ The application is designed for static hosting and can be deployed to:
 - Netlify (current deployment: https://fast-logbook.netlify.app)
 - GitHub Pages
 - Any static file hosting service
-- Docker containers (Dockerfile and docker-compose.yml included)
+- Docker containers (Dockerfile and docker-compose.yml included; nginx:alpine serving on port 80)
 
-No build process is required for deployment - all files are production-ready.
+No build process is required for deployment — all files are production-ready.
+
+---
+
+<!-- commit: ef46e13 -->

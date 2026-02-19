@@ -2,12 +2,47 @@
 
 ## Module Overview
 
-The application uses four core utility modules located in [js/lib/](js/lib/):
+The application uses five core utility modules located in [js/lib/](js/lib/):
 
-1. **utils.js**: Date/time, localStorage constants, PWA installation, theme management
-2. **download.js**: Log parsing, formatting, and export functionality
-3. **multilingualization.js**: Internationalization (i18n) system
-4. **indolence.min.js**: Minimized DOM utility functions
+1. **analytics.js**: Google Analytics GA4 event tracking
+2. **utils.js**: Date/time, localStorage constants, PWA installation, theme management
+3. **download.js**: Log parsing, formatting, and export functionality
+4. **multilingualization.js**: Internationalization (i18n) system
+5. **indolence.min.js**: Minimized DOM utility functions
+
+---
+
+## 0. analytics.js
+
+File: [js/lib/analytics.js](js/lib/analytics.js)
+
+### initAnalytics()
+**Location**: [js/lib/analytics.js:2-65](js/lib/analytics.js#L2-L65)
+
+```javascript
+export function initAnalytics()
+```
+
+**Purpose**: Registers GA4 event tracking listeners for key user interactions.
+
+**Behavior**:
+- Wraps `gtag()` calls in `sendGAEvent()` (no-op if `gtag` is undefined)
+- Attaches click listeners to menu items and the help button
+- Listens to `appinstalled` on `window` for PWA install events
+
+**Tracked Events**:
+
+| Event Name | Trigger | Category |
+|---|---|---|
+| `view_formatted_log` | Click `#view_formatted_log` | engagement |
+| `configure` | Click `#configure` | engagement |
+| `help` | Click `#help_button` | engagement |
+| `export_log` | Click `#download_formatted_log` | engagement |
+| `pwa_install` | `window appinstalled` | engagement |
+
+**Usage**: Called in [js/main.js](js/main.js) during DOMContentLoaded initialization.
+
+**Note**: `gtag` is expected as a global variable loaded via Google Analytics script tag in `index.html`.
 
 ---
 
@@ -938,3 +973,5 @@ URL.revokeObjectURL(url); // Release memory after download
 - Categories with special characters
 - Very long detail strings
 - Missing semicolon separator
+
+<!-- commit: ef46e13 -->

@@ -423,6 +423,16 @@ if (e.isComposing && e.inputType === 'insertCompositionText') {
 
 ---
 
+### ~~24b. analytics.js Not in Service Worker Cache~~ (FIXED)
+
+**Location**: [sw.js:6-26](sw.js#L6-L26)
+
+**Status**: ✓ Fixed — `/js/lib/analytics.js` added to `assets` array in [sw.js](sw.js)
+
+**Previous Issue**: `/js/lib/analytics.js` was imported by `main.js` but not listed in the SW `assets` array, so it was unavailable on first offline load.
+
+---
+
 ### 25. No Input Sanitization for Downloads
 
 **Issue**: User input included in generated HTML without full sanitization
@@ -558,3 +568,5 @@ To identify additional issues, implement:
 8. **Offline Testing** with service worker caching
 9. **Storage Quota Testing** to verify error handling
 10. **i18n Testing** for Japanese and English translations
+
+<!-- commit: ef46e13 -->

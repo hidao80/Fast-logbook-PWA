@@ -449,12 +449,15 @@ File: [js/main.js](js/main.js)
 
 **Imports**:
 ```javascript
-import { $$one, $$all, $$disableConsole } from './lib/indolence.min.js';
-import { LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine, appendTime,
-         installPWA, autoSetTheme } from './lib/utils.js';
-import Multilingualization from './lib/multilingualization.js';
+import { initAnalytics } from './lib/analytics.js';
 import { downloadLog, generateFormattedLog } from './lib/download.js';
-import * as bootstrap from 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';
+import { $$all, $$disableConsole, $$one } from './lib/indolence.min.js';
+import Multilingualization from './lib/multilingualization.js';
+import {
+  appendTime, autoSetTheme, installPWA,
+  LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine,
+} from './lib/utils.js';
+/* global bootstrap */
 ```
 
 **Initialization Sequence** ([js/main.js:58-276](js/main.js#L58-L276)):
@@ -562,22 +565,24 @@ import { $$one, $$all } from './lib/indolence.min.js';
 
 ### Internal Modules
 
-1. **indolence.min.js**: DOM utility functions (`$$one`, `$$all`)
-2. **utils.js**: Date/time, localStorage, theme utilities
-3. **multilingualization.js**: i18n translation system
-4. **download.js**: Log formatting and export
+1. **analytics.js**: Google Analytics GA4 event tracking (`initAnalytics`)
+2. **indolence.min.js**: DOM utility functions (`$$one`, `$$all`)
+3. **utils.js**: Date/time, localStorage, theme utilities
+4. **multilingualization.js**: i18n translation system
+5. **download.js**: Log formatting and export
 
 **Dependency Graph**:
 ```
 index.html
 ├── main.js
+│   ├── analytics.js
 │   ├── indolence.min.js
 │   ├── utils.js
 │   ├── multilingualization.js
 │   ├── download.js
 │   │   ├── utils.js
 │   │   └── multilingualization.js
-│   └── bootstrap (CDN)
+│   └── bootstrap (CDN, global via gtag)
 └── CSS
     ├── main.css
     └── bootstrap (CDN)
@@ -605,3 +610,5 @@ index.html
 
 ### beforeinstallprompt
 - PWA installation prompt handling ([js/lib/utils.js:113-118](js/lib/utils.js#L113-L118))
+
+<!-- commit: ef46e13 -->

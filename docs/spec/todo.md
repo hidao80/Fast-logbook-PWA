@@ -108,6 +108,14 @@ caches.open(CACHE_NAME).then((cache) => {
 
 ---
 
+### ~~4b. Add analytics.js to Service Worker Cache~~ ✓ COMPLETED
+**Issue**: [known_bugs.md#24b](known_bugs.md#24b-analyticsjs-not-in-service-worker-cache)
+**File**: [sw.js:6-26](sw.js#L6-L26)
+
+**Status**: ✓ `/js/lib/analytics.js` added to the `assets` array in [sw.js](sw.js)
+
+---
+
 ### 5. ~~Fix or Remove Textarea Enter Key Handler~~ ✓ COMPLETED
 **Issue**: [known_bugs.md#6](known_bugs.md#6-textarea-enter-key-handling)
 **File**: [js/main.js:151-158](js/main.js#L151-L158)
@@ -629,15 +637,17 @@ Add i18n for status text, use Bootstrap Icons for visual + text indicator
 
 ### 39. Add GitHub Actions CI/CD
 
-**Current**: ESLint workflow exists
+**Current**: Two workflows exist:
+- `lint.yml`: Biome lint check (`biome check js/`)
+- `audit.yml`: `npm audit --audit-level=high`
 
-**Implementation**:
-1. Add test running workflow
+**Remaining**:
+1. Add test running workflow (once tests are written)
 2. Add build and deploy workflow
 3. Add release automation
 4. Add PR checks (tests, lint, build)
 
-**Effort**: 6 hours
+**Effort**: 4 hours (partial done)
 **Impact**: Automated quality checks
 
 ---
@@ -664,6 +674,7 @@ Add i18n for status text, use Bootstrap Icons for visual + text indicator
 - [ ] #2: Internationalize error messages
 - [ ] #3: Fix service worker cache name race condition
 - [ ] #4: Fix hard-coded cache name in fetch handler
+- [x] #4b: Add analytics.js to Service Worker Cache ✓ COMPLETED
 - [x] #5: Fix or remove textarea Enter key handler ✓ COMPLETED (v25.12.13)
 - [ ] #7: Add color-blind friendly save indicator
 
@@ -721,4 +732,6 @@ This document will be updated as items are completed. Completed items will be:
 - Moved to separate CHANGELOG.md
 - Referenced in commit messages
 
-Last updated: 2025-12-13
+Last updated: 2026-02-19
+
+<!-- commit: ef46e13 -->
