@@ -1,3 +1,5 @@
+# Fast Logbook PWA
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)&emsp;
 ![PWA](https://img.shields.io/badge/PWA-Yes-4BC51D.svg)&emsp;
 ![Lint](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/lint.yml/badge.svg)&emsp;
@@ -12,8 +14,6 @@
 - **Quick**: Instantly stamp with a tap or by pressing the number keys 1-9.
 - **Aggregate**: Instantly calculate totals and grand totals.
 - **Secure**: Data stays 100% in your browser — no server, no account.
-
-# Fast Logbook PWA
 
 ## Overview
 Fast-logbook-PWA is a lightweight PWA for recording and aggregating daily work logs quickly and securely, on any device with a browser.
