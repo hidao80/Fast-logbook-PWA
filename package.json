@@ -1,6 +1,6 @@
 {
   "name": "fast-logbook-pwa",
-  "version": "25.12.17",
+  "version": "26.02.19",
   "description": "Time-stamped work notes PWA",
   "scripts": {
     "lint": "biome check js/",
