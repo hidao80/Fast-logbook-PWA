@@ -1,8 +1,15 @@
-import { $$one, $$all, $$disableConsole } from './lib/indolence.min.js';
-import { LOG_DATA_KEY, ROUNDING_UNIT_MINUTE_KEY, trimNewLine, appendTime, installPWA, autoSetTheme } from './lib/utils.js';
-import Multilingualization from './lib/multilingualization.js';
-import { downloadLog, generateFormattedLog } from './lib/download.js';
 import { initAnalytics } from './lib/analytics.js';
+import { downloadLog, generateFormattedLog } from './lib/download.js';
+import { $$all, $$disableConsole, $$one } from './lib/indolence.min.js';
+import Multilingualization from './lib/multilingualization.js';
+import {
+  appendTime,
+  autoSetTheme,
+  installPWA,
+  LOG_DATA_KEY,
+  ROUNDING_UNIT_MINUTE_KEY,
+  trimNewLine,
+} from './lib/utils.js';
 
 /* global bootstrap */
 
@@ -14,7 +21,7 @@ import { initAnalytics } from './lib/analytics.js';
  */
 export function appendLog(tag) {
   const textarea = $$one('textarea');
-  textarea.value += '\n' + tag;
+  textarea.value += `\n${tag}`;
   textarea.value = trimNewLine(textarea.value);
 
   // Always scroll to the bottom
@@ -29,7 +36,7 @@ export function appendLog(tag) {
 async function loadLogs() {
   // A similar object is input instead of an empty string
   const str = localStorage.getItem(LOG_DATA_KEY);
-  if (str && str != 'undefined') {
+  if (str && str !== 'undefined') {
     const textarea = $$one('textarea');
     textarea.value = str;
 
@@ -68,14 +75,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Get the version number from manifest.json.
   fetch('/manifest.json')
-    .then(response => response.json())
-    .then(manifest => {
+    .then((response) => response.json())
+    .then((manifest) => {
       $$one('#version_number').textContent = manifest.version;
     });
 
   // When a preset tag is clicked
   for (const node of $$all('label[data-shortcut-key]')) {
-    const key = 'shortcut_' + node.dataset.shortcutKey;
+    const key = `shortcut_${node.dataset.shortcutKey}`;
     const str = localStorage.getItem(key);
     if (str && str !== 'undefined') {
       node.textContent = str;
@@ -83,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       node.textContent = Multilingualization.translate(node.dataset.translate);
     }
 
-    node.addEventListener('click', async e => {
+    node.addEventListener('click', async (e) => {
       e.stopPropagation();
       if (!e.target.textContent) return;
       await appendLog(appendTime(e.target.textContent));
@@ -92,8 +99,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Dynamic update of placeholders
-  $$one('input[placeholder]').placeholder = Multilingualization.translate('input_placeholder');
-  $$one('textarea[placeholder]').placeholder = Multilingualization.translate('textarea_placeholder');
+  $$one('input[placeholder]').placeholder =
+    Multilingualization.translate('input_placeholder');
+  $$one('textarea[placeholder]').placeholder = Multilingualization.translate(
+    'textarea_placeholder',
+  );
 
   // When a key is entered into the PWA
   document.body.addEventListener('keydown', async (e) => {
@@ -101,9 +111,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // When a number key is pressed
     const matches = e.code.match(/Digit(\d)/);
-    if (matches?.length == 2) {
+    if (matches?.length === 2) {
       const inputDigit = matches[1];
-      if (inputDigit == '0') {
+      if (inputDigit === '0') {
         // When 0 is pressed, focus on the input field
         e.preventDefault();
         e.stopPropagation();
@@ -119,13 +129,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   /**
    * Processes the input from a given element, appends it to a log with a timestamp, and clears the input.
-   * 
+   *
    * @async
    * @function processInput
    * @param {HTMLInputElement} elem - The input element to process.
    * @returns {Promise<void>} A promise that resolves when the input has been processed and logged.
    * @throws {Error} If appendLog or appendTime functions fail.
-   * 
+   *
    * @example
    * // Assuming we have an input element with id 'myInput'
    * const inputElem = document.getElementById('myInput');
@@ -139,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // When input to the 0th element is confirmed, stamp the entered log for PC
-  $$one('input').addEventListener('keydown', async e => {
+  $$one('input').addEventListener('keydown', async (e) => {
     // Ignore events processed by IME
     if (!e.isComposing && e.keyCode !== 229 && e.key === 'Enter') {
       processInput(e.target);
@@ -151,8 +161,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Save when Enter key is pressed in textarea
-  $$one('textarea').addEventListener('keydown', async e => {
-    if ('Enter' == e.code) {
+  $$one('textarea').addEventListener('keydown', async (e) => {
+    if ('Enter' === e.code) {
       // Ignore events processed by IME
       if (!e.isComposing && e.keyCode !== 229 && e.key === 'Enter') {
         return;
@@ -162,7 +172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   let debounceTimeout;
-  $$one('textarea').addEventListener('input', async e => {
+  $$one('textarea').addEventListener('input', async (e) => {
     // Set to dirty state when IME conversion is confirmed
     if (e.isComposing && e.inputType === 'insertCompositionText') {
       $$one('.navbar-save-status').classList.remove('saved');
@@ -178,21 +188,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Save the log when the input in the textarea is confirmed
-  $$one('textarea').addEventListener('compositionend', async function () {
+  $$one('textarea').addEventListener('compositionend', async () => {
     clearTimeout(debounceTimeout);
     await saveLogs();
   });
 
   // When the popup loses focus, save the content of textarea
   [$$one('input'), window].forEach((node) => {
-    node.addEventListener('blur', async function () {
+    node.addEventListener('blur', async () => {
       await saveLogs();
     });
   });
 
   // Add click event listener to the toggle button
-  $$one('.navbar-toggler').addEventListener('click', function (event) {
-    event.preventDefault();  // Prevent default event
+  $$one('.navbar-toggler').addEventListener('click', (event) => {
+    event.preventDefault(); // Prevent default event
     event.stopPropagation(); // Stop event propagation
 
     // Save the content of textarea
@@ -224,7 +234,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       localStorage.setItem(ROUNDING_UNIT_MINUTE_KEY, mins);
     }
     const outputStr = generateFormattedLog(log, mins);
-    const newTab = window.open(Multilingualization.translate('log_viewer'), '_log_viewer');
+    const newTab = window.open(
+      Multilingualization.translate('log_viewer'),
+      '_log_viewer',
+    );
     newTab.document.write(outputStr);
     newTab.document.close();
   });
@@ -238,7 +251,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   $$one('a#delete_log').addEventListener('click', async () => {
     // 削除確認モーダルを表示
     if (typeof bootstrap !== 'undefined') {
-      const deleteConfirmModal = new bootstrap.Modal($$one('#deleteConfirmModal'));
+      const deleteConfirmModal = new bootstrap.Modal(
+        $$one('#deleteConfirmModal'),
+      );
       deleteConfirmModal.show();
     } else {
       console.error('Bootstrap library is not loaded');
@@ -252,7 +267,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // モーダルを閉じる
     if (typeof bootstrap !== 'undefined') {
-      const deleteConfirmModal = bootstrap.Modal.getInstance($$one('#deleteConfirmModal'));
+      const deleteConfirmModal = bootstrap.Modal.getInstance(
+        $$one('#deleteConfirmModal'),
+      );
       if (deleteConfirmModal) {
         deleteConfirmModal.hide();
       }

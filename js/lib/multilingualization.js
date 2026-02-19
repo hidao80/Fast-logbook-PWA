@@ -9,11 +9,11 @@ export default class Multilingualization {
    * This method should be called synchronously in <head> to prevent translation flicker
    */
   static init() {
-    const currentLang = this.language();
+    const currentLang = Multilingualization.language();
 
     // グローバル翻訳関数を設定
     window.__i18n_t = (key) => {
-      const dict = this.dictionaries[currentLang];
+      const dict = Multilingualization.dictionaries[currentLang];
       return dict ? dict[key] || key : key;
     };
 
@@ -22,7 +22,7 @@ export default class Multilingualization {
       if (elem.nodeType !== 1) return; // 要素ノードのみ
 
       // data-translate属性を持つ要素を翻訳
-      if (elem.hasAttribute && elem.hasAttribute('data-translate')) {
+      if (elem.hasAttribute?.('data-translate')) {
         const key = elem.dataset.translate;
         const translated = window.__i18n_t(key);
         if (elem.tagName === 'TITLE') {
@@ -49,7 +49,7 @@ export default class Multilingualization {
     if (document.documentElement) {
       observer.observe(document.documentElement, {
         childList: true,
-        subtree: true
+        subtree: true,
       });
     }
 
@@ -68,246 +68,344 @@ export default class Multilingualization {
    *  @var dictionaries Multilingual dictionary object
    */
   static dictionaries = {
-    'en': {
-      'app_name': 'Fast logbook PWA',
-      'popup_title': 'Fast logbook PWA',
-      'popup_description': 'Time-stamped work notes PWA',
-      'configure': 'Configure',
-      'config_title': 'Config - Fast logbook PWA',
-      'view_formatted_log': 'View formatted log',
-      'download_formatted_log': 'Download formatted log',
-      'shortcut_items_title': 'Shortcut items',
-      'shortcut_1': '@work +PromotionalExams;Study',
-      'shortcut_2': '@wrivate +housework;Cleaning',
-      'shortcut_3': '@work +PromotionalExams;Research',
-      'shortcut_4': '@work +PromotionalExams;Report',
-      'shortcut_5': '@work +PromotionalExams;Presentation',
-      'shortcut_6': '',
-      'shortcut_7': '',
-      'shortcut_8': '',
-      'shortcut_9': '',
-      'input_placeholder': 'Enter a task in free description',
-      'textarea_placeholder': 'Work logs will be output here. Editable',
-      'rounding_unit': 'Rounding unit',
+    en: {
+      app_name: 'Fast logbook PWA',
+      popup_title: 'Fast logbook PWA',
+      popup_description: 'Time-stamped work notes PWA',
+      configure: 'Configure',
+      config_title: 'Config - Fast logbook PWA',
+      view_formatted_log: 'View formatted log',
+      download_formatted_log: 'Download formatted log',
+      shortcut_items_title: 'Shortcut items',
+      shortcut_1: '@work +PromotionalExams;Study',
+      shortcut_2: '@wrivate +housework;Cleaning',
+      shortcut_3: '@work +PromotionalExams;Research',
+      shortcut_4: '@work +PromotionalExams;Report',
+      shortcut_5: '@work +PromotionalExams;Presentation',
+      shortcut_6: '',
+      shortcut_7: '',
+      shortcut_8: '',
+      shortcut_9: '',
+      input_placeholder: 'Enter a task in free description',
+      textarea_placeholder: 'Work logs will be output here. Editable',
+      rounding_unit: 'Rounding unit',
       '1min': '1min',
       '5min': '5min',
       '10min': '10min',
       '15min': '15min',
       '30min': '30min',
       '60min': '60min',
-      'register_the_string_to_the_shortcut_key': 'Please register the string in the shortcut key. Tags beginning with "^" will not be counted.<br>After ";", write the details and include them in the group of strings before ";" for aggregation.',
-      'plaintext_log': 'Plaintext',
-      'markdown_summary': 'Markdown table',
-      'html_summary': 'HTML table',
-      'log_viewer': 'Log preview',
-      'work_category': 'Work category',
-      'work_detail': 'Work detail',
-      'work_time_hour': 'Work time[hrs.]',
-      'work_time_min': 'Work time[min.]',
-      'work_time_actual': 'Actual work',
-      'work_time_total': 'Total',
-      'mins': 'min(s).',
-      'back': 'Back',
-      'delete_log': 'Delete log',
-      'delete_log_confirm': 'Are you sure you want to delete the log?',
-      'install_pwa': 'Install PWA',
-      'delete_log_confirm_title': 'Delete log',
-      'delete_log_confirm_message': 'Are you sure you want to delete the log?',
-      'cancel': 'Cancel',
-      'delete': 'Delete',
-      'help': 'Help',
-      'help_title': 'Fast Logbook PWA User Manual',
-      'help_tab_main_screeen': 'Main Screen',
-      'help_tab_config_screen': 'Configuration Screen',
-      'help_overview_title': 'Overview',
-      'help_overview_content': 'Fast Logbook PWA is a web application that allows you to easily create and manage work records with timestamps. Implemented as a Progressive Web App (PWA), it can be installed and used offline.',
-      'help_basic_operations_title': 'Basic Operations',
-      'help_main_screen_title': 'Main Screen',
-      'help_main_screen_memo': '<strong>Memo Input</strong>: Enter work content or information you want to record in the text area at the bottom of the screen.',
-      'help_main_screen_shortcut': '<strong>Shortcut Function</strong>: Press buttons 1-9 displayed at the top of the screen to input frequently used phrases or content with a single touch.',
-      'help_main_screen_save_status': '<strong>Save Status</strong>: Check the save status with the "●" mark displayed in the navigation bar at the top of the screen.',
-      'help_main_screen_menu_operations_title': 'Menu Operations',
-      'help_main_screen_menu_operations_content': 'Tap the hamburger menu (≡) in the upper left to open the side menu.',
-      'help_main_screen_show_formated_log': '<strong>Display Formatted Log</strong>: Shows your recorded content in a formatted view.',
-      'help_main_screen_download_formated_log': '<strong>Download Formatted Log</strong>: Download your records as a file.',
-      'help_main_screen_config': '<strong>Settings</strong>: Change application settings.',
-      'help_main_screen_delete_log': '<strong>Delete Log</strong>: Delete all recorded content (a confirmation dialog will be displayed).',
-      'help_main_screen_install_pwd': '<strong>Install PWA</strong>: Install as an app from the browser (only displayed on supported devices).',
-      'help_main_screen_shortcut_settings_title': 'Shortcut Settings',
-      'help_main_screen_shortcut_settings_content': 'You can set frequently used phrases for shortcut keys 1-9. These can be edited from the settings screen. Field 0 can be used for entering phrases for temporary use.',
-      'help_main_screen_example_of_summary_format': 'Summary Format Examples',
-      'help_main_screen_example_1': 'Fast Logbook enables automatic summarization when records follow specific formats. The following rules apply to the summary function:',
-      'help_main_screen_example_2': '<strong>Tags starting with "^"</strong>: Treated as comments or metadata excluded from counting',
-      'help_main_screen_example_3': '<strong>";" separator</strong>: Text before the semicolon is grouped, and text after is treated as detailed information',
-      'help_main_screen_example_4': 'Basic Summary Format Example',
-      'help_main_screen_example_5': '2025-03-06 10:00Meeting;Project A progress check\n2025-03-06 11:30Development;Login screen implementation\n2025-03-06 13:00Meeting;Weekly team MTG\n2025-03-06 15:30Review;Code review response\n2025-03-06 16:45^Tomorrow\'s task memo: Continue API development\n2025- 03-06 17:00Development; Bug fix #42',
-      'help_main_screen_example_6': '* "Meeting", "Development", and "Review" are tallied as groups, and lines starting with "^" are not counted.',
-      'help_main_screen_example_of_project': 'Project-Specific Summary Format Example',
-      'help_main_screen_example_7': '2025-03-06 09:15Project A;Specification review\n2025-03-06 10:30Project A;Create feedback\n2025-03-06 10:45^This project is scheduled to be completed this week\n2025-03-06 11:00Project B;Team MTG\n2025-03-06 13:30Project A;Modification work',
-      'help_main_screen_example_8': '* "Project A" and "Project B" are tallied as groups, allowing calculation of working hours for each project.',
-      'help_main_screen_example_of_customer_summary_format': 'Customer Summary Format Example',
-      'help_main_screen_example_9': '2025-03-06 09:00Customer A;Design review MTG\n2025-03-06 10:30^Next meeting scheduled for next Wednesday\n2025-03-06 10:45Customer B;Create proposal materials\n2025-03-06 13:00Customer A;Modification response\n2025-03-06 15:00Customer C;Initial hearing',
-      'help_main_screen_example_10': '* Time is tallied for each of "Customer A", "Customer B", and "Customer C".',
-      'help_main_screen_example_of_summary_format_by_task_type': 'Task Type Summary Format Example',
-      'help_main_screen_example_11': '2025-03-06 09:00Development;Database design\n2025-03-06 11:30Meeting;Weekly regular\n2025-03-06 12:00^Check this week\'s KPIs\n2025- 03-06 13:00Development; API implementation\n2025- 03-06 15: 45Testing;Create unit tests\n2025-03-06 16:00Documentation;Create API specification',
-      'help_main_screen_example_12': '* Time is tallied by work types: "Development", "Meeting", "Testing", and "Documentation".',
-      'help_main_screen_example_of_summary_format_with_case_number': 'Case Number Summary Format Example',
-      'help_main_screen_example_13': '2025-03-06 10:15PRJ-001;Customer meeting\n2025-03-06 11:30PRJ-001;Requirements organization\n2025-03-06 13:00^Make note of important points\n2025-03-06 14:00PRJ-002;Code implementation\n2025-03-06 16:30PRJ-001;Create specification document',
-      'help_main_screen_example_14': '* Time is tallied for each case number such as "PRJ-001" and "PRJ-002".',
-      'help_main_screen_example_of_combined_tabulation_format': 'Combined Tabulation Format Example',
-      'help_main_screen_example_15': '2025-03-06 09:30Development PRJ-001;Dashboard implementation\n2025-03-06 10:00^Mobile support to be implemented later\n2025-03-06 11:00Meeting PRJ-001;Client MTG\n2025-03-06 14:15Development PRJ-002;Authentication feature implementation\n2025-03-06 17:00Testing PRJ-001;Create test cases',
-      'help_main_screen_example_16': '* Multiple classifications can be combined by separating with spaces. In this example, you can tabulate by combining work type and project number.',
-      'help_main_screen_hint': '<strong>Hint:</strong> To perform summaries smoothly, it\'s important to record group names consistently.Be careful, as similar meanings like "Meeting" and "Conference" will be tallied as separate groups if different notations are used. Date and time are recorded automatically, but you can also enter them explicitly as in the examples above.',
-      'help_main_screen_delete_log_title': 'About Deleting Logs',
-      'help_main_screen_delete_log_content': 'When you press the "Delete Log" button, a confirmation dialog will appear. Please note that once deletion is executed, all recorded content will be erased and cannot be restored.',
-      'help_main_screen_offline_features_title': 'Offline Features',
-      'help_main_screen_offline_features_content': 'When installed as a PWA, it can be used in environments without internet connection. Data is saved on the device.',
-      'help_main_screen_version_info_title': 'Version Information',
-      'help_main_screen_version_info_content': 'The current version is displayed next to "ver." at the bottom of the side menu.',
-      'help_config_screen_title': 'How to Use the Configuration Screen',
-      'help_config_screen_customizable_behavior': 'On the configuration screen, you can customize the application\'s behavior and display.',
-      'help_config_screen_setting_time_rounding_unit': 'Time Rounding Unit Setting',
-      'help_config_screen_choice_available_timestamp_rounding': 'You can round timestamp times to a specified unit. You can choose from the following options:',
-      'help_config_screen_example_1': '<strong>1 minute</strong>: Record time in 1-minute units (default)',
-      'help_config_screen_example_2': '<strong>5 minutes</strong>: Round time to 5-minute units',
-      'help_config_screen_example_3': '<strong>10 minutes</strong>: Round time to 10-minute units',
-      'help_config_screen_example_4': '<strong>15 minutes</strong>: Round time to 15-minute units',
-      'help_config_screen_example_5': '<strong>30 minutes</strong>: Round time to 30-minute units',
-      'help_config_screen_example_6': '<strong>60 minutes</strong>: Round time to 60-minute units',
-      'help_config_screen_log_readability_balance': 'This setting helps balance time precision and log readability. For example, if set to 15-minute units, a 10:07 record will be rounded to either 10:00 or 10:15, whichever is closer.',
-      'help_config_screen_setting_shortcut': 'Shortcut Item Settings',
-      'help_config_screen_shortcut_key_text': 'You can set the text assigned to shortcut keys (1-9) used on the main screen.',
-      'help_config_screen_example_7': 'For example:',
-      'help_config_screen_example_8': '"Meeting Start"',
-      'help_config_screen_example_9': '"Break"',
-      'help_config_screen_example_10': '"Resume Work"',
-      'help_config_screen_example_11': '"Task Complete"',
-      'help_config_screen_repeated_input_one_touch_recording': 'Setting these shortcuts allows you to record frequently input content with a single touch.',
-      'help_config_screen_hint': '<strong>Hint:</strong> For efficient work recording, we recommend registering frequently used phrases and templates as shortcuts.',
-      'help_config_screen_save_setting': 'Saving Settings',
-      'help_config_screen_auto_save': 'Settings are saved automatically. When you return to the main screen after making changes, the new settings are applied immediately.',
-      'help_close_button': 'Close'
+      register_the_string_to_the_shortcut_key:
+        'Please register the string in the shortcut key. Tags beginning with "^" will not be counted.<br>After ";", write the details and include them in the group of strings before ";" for aggregation.',
+      plaintext_log: 'Plaintext',
+      markdown_summary: 'Markdown table',
+      html_summary: 'HTML table',
+      log_viewer: 'Log preview',
+      work_category: 'Work category',
+      work_detail: 'Work detail',
+      work_time_hour: 'Work time[hrs.]',
+      work_time_min: 'Work time[min.]',
+      work_time_actual: 'Actual work',
+      work_time_total: 'Total',
+      mins: 'min(s).',
+      back: 'Back',
+      delete_log: 'Delete log',
+      delete_log_confirm: 'Are you sure you want to delete the log?',
+      install_pwa: 'Install PWA',
+      delete_log_confirm_title: 'Delete log',
+      delete_log_confirm_message: 'Are you sure you want to delete the log?',
+      cancel: 'Cancel',
+      delete: 'Delete',
+      help: 'Help',
+      help_title: 'Fast Logbook PWA User Manual',
+      help_tab_main_screeen: 'Main Screen',
+      help_tab_config_screen: 'Configuration Screen',
+      help_overview_title: 'Overview',
+      help_overview_content:
+        'Fast Logbook PWA is a web application that allows you to easily create and manage work records with timestamps. Implemented as a Progressive Web App (PWA), it can be installed and used offline.',
+      help_basic_operations_title: 'Basic Operations',
+      help_main_screen_title: 'Main Screen',
+      help_main_screen_memo:
+        '<strong>Memo Input</strong>: Enter work content or information you want to record in the text area at the bottom of the screen.',
+      help_main_screen_shortcut:
+        '<strong>Shortcut Function</strong>: Press buttons 1-9 displayed at the top of the screen to input frequently used phrases or content with a single touch.',
+      help_main_screen_save_status:
+        '<strong>Save Status</strong>: Check the save status with the "●" mark displayed in the navigation bar at the top of the screen.',
+      help_main_screen_menu_operations_title: 'Menu Operations',
+      help_main_screen_menu_operations_content:
+        'Tap the hamburger menu (≡) in the upper left to open the side menu.',
+      help_main_screen_show_formated_log:
+        '<strong>Display Formatted Log</strong>: Shows your recorded content in a formatted view.',
+      help_main_screen_download_formated_log:
+        '<strong>Download Formatted Log</strong>: Download your records as a file.',
+      help_main_screen_config:
+        '<strong>Settings</strong>: Change application settings.',
+      help_main_screen_delete_log:
+        '<strong>Delete Log</strong>: Delete all recorded content (a confirmation dialog will be displayed).',
+      help_main_screen_install_pwd:
+        '<strong>Install PWA</strong>: Install as an app from the browser (only displayed on supported devices).',
+      help_main_screen_shortcut_settings_title: 'Shortcut Settings',
+      help_main_screen_shortcut_settings_content:
+        'You can set frequently used phrases for shortcut keys 1-9. These can be edited from the settings screen. Field 0 can be used for entering phrases for temporary use.',
+      help_main_screen_example_of_summary_format: 'Summary Format Examples',
+      help_main_screen_example_1:
+        'Fast Logbook enables automatic summarization when records follow specific formats. The following rules apply to the summary function:',
+      help_main_screen_example_2:
+        '<strong>Tags starting with "^"</strong>: Treated as comments or metadata excluded from counting',
+      help_main_screen_example_3:
+        '<strong>";" separator</strong>: Text before the semicolon is grouped, and text after is treated as detailed information',
+      help_main_screen_example_4: 'Basic Summary Format Example',
+      help_main_screen_example_5:
+        "2025-03-06 10:00Meeting;Project A progress check\n2025-03-06 11:30Development;Login screen implementation\n2025-03-06 13:00Meeting;Weekly team MTG\n2025-03-06 15:30Review;Code review response\n2025-03-06 16:45^Tomorrow's task memo: Continue API development\n2025- 03-06 17:00Development; Bug fix #42",
+      help_main_screen_example_6:
+        '* "Meeting", "Development", and "Review" are tallied as groups, and lines starting with "^" are not counted.',
+      help_main_screen_example_of_project:
+        'Project-Specific Summary Format Example',
+      help_main_screen_example_7:
+        '2025-03-06 09:15Project A;Specification review\n2025-03-06 10:30Project A;Create feedback\n2025-03-06 10:45^This project is scheduled to be completed this week\n2025-03-06 11:00Project B;Team MTG\n2025-03-06 13:30Project A;Modification work',
+      help_main_screen_example_8:
+        '* "Project A" and "Project B" are tallied as groups, allowing calculation of working hours for each project.',
+      help_main_screen_example_of_customer_summary_format:
+        'Customer Summary Format Example',
+      help_main_screen_example_9:
+        '2025-03-06 09:00Customer A;Design review MTG\n2025-03-06 10:30^Next meeting scheduled for next Wednesday\n2025-03-06 10:45Customer B;Create proposal materials\n2025-03-06 13:00Customer A;Modification response\n2025-03-06 15:00Customer C;Initial hearing',
+      help_main_screen_example_10:
+        '* Time is tallied for each of "Customer A", "Customer B", and "Customer C".',
+      help_main_screen_example_of_summary_format_by_task_type:
+        'Task Type Summary Format Example',
+      help_main_screen_example_11:
+        "2025-03-06 09:00Development;Database design\n2025-03-06 11:30Meeting;Weekly regular\n2025-03-06 12:00^Check this week's KPIs\n2025- 03-06 13:00Development; API implementation\n2025- 03-06 15: 45Testing;Create unit tests\n2025-03-06 16:00Documentation;Create API specification",
+      help_main_screen_example_12:
+        '* Time is tallied by work types: "Development", "Meeting", "Testing", and "Documentation".',
+      help_main_screen_example_of_summary_format_with_case_number:
+        'Case Number Summary Format Example',
+      help_main_screen_example_13:
+        '2025-03-06 10:15PRJ-001;Customer meeting\n2025-03-06 11:30PRJ-001;Requirements organization\n2025-03-06 13:00^Make note of important points\n2025-03-06 14:00PRJ-002;Code implementation\n2025-03-06 16:30PRJ-001;Create specification document',
+      help_main_screen_example_14:
+        '* Time is tallied for each case number such as "PRJ-001" and "PRJ-002".',
+      help_main_screen_example_of_combined_tabulation_format:
+        'Combined Tabulation Format Example',
+      help_main_screen_example_15:
+        '2025-03-06 09:30Development PRJ-001;Dashboard implementation\n2025-03-06 10:00^Mobile support to be implemented later\n2025-03-06 11:00Meeting PRJ-001;Client MTG\n2025-03-06 14:15Development PRJ-002;Authentication feature implementation\n2025-03-06 17:00Testing PRJ-001;Create test cases',
+      help_main_screen_example_16:
+        '* Multiple classifications can be combined by separating with spaces. In this example, you can tabulate by combining work type and project number.',
+      help_main_screen_hint:
+        '<strong>Hint:</strong> To perform summaries smoothly, it\'s important to record group names consistently.Be careful, as similar meanings like "Meeting" and "Conference" will be tallied as separate groups if different notations are used. Date and time are recorded automatically, but you can also enter them explicitly as in the examples above.',
+      help_main_screen_delete_log_title: 'About Deleting Logs',
+      help_main_screen_delete_log_content:
+        'When you press the "Delete Log" button, a confirmation dialog will appear. Please note that once deletion is executed, all recorded content will be erased and cannot be restored.',
+      help_main_screen_offline_features_title: 'Offline Features',
+      help_main_screen_offline_features_content:
+        'When installed as a PWA, it can be used in environments without internet connection. Data is saved on the device.',
+      help_main_screen_version_info_title: 'Version Information',
+      help_main_screen_version_info_content:
+        'The current version is displayed next to "ver." at the bottom of the side menu.',
+      help_config_screen_title: 'How to Use the Configuration Screen',
+      help_config_screen_customizable_behavior:
+        "On the configuration screen, you can customize the application's behavior and display.",
+      help_config_screen_setting_time_rounding_unit:
+        'Time Rounding Unit Setting',
+      help_config_screen_choice_available_timestamp_rounding:
+        'You can round timestamp times to a specified unit. You can choose from the following options:',
+      help_config_screen_example_1:
+        '<strong>1 minute</strong>: Record time in 1-minute units (default)',
+      help_config_screen_example_2:
+        '<strong>5 minutes</strong>: Round time to 5-minute units',
+      help_config_screen_example_3:
+        '<strong>10 minutes</strong>: Round time to 10-minute units',
+      help_config_screen_example_4:
+        '<strong>15 minutes</strong>: Round time to 15-minute units',
+      help_config_screen_example_5:
+        '<strong>30 minutes</strong>: Round time to 30-minute units',
+      help_config_screen_example_6:
+        '<strong>60 minutes</strong>: Round time to 60-minute units',
+      help_config_screen_log_readability_balance:
+        'This setting helps balance time precision and log readability. For example, if set to 15-minute units, a 10:07 record will be rounded to either 10:00 or 10:15, whichever is closer.',
+      help_config_screen_setting_shortcut: 'Shortcut Item Settings',
+      help_config_screen_shortcut_key_text:
+        'You can set the text assigned to shortcut keys (1-9) used on the main screen.',
+      help_config_screen_example_7: 'For example:',
+      help_config_screen_example_8: '"Meeting Start"',
+      help_config_screen_example_9: '"Break"',
+      help_config_screen_example_10: '"Resume Work"',
+      help_config_screen_example_11: '"Task Complete"',
+      help_config_screen_repeated_input_one_touch_recording:
+        'Setting these shortcuts allows you to record frequently input content with a single touch.',
+      help_config_screen_hint:
+        '<strong>Hint:</strong> For efficient work recording, we recommend registering frequently used phrases and templates as shortcuts.',
+      help_config_screen_save_setting: 'Saving Settings',
+      help_config_screen_auto_save:
+        'Settings are saved automatically. When you return to the main screen after making changes, the new settings are applied immediately.',
+      help_close_button: 'Close',
     },
-    'ja': {
-      'app_name': 'Fast logbook PWA',
-      'popup_title': 'Fast logbook PWA',
-      'popup_description': '開始時間付き作業メモPWA',
-      'configure': '設定',
-      'config_title': '設定 - Fast logbook PWA',
-      'view_formatted_log': 'ログを表示',
-      'download_formatted_log': 'ログをダウンロード',
-      'shortcut_items_title': 'ショートカット項目',
-      'shortcut_1': '@仕事 +昇進試験;勉強',
-      'shortcut_2': '@私用 +家事;掃除',
-      'shortcut_3': '@仕事 +昇進試験;研究',
-      'shortcut_4': '@仕事 +昇進試験;レポート',
-      'shortcut_5': '@仕事 +昇進試験;プレゼンテーション',
-      'shortcut_6': '',
-      'shortcut_7': '',
-      'shortcut_8': '',
-      'shortcut_9': '',
-      'input_placeholder': '自由記述でタスクを入力',
-      'textarea_placeholder': '作業記録が出力される。修正可能',
-      'rounding_unit': '時間丸め単位',
+    ja: {
+      app_name: 'Fast logbook PWA',
+      popup_title: 'Fast logbook PWA',
+      popup_description: '開始時間付き作業メモPWA',
+      configure: '設定',
+      config_title: '設定 - Fast logbook PWA',
+      view_formatted_log: 'ログを表示',
+      download_formatted_log: 'ログをダウンロード',
+      shortcut_items_title: 'ショートカット項目',
+      shortcut_1: '@仕事 +昇進試験;勉強',
+      shortcut_2: '@私用 +家事;掃除',
+      shortcut_3: '@仕事 +昇進試験;研究',
+      shortcut_4: '@仕事 +昇進試験;レポート',
+      shortcut_5: '@仕事 +昇進試験;プレゼンテーション',
+      shortcut_6: '',
+      shortcut_7: '',
+      shortcut_8: '',
+      shortcut_9: '',
+      input_placeholder: '自由記述でタスクを入力',
+      textarea_placeholder: '作業記録が出力される。修正可能',
+      rounding_unit: '時間丸め単位',
       '1min': '1分',
       '5min': '5分',
       '10min': '10分',
       '15min': '15分',
       '30min': '30分',
       '60min': '60分',
-      'register_the_string_to_the_shortcut_key': 'ショートカットキーに文字列を登録してください。「^」で始まるタグはカウントされません。<br>「;」の後に詳細を書き、「;」の前の文字列のグループに含めて集計します。',
-      'plaintext_log': 'プレーンテキスト',
-      'markdown_summary': 'Markdownの表',
-      'html_summary': 'HTMLの表',
-      'log_viewer': 'ログのプレビュー',
-      'work_category': '業務名',
-      'work_detail': '業務内容',
-      'work_time_hour': '作業時間[時]',
-      'work_time_min': '作業時間[分]',
-      'work_time_actual': '実働計',
-      'work_time_total': '総計',
-      'mins': '分',
-      'back': '戻る',
-      'delete_log': 'ログ削除',
-      'delete_log_confirm': '本当にログを削除しますか？',
-      'install_pwa': 'PWAをインストール',
-      'delete_log_confirm_title': 'ログ削除',
-      'delete_log_confirm_message': '本当にログを削除しますか？',
-      'cancel': 'キャンセル',
-      'delete': '削除',
-      'help': 'ヘルプ',
-      'help_title': 'Fast Logbook PWA 取扱説明書',
-      'help_tab_main_screeen': 'メイン画面',
-      'help_tab_config_screen': '設定画面',
-      'help_overview_title': '概要',
-      'help_overview_content': 'Fast Logbook PWAは、タイムスタンプ付きの作業記録を簡単に作成・管理できるWebアプリケーションです。PWA（Progressive Web App）として実装されているため、インストールしてオフラインでも使用できます。',
-      'help_basic_operations_title': '基本操作',
-      'help_main_screen_title': 'メイン画面',
-      'help_main_screen_memo': '<strong>メモ入力</strong>：画面下部のテキストエリアに、作業内容や記録したい情報を入力します。',
-      'help_main_screen_shortcut': '<strong>ショートカット機能</strong>：画面上部に表示されている1〜9のボタンを押すことで、よく使うフレーズや記録内容をワンタッチで入力できます。',
-      'help_main_screen_save_status': '<strong>保存状態</strong>：画面上部のナビゲーションバーに表示される「●」マークで保存状態を確認できます。',
-      'help_main_screen_menu_operations_title': 'メニュー操作',
-      'help_main_screen_menu_operations_content': '左上のハンバーガーメニュー（≡）をタップすると、サイドメニューが開きます。',
-      'help_main_screen_show_formated_log': '<strong>フォーマット済みログの表示</strong>：記録した内容を整形して表示します。',
-      'help_main_screen_download_formated_log': '<strong>フォーマット済みログのダウンロード</strong>：記録内容をファイルとしてダウンロードできます。',
-      'help_main_screen_config': '<strong>設定</strong>：アプリの設定を変更します。',
-      'help_main_screen_delete_log': '<strong>ログの削除</strong>：記録内容をすべて削除します（確認ダイアログが表示されます）。',
-      'help_main_screen_install_pwd': '<strong>PWAのインストール</strong>：ブラウザからアプリとしてインストールできます（対応デバイスのみ表示）。',
-      'help_main_screen_shortcut_settings_title': 'ショートカット設定',
-      'help_main_screen_shortcut_settings_content': '1〜9のショートカットキーには、よく使うフレーズを設定できます。設定画面から編集可能です。0のフィールドには、一時的に使用するフレーズを入力できます。',
-      'help_main_screen_example_of_summary_format': '集計フォーマット記述例',
-      'help_main_screen_example_1': 'Fast Logbookでは、特定のフォーマットで記録することで自動集計が可能になります。集計機能では以下のルールが適用されます：',
-      'help_main_screen_example_2': '<strong>「^」で始まるタグ</strong>：カウント対象外のコメントやメタデータとして扱われます',
-      'help_main_screen_example_3': '<strong>「;」区切り</strong>：セミコロン前の文字列がグループ化され、セミコロン後が詳細情報として扱われます',
-      'help_main_screen_example_4': '基本的な集計フォーマット例',
-      'help_main_screen_example_5': '2025-03-06 10:00会議;プロジェクトA進捗確認\n2025-03-06 11:30開発;ログイン画面実装\n2025-03-06 13:00会議;週次チームMTG\n2025-03-06 15:30レビュー;コードレビュー対応\n2025-03-06 16:45^明日のタスクメモ：API開発を継続する\n2025-03-06 17:00開発;バグ修正 #42',
-      'help_main_screen_example_6': '※「会議」「開発」「レビュー」がグループとして集計され、「^」から始まる行はカウントされません。',
-      'help_main_screen_example_of_project': 'プロジェクト別集計フォーマット例',
-      'help_main_screen_example_7': '2025-03-06 09:15プロジェクトA;仕様書レビュー\n2025-03-06 10:30プロジェクトA;フィードバック作成\n2025-03-06 10:45^このプロジェクトは今週中に完了予定\n2025-03-06 11:00プロジェクトB;チームMTG\n2025-03-06 13:30プロジェクトA;修正作業',
-      'help_main_screen_example_8': '※「プロジェクトA」「プロジェクトB」がグループとして集計され、各プロジェクトの作業時間が算出できます。',
-      'help_main_screen_example_of_customer_summary_format': '顧客別集計フォーマット例',
-      'help_main_screen_example_9': '2025-03-06 09:00顧客A;デザインレビューMTG\n2025-03-06 10:30^次回は来週水曜日に予定\n2025-03-06 10:45顧客B;提案資料作成\n2025-03-06 13:00顧客A;修正対応\n2025-03-06 15:00顧客C;初回ヒアリング',
-      'help_main_screen_example_10': '※「顧客A」「顧客B」「顧客C」ごとに時間が集計されます。',
-      'help_main_screen_example_of_summary_format_by_task_type': 'タスクタイプ別集計フォーマット例',
-      'help_main_screen_example_11': '2025-03-06 09:00開発;データベース設計\n2025-03-06 11:30会議;週次定例 \n2025-03-06 12:00^今週のKPIを確認する\n2025-03-06 13:00開発;API実装\n2025-03-06 15:45テスト;単体テスト作成\n2025-03-06 16:00ドキュメント;API仕様書作成',
-      'help_main_screen_example_12': '※「開発」「会議」「テスト」「ドキュメント」という作業タイプごとに時間が集計されます。',
-      'help_main_screen_example_of_summary_format_with_case_number': '案件番号付き集計フォーマット例',
-      'help_main_screen_example_13': '2025-03-06 10:15PRJ-001;顧客ミーティング\n2025-03-06 11:30PRJ-001;要件整理\n2025-03-06 13:00^重要なポイントをメモしておく\n2025-03-06 14:00PRJ-002;コード実装\n2025-03-06 16:30PRJ-001;仕様書作成',
-      'help_main_screen_example_14': '※「PRJ-001」「PRJ-002」などの案件番号ごとに時間が集計されます。',
-      'help_main_screen_example_of_combined_tabulation_format': '組み合わせ集計フォーマット例',
-      'help_main_screen_example_15': '2025-03-06 09:30開発 PRJ-001;ダッシュボード実装\n2025-03-06 10:00^モバイル対応は後日実施\n2025-03-06 11:00会議 PRJ-001;クライアントMTG\n2025-03-06 14:15開発 PRJ-002;認証機能実装\n2025-03-06 17:00テスト PRJ-001;テストケース作成',
-      'help_main_screen_example_16': '※スペースで区切ることで複数の分類を組み合わせることも可能です。この例では作業タイプとプロジェクト番号の組み合わせで集計できます。',
-      'help_main_screen_hint': '<strong>ヒント：</strong>集計をスムーズに行うためには、一貫した形式でグループ名を記録することが重要です。「会議」と「ミーティング」のように似た意味でも異なる表記を使うと別グループとして集計されるため注意しましょう。日付と時刻は自動的に記録されますが、上記の例のように明示的に入力することもできます。',
-      'help_main_screen_delete_log_title': 'ログの削除について',
-      'help_main_screen_delete_log_content': '「ログの削除」ボタンを押すと確認ダイアログが表示されます。削除を実行すると、記録内容はすべて消去され元に戻せませんのでご注意ください。',
-      'help_main_screen_offline_features_title': 'オフライン機能',
-      'help_main_screen_offline_features_content': 'PWAとしてインストールすると、インターネット接続がない環境でも利用できます。データは端末上に保存されます。',
-      'help_main_screen_version_info_title': 'バージョン情報',
-      'help_main_screen_version_info_content': '現在のバージョンは、サイドメニュー下部の「ver.」の横に表示されています。',
-      'help_config_screen_title': '設定画面の使い方',
-      'help_config_screen_customizable_behavior': '設定画面では、アプリの動作や表示をカスタマイズすることができます。',
-      'help_config_screen_setting_time_rounding_unit': '時間丸め単位の設定',
-      'help_config_screen_choice_available_timestamp_rounding': 'タイムスタンプの時間を指定した単位で丸めることができます。以下の選択肢から選ぶことができます：',
-      'help_config_screen_example_1': '<strong>1分</strong>：時間を1分単位で記録します（デフォルト）',
-      'help_config_screen_example_2': '<strong>5分</strong>：時間を5分単位で丸めます',
-      'help_config_screen_example_3': '<strong>10分</strong>：時間を10分単位で丸めます',
-      'help_config_screen_example_4': '<strong>15分</strong>：時間を15分単位で丸めます',
-      'help_config_screen_example_5': '<strong>30分</strong>：時間を30分単位で丸めます',
-      'help_config_screen_example_6': '<strong>60分</strong>：時間を60分単位で丸めます',
-      'help_config_screen_log_readability_balance': 'この設定は、時間の精度とログの見やすさのバランスを取るのに役立ちます。例えば、15分単位に設定すると、10:07の記録は10:00または10:15のいずれか近い方に丸められます。',
-      'help_config_screen_setting_shortcut': 'ショートカット項目の設定',
-      'help_config_screen_shortcut_key_text': 'メイン画面で使用するショートカットキー（1〜9）に割り当てるテキストを設定できます。',
-      'help_config_screen_example_7': '例えば：',
-      'help_config_screen_example_8': '「会議開始」',
-      'help_config_screen_example_9': '「休憩」',
-      'help_config_screen_example_10': '「作業再開」',
-      'help_config_screen_example_11': '「タスク完了」',
-      'help_config_screen_repeated_input_one_touch_recording': 'これらのショートカットを設定しておくことで、繰り返し入力する内容をワンタッチで記録できるようになります。',
-      'help_config_screen_hint': '<strong>ヒント：</strong> 効率的な作業記録のために、よく使うフレーズや定型文をショートカットに登録しておくことをお勧めします。',
-      'help_config_screen_save_setting': '設定の保存',
-      'help_config_screen_auto_save': '設定内容は自動的に保存されます。変更後はメイン画面に戻ると、すぐに新しい設定が適用されます。',
-      'help_close_button': '閉じる'
-    }
+      register_the_string_to_the_shortcut_key:
+        'ショートカットキーに文字列を登録してください。「^」で始まるタグはカウントされません。<br>「;」の後に詳細を書き、「;」の前の文字列のグループに含めて集計します。',
+      plaintext_log: 'プレーンテキスト',
+      markdown_summary: 'Markdownの表',
+      html_summary: 'HTMLの表',
+      log_viewer: 'ログのプレビュー',
+      work_category: '業務名',
+      work_detail: '業務内容',
+      work_time_hour: '作業時間[時]',
+      work_time_min: '作業時間[分]',
+      work_time_actual: '実働計',
+      work_time_total: '総計',
+      mins: '分',
+      back: '戻る',
+      delete_log: 'ログ削除',
+      delete_log_confirm: '本当にログを削除しますか？',
+      install_pwa: 'PWAをインストール',
+      delete_log_confirm_title: 'ログ削除',
+      delete_log_confirm_message: '本当にログを削除しますか？',
+      cancel: 'キャンセル',
+      delete: '削除',
+      help: 'ヘルプ',
+      help_title: 'Fast Logbook PWA 取扱説明書',
+      help_tab_main_screeen: 'メイン画面',
+      help_tab_config_screen: '設定画面',
+      help_overview_title: '概要',
+      help_overview_content:
+        'Fast Logbook PWAは、タイムスタンプ付きの作業記録を簡単に作成・管理できるWebアプリケーションです。PWA（Progressive Web App）として実装されているため、インストールしてオフラインでも使用できます。',
+      help_basic_operations_title: '基本操作',
+      help_main_screen_title: 'メイン画面',
+      help_main_screen_memo:
+        '<strong>メモ入力</strong>：画面下部のテキストエリアに、作業内容や記録したい情報を入力します。',
+      help_main_screen_shortcut:
+        '<strong>ショートカット機能</strong>：画面上部に表示されている1〜9のボタンを押すことで、よく使うフレーズや記録内容をワンタッチで入力できます。',
+      help_main_screen_save_status:
+        '<strong>保存状態</strong>：画面上部のナビゲーションバーに表示される「●」マークで保存状態を確認できます。',
+      help_main_screen_menu_operations_title: 'メニュー操作',
+      help_main_screen_menu_operations_content:
+        '左上のハンバーガーメニュー（≡）をタップすると、サイドメニューが開きます。',
+      help_main_screen_show_formated_log:
+        '<strong>フォーマット済みログの表示</strong>：記録した内容を整形して表示します。',
+      help_main_screen_download_formated_log:
+        '<strong>フォーマット済みログのダウンロード</strong>：記録内容をファイルとしてダウンロードできます。',
+      help_main_screen_config:
+        '<strong>設定</strong>：アプリの設定を変更します。',
+      help_main_screen_delete_log:
+        '<strong>ログの削除</strong>：記録内容をすべて削除します（確認ダイアログが表示されます）。',
+      help_main_screen_install_pwd:
+        '<strong>PWAのインストール</strong>：ブラウザからアプリとしてインストールできます（対応デバイスのみ表示）。',
+      help_main_screen_shortcut_settings_title: 'ショートカット設定',
+      help_main_screen_shortcut_settings_content:
+        '1〜9のショートカットキーには、よく使うフレーズを設定できます。設定画面から編集可能です。0のフィールドには、一時的に使用するフレーズを入力できます。',
+      help_main_screen_example_of_summary_format: '集計フォーマット記述例',
+      help_main_screen_example_1:
+        'Fast Logbookでは、特定のフォーマットで記録することで自動集計が可能になります。集計機能では以下のルールが適用されます：',
+      help_main_screen_example_2:
+        '<strong>「^」で始まるタグ</strong>：カウント対象外のコメントやメタデータとして扱われます',
+      help_main_screen_example_3:
+        '<strong>「;」区切り</strong>：セミコロン前の文字列がグループ化され、セミコロン後が詳細情報として扱われます',
+      help_main_screen_example_4: '基本的な集計フォーマット例',
+      help_main_screen_example_5:
+        '2025-03-06 10:00会議;プロジェクトA進捗確認\n2025-03-06 11:30開発;ログイン画面実装\n2025-03-06 13:00会議;週次チームMTG\n2025-03-06 15:30レビュー;コードレビュー対応\n2025-03-06 16:45^明日のタスクメモ：API開発を継続する\n2025-03-06 17:00開発;バグ修正 #42',
+      help_main_screen_example_6:
+        '※「会議」「開発」「レビュー」がグループとして集計され、「^」から始まる行はカウントされません。',
+      help_main_screen_example_of_project: 'プロジェクト別集計フォーマット例',
+      help_main_screen_example_7:
+        '2025-03-06 09:15プロジェクトA;仕様書レビュー\n2025-03-06 10:30プロジェクトA;フィードバック作成\n2025-03-06 10:45^このプロジェクトは今週中に完了予定\n2025-03-06 11:00プロジェクトB;チームMTG\n2025-03-06 13:30プロジェクトA;修正作業',
+      help_main_screen_example_8:
+        '※「プロジェクトA」「プロジェクトB」がグループとして集計され、各プロジェクトの作業時間が算出できます。',
+      help_main_screen_example_of_customer_summary_format:
+        '顧客別集計フォーマット例',
+      help_main_screen_example_9:
+        '2025-03-06 09:00顧客A;デザインレビューMTG\n2025-03-06 10:30^次回は来週水曜日に予定\n2025-03-06 10:45顧客B;提案資料作成\n2025-03-06 13:00顧客A;修正対応\n2025-03-06 15:00顧客C;初回ヒアリング',
+      help_main_screen_example_10:
+        '※「顧客A」「顧客B」「顧客C」ごとに時間が集計されます。',
+      help_main_screen_example_of_summary_format_by_task_type:
+        'タスクタイプ別集計フォーマット例',
+      help_main_screen_example_11:
+        '2025-03-06 09:00開発;データベース設計\n2025-03-06 11:30会議;週次定例 \n2025-03-06 12:00^今週のKPIを確認する\n2025-03-06 13:00開発;API実装\n2025-03-06 15:45テスト;単体テスト作成\n2025-03-06 16:00ドキュメント;API仕様書作成',
+      help_main_screen_example_12:
+        '※「開発」「会議」「テスト」「ドキュメント」という作業タイプごとに時間が集計されます。',
+      help_main_screen_example_of_summary_format_with_case_number:
+        '案件番号付き集計フォーマット例',
+      help_main_screen_example_13:
+        '2025-03-06 10:15PRJ-001;顧客ミーティング\n2025-03-06 11:30PRJ-001;要件整理\n2025-03-06 13:00^重要なポイントをメモしておく\n2025-03-06 14:00PRJ-002;コード実装\n2025-03-06 16:30PRJ-001;仕様書作成',
+      help_main_screen_example_14:
+        '※「PRJ-001」「PRJ-002」などの案件番号ごとに時間が集計されます。',
+      help_main_screen_example_of_combined_tabulation_format:
+        '組み合わせ集計フォーマット例',
+      help_main_screen_example_15:
+        '2025-03-06 09:30開発 PRJ-001;ダッシュボード実装\n2025-03-06 10:00^モバイル対応は後日実施\n2025-03-06 11:00会議 PRJ-001;クライアントMTG\n2025-03-06 14:15開発 PRJ-002;認証機能実装\n2025-03-06 17:00テスト PRJ-001;テストケース作成',
+      help_main_screen_example_16:
+        '※スペースで区切ることで複数の分類を組み合わせることも可能です。この例では作業タイプとプロジェクト番号の組み合わせで集計できます。',
+      help_main_screen_hint:
+        '<strong>ヒント：</strong>集計をスムーズに行うためには、一貫した形式でグループ名を記録することが重要です。「会議」と「ミーティング」のように似た意味でも異なる表記を使うと別グループとして集計されるため注意しましょう。日付と時刻は自動的に記録されますが、上記の例のように明示的に入力することもできます。',
+      help_main_screen_delete_log_title: 'ログの削除について',
+      help_main_screen_delete_log_content:
+        '「ログの削除」ボタンを押すと確認ダイアログが表示されます。削除を実行すると、記録内容はすべて消去され元に戻せませんのでご注意ください。',
+      help_main_screen_offline_features_title: 'オフライン機能',
+      help_main_screen_offline_features_content:
+        'PWAとしてインストールすると、インターネット接続がない環境でも利用できます。データは端末上に保存されます。',
+      help_main_screen_version_info_title: 'バージョン情報',
+      help_main_screen_version_info_content:
+        '現在のバージョンは、サイドメニュー下部の「ver.」の横に表示されています。',
+      help_config_screen_title: '設定画面の使い方',
+      help_config_screen_customizable_behavior:
+        '設定画面では、アプリの動作や表示をカスタマイズすることができます。',
+      help_config_screen_setting_time_rounding_unit: '時間丸め単位の設定',
+      help_config_screen_choice_available_timestamp_rounding:
+        'タイムスタンプの時間を指定した単位で丸めることができます。以下の選択肢から選ぶことができます：',
+      help_config_screen_example_1:
+        '<strong>1分</strong>：時間を1分単位で記録します（デフォルト）',
+      help_config_screen_example_2:
+        '<strong>5分</strong>：時間を5分単位で丸めます',
+      help_config_screen_example_3:
+        '<strong>10分</strong>：時間を10分単位で丸めます',
+      help_config_screen_example_4:
+        '<strong>15分</strong>：時間を15分単位で丸めます',
+      help_config_screen_example_5:
+        '<strong>30分</strong>：時間を30分単位で丸めます',
+      help_config_screen_example_6:
+        '<strong>60分</strong>：時間を60分単位で丸めます',
+      help_config_screen_log_readability_balance:
+        'この設定は、時間の精度とログの見やすさのバランスを取るのに役立ちます。例えば、15分単位に設定すると、10:07の記録は10:00または10:15のいずれか近い方に丸められます。',
+      help_config_screen_setting_shortcut: 'ショートカット項目の設定',
+      help_config_screen_shortcut_key_text:
+        'メイン画面で使用するショートカットキー（1〜9）に割り当てるテキストを設定できます。',
+      help_config_screen_example_7: '例えば：',
+      help_config_screen_example_8: '「会議開始」',
+      help_config_screen_example_9: '「休憩」',
+      help_config_screen_example_10: '「作業再開」',
+      help_config_screen_example_11: '「タスク完了」',
+      help_config_screen_repeated_input_one_touch_recording:
+        'これらのショートカットを設定しておくことで、繰り返し入力する内容をワンタッチで記録できるようになります。',
+      help_config_screen_hint:
+        '<strong>ヒント：</strong> 効率的な作業記録のために、よく使うフレーズや定型文をショートカットに登録しておくことをお勧めします。',
+      help_config_screen_save_setting: '設定の保存',
+      help_config_screen_auto_save:
+        '設定内容は自動的に保存されます。変更後はメイン画面に戻ると、すぐに新しい設定が適用されます。',
+      help_close_button: '閉じる',
+    },
   };
 
   /**
@@ -316,13 +414,15 @@ export default class Multilingualization {
    * @returns {string} Current language
    */
   static language() {
-    const lang = ((window.navigator.languages && window.navigator.languages[0]) ||
+    const lang = (
+      window.navigator.languages?.[0] ||
       window.navigator.language ||
       window.navigator.userLanguage ||
-      window.navigator.browserLanguage).slice(0, 2);
+      window.navigator.browserLanguage
+    ).slice(0, 2);
 
     // Show English for undefined languages
-    return this.dictionaries[lang] ? lang : 'en';
+    return Multilingualization.dictionaries[lang] ? lang : 'en';
   }
 
   /**
@@ -332,15 +432,18 @@ export default class Multilingualization {
    * @returns {string} Translated term
    */
   static translate(index) {
-    return this.dictionaries[this.language()][index];
+    return Multilingualization.dictionaries[Multilingualization.language()][
+      index
+    ];
   }
 
   /**
    * Initialization of dictionary object
    */
   static translateAll() {
-    const dictionary = this.dictionaries[this.language()];
-    for (let elem of document.querySelectorAll('[data-translate]')) {
+    const dictionary =
+      Multilingualization.dictionaries[Multilingualization.language()];
+    for (const elem of document.querySelectorAll('[data-translate]')) {
       elem.innerHTML = dictionary[elem.dataset.translate];
     }
   }

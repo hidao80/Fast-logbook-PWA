@@ -27,7 +27,7 @@ export function getTodayString() {
 export function fetchHourFromTime(time = null, isInt = true) {
   const date = time === null ? new Date() : new Date(time);
   const hour = date.getHours().toString().padStart(2, '0');
-  return isInt ? parseInt(hour) : hour;
+  return isInt ? parseInt(hour, 10) : hour;
 }
 
 /**
@@ -42,7 +42,7 @@ export function fetchHourFromTime(time = null, isInt = true) {
 export function fetchMinFromTime(time = null, isInt = true) {
   const date = time === null ? new Date() : new Date(time);
   const min = date.getMinutes().toString().padStart(2, '0');
-  return isInt ? parseInt(min) : min;
+  return isInt ? parseInt(min, 10) : min;
 }
 
 /**
@@ -74,10 +74,14 @@ export function getRoundingUnit(value) {
  * @example appendTime('Project A;Meeting') -> '2023-01-01 00:00Project A;Meeting'
  */
 export function appendTime(tag) {
-  return getTodayString()
-    + ' '
-    + fetchHourFromTime(null, false) + ':' + fetchMinFromTime(null, false)
-    + tag;
+  return (
+    getTodayString() +
+    ' ' +
+    fetchHourFromTime(null, false) +
+    ':' +
+    fetchMinFromTime(null, false) +
+    tag
+  );
 }
 
 /**
@@ -110,7 +114,7 @@ export function escapeHtml(unsafe) {
  */
 export function installPWA(elem) {
   // display the install button when the install prompt is displayed
-  window.addEventListener('beforeinstallprompt', function (event) {
+  window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
     elem.promptEvent = event;
     elem.classList.remove('d-none'); // display the button
@@ -121,7 +125,7 @@ export function installPWA(elem) {
   elem.addEventListener('click', () => {
     if (elem.promptEvent) {
       elem.promptEvent.prompt(); // display dialog box
-      elem.promptEvent.userChoice.then(function () {
+      elem.promptEvent.userChoice.then(() => {
         elem.classList.add('d-none'); // hide the button
         elem.promptEvent = null; // release the event
       });
@@ -133,8 +137,12 @@ export function installPWA(elem) {
  * Set the theme automatically
  */
 export function autoSetTheme() {
-  const theme = document.documentElement.getAttribute('data-bs-theme') ?? 'light';
-  if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  const theme =
+    document.documentElement.getAttribute('data-bs-theme') ?? 'light';
+  if (
+    theme === 'auto' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  ) {
     document.documentElement.setAttribute('data-bs-theme', 'dark');
   } else {
     document.documentElement.setAttribute('data-bs-theme', theme);
