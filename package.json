@@ -3,11 +3,11 @@
   "version": "25.12.17",
   "description": "Time-stamped work notes PWA",
   "scripts": {
-    "lint": "eslint js/**/*.js",
-    "lint:fix": "eslint js/**/*.js --fix"
+    "lint": "biome check js/",
+    "lint:fix": "biome check --write js/"
   },
   "devDependencies": {
-    "eslint": "^8.57.0"
+    "@biomejs/biome": "^2.4.2"
   },
   "keywords": [
     "pwa",
@@ -15,5 +15,6 @@
     "productivity"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "type": "module"
 }
