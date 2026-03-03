@@ -1,4 +1,11 @@
 node_modules/
 .claude/
+pnpm-lock.yaml
 
 CLAUDE.md
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+screenshots/

@@ -3,11 +3,18 @@
   "version": "26.02.19",
   "description": "Time-stamped work notes PWA",
   "scripts": {
+    "dev": "npx serve .",
     "lint": "biome check js/",
-    "lint:fix": "biome check --write js/"
+    "lint:fix": "biome check --write js/",
+    "test": "playwright test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "screenshot": "playwright test tests/e2e/screenshot.spec.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.2"
+    "@biomejs/biome": "^2.4.2",
+    "@playwright/test": "^1.49.0"
   },
   "keywords": [
     "pwa",

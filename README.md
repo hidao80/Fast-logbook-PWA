@@ -22,11 +22,11 @@ Fast-logbook-PWA is a lightweight PWA for recording and aggregating daily work l
 Existing work log management tools require installation or account creation, or lack aggregation features, making daily recording cumbersome.
 Fast-logbook-PWA was created to provide a work log experience where you can "record with one action and aggregate instantly" without requiring installation or accounts.
 
-[🚀 **Live Demo**](https://fast-logbook.netlify.app/)
+[:rocket: **Live Demo**](https://fast-logbook.netlify.app/)
 
 <img width="30%" alt="input screen" src="https://github.com/user-attachments/assets/c990ed5d-1973-42c5-b36c-1c9910ca0e7a" />&emsp;<img width="30%" alt="スクリーンショット 2025-10-31 073723" src="https://github.com/user-attachments/assets/650c8fd4-dc39-4c16-ae6b-d92ba7ddc236" />
 
-## ✨ Features
+## :sparkles: Features
 
 - **No account required; data remains only in your browser**
 - PWA with offline support; installable as an app on both PC and mobile
@@ -37,7 +37,7 @@ Fast-logbook-PWA was created to provide a work log experience where you can "rec
 - Dark mode support
 - Internationalization (en, ja)
 
-## 🚀 Quick Start
+## :rocket: Quick Start
 
 ### Run with Docker
 
@@ -46,19 +46,27 @@ Fast-logbook-PWA was created to provide a work log experience where you can "rec
 docker compose up
 
 # Production build
-docker build -t fast-logbook-pwa .
-docker run -p 8080:80 fast-logbook-pwa
+docker compose up --build
+```
+
+### Run with Podman
+
+```bash
+# Development
+podman compose up
+
+# Production build
+podman compose up --build
 ```
 
 ### Run locally
 
 ```bash
 npm install
-# Open index.html in your browser or use a local server
-npx serve .
+npm run dev
 ```
 
-## 📲 How to Install
+## :calling: How to Install
 
 It is possible to use the PWA without installing it.
 
@@ -67,7 +75,7 @@ It is possible to use the PWA without installing it.
 3. Click the "Install PWA" button at the bottom of the sidebar.
 4. When the installation dialog is displayed, click the "Install" button.
 
-## 📖 Usage
+## :book: Usage
 
 ### 1. Setup
 
@@ -88,13 +96,13 @@ Option settings are saved automatically.
 1. Clicking the View Log button at the top of the sidebar will open an HTML file in another tab with an HTML table, plain text, and Markdown table all in one.
 2. Click the Download Log button at the top of the sidebar to download an HTML file with the HTML table, plain text, and Markdown table all in one.
 
-## 🛠️ Tech Stack
+## :hammer_and_wrench: Tech Stack
 
 - HTML5 / CSS3 / Vanilla JavaScript
 - Service Worker (PWA)
 - Local Storage
 
-## 📸 Screenshots
+## :camera_flash: Screenshots
 
 <details>
 <summary>Details</summary>
@@ -123,10 +131,10 @@ Option settings are saved automatically.
 *Exported summary HTML file*  
 </details>
 
-## 🤝 Contributing
+## :handshake: Contributing
 
 Bug reports and pull requests are welcome.
 
-## 📄 License
+## :page_facing_up: License
 
 MIT
