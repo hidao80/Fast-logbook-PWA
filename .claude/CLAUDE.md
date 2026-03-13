@@ -32,7 +32,7 @@ Playwright tests live in `tests/e2e/` and run against `http://localhost:3000`. T
 
 ### Module structure
 
-```
+```plain
 js/
 ├── main.js        # Entry point for index.html — init, event binding, log CRUD
 ├── config.js      # Entry point for config.html — settings UI
