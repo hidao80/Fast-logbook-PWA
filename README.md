@@ -133,7 +133,8 @@ Option settings are saved automatically.
 
 ## :handshake: Contributing
 
-Bug reports and pull requests are welcome.
+Bug reports and pull requests are welcome.  
+Please note that this project uses [Takumi Guard](https://github.com/flatt-security/setup-takumi-guard-npm) in CI workflows to scan dependencies for malware and ensure supply chain security. This scanning only applies to CI and does not affect your local development environment.
 
 ## :page_facing_up: License
 
