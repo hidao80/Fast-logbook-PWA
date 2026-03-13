@@ -62,5 +62,5 @@ When fixing this bug, use the `CACHE_NAME` variable. Writing to the wrong cache 
 
 ## Development Server
 
-`npx serve .` does not use HTTPS. Service Worker testing requires HTTPS;
-use the production environment or a local HTTPS proxy for that purpose.
+`npm run dev` does not use HTTPS. Modern browsers treat `localhost` as a secure context, so Service Worker registration and testing work over HTTP on `localhost`.
+HTTPS is required only when testing on non-localhost origins (e.g. a staging server or a device on the local network). In those cases, use a local HTTPS proxy or the production environment.
