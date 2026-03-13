@@ -1,5 +1,6 @@
 node_modules/
 .claude/histories
+.claude/settings.local.json
 pnpm-lock.yaml
 
 # Playwright
