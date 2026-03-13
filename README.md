@@ -4,7 +4,7 @@
 ![PWA](https://img.shields.io/badge/PWA-Yes-4BC51D.svg)
 ![Lint](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/lint.yml/badge.svg)
 ![Audit](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/audit.yml/badge.svg)
-[![Security: Takumi Guard](https://img.shields.io/badge/Security-Takumi%20Guard-blue)](https://github.com/hidao80/mago-vsx/actions/workflows/npm-scan.yml)
+[![Security: Takumi Guard](https://img.shields.io/badge/Security-Takumi%20Guard-blue)](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/npm-scan.yml)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/e764aaa6-ad23-4945-8b6e-17a802224243/deploy-status)](https://app.netlify.com/sites/fast-logbook/deploys)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hidao80/Fast-logbook-PWA)
 
