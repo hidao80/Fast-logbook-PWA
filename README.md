@@ -1,13 +1,18 @@
 # Fast Logbook PWA
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)&emsp;
-![PWA](https://img.shields.io/badge/PWA-Yes-4BC51D.svg)&emsp;
-![Lint](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/lint.yml/badge.svg)&emsp;
-![Audit](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/audit.yml/badge.svg)&emsp;
-[![Netlify Status](https://api.netlify.com/api/v1/badges/e764aaa6-ad23-4945-8b6e-17a802224243/deploy-status)](https://app.netlify.com/sites/fast-logbook/deploys)&emsp;
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![PWA](https://img.shields.io/badge/PWA-Yes-4BC51D.svg)
+![Lint](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/lint.yml/badge.svg)
+![Audit](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/audit.yml/badge.svg)
+[![Security: Takumi Guard](https://img.shields.io/badge/Security-Takumi%20Guard-blue)](https://github.com/hidao80/mago-vsx/actions/workflows/npm-scan.yml)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/e764aaa6-ad23-4945-8b6e-17a802224243/deploy-status)](https://app.netlify.com/sites/fast-logbook/deploys)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hidao80/Fast-logbook-PWA)
 
-![Accessibility](https://img.shields.io/badge/Accessibility-94-brightgreen?style=flat-square)&emsp;![Best_Practices](https://img.shields.io/badge/Best_Practices-100-brightgreen?style=flat-square)&emsp;![Performance](https://img.shields.io/badge/Performance-93-brightgreen?style=flat-square)&emsp;![SEO](https://img.shields.io/badge/SEO-90-brightgreen?style=flat-square)&emsp;<sub>Measured on Jan 17, 2026 by [Lighthouse-badges](https://github.com/hidao80/lighthouse-badges) — [Measure now!](https://pagespeed.web.dev/analysis?url=https://fast-logbook.netlify.app/)</sub>
+![Accessibility](https://img.shields.io/badge/Accessibility-94-brightgreen?style=flat-square)
+![Best_Practices](https://img.shields.io/badge/Best_Practices-100-brightgreen?style=flat-square)
+![Performance](https://img.shields.io/badge/Performance-93-brightgreen?style=flat-square)
+![SEO](https://img.shields.io/badge/SEO-90-brightgreen?style=flat-square)
+<sub>Measured on Jan 17, 2026 by [Lighthouse-badges](https://github.com/hidao80/lighthouse-badges) — [Measure now!](https://pagespeed.web.dev/analysis?url=https://fast-logbook.netlify.app/)</sub>
 
 **Record with one tap. Instantly tally. No installation required.**
 

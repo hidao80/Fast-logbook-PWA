@@ -9,22 +9,10 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v5
-      - uses: flatt-security/setup-takumi-guard-npm@v1
-      - uses: pnpm/action-setup@v4
+      - uses: flatt-security/setup-takumi-guard-npm
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-
-  npm-advisory-audit:
-    runs-on: ubuntu-slim
-    steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm audit --audit-level=high
+          cache: "npm"
+      - run: npm ci
+      - run: npm audit --audit-level=high
