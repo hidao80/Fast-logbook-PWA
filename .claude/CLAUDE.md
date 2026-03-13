@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Local development (no build step needed)
-npx serve .
+npm run dev
 
 # Lint (Biome)
 npm run lint
@@ -28,7 +28,7 @@ Playwright tests live in `tests/e2e/` and run against `http://localhost:3000`. T
 
 ## Architecture
 
-**Client-only PWA** — no backend, no build step, no bundler. All logic runs in the browser via native ES Modules. Data stays in `localStorage`. Open `index.html` directly in a browser or serve with `npx serve .`.
+**Client-only PWA** — no backend, no build step, no bundler. All logic runs in the browser via native ES Modules. Data stays in `localStorage`. Open `index.html` directly in a browser.
 
 ### Module structure
 
