@@ -3,11 +3,9 @@ name: Lint
 on:
   push:
     branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
 
 jobs:
-  biome:
+  lint:
     runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v5
