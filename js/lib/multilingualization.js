@@ -95,6 +95,7 @@ export default class Multilingualization {
       '15min': '15min',
       '30min': '30min',
       '60min': '60min',
+      'date-roll-over-time': 'Date Roll-over Time',
       register_the_string_to_the_shortcut_key:
         'Please register the string in the shortcut key. Tags beginning with "^" will not be counted.<br>After ";", write the details and include them in the group of strings before ";" for aggregation.',
       plaintext_log: 'Plaintext',
@@ -265,6 +266,7 @@ export default class Multilingualization {
       '15min': '15分',
       '30min': '30分',
       '60min': '60分',
+      'date-roll-over-time': '日付変更時刻',
       register_the_string_to_the_shortcut_key:
         'ショートカットキーに文字列を登録してください。「^」で始まるタグはカウントされません。<br>「;」の後に詳細を書き、「;」の前の文字列のグループに含めて集計します。',
       plaintext_log: 'プレーンテキスト',
