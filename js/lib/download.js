@@ -1,4 +1,5 @@
 import Multilingualization from './multilingualization.js';
+import { getItem } from './storage.js';
 import {
   escapeHtml,
   fetchHourFromTime,
@@ -11,6 +12,11 @@ import {
 const HTML_SUMMARY = 'html_summary';
 const PLAINTEXT_LOG = 'plaintext_log';
 const MARKDOWN_SUMMARY = 'markdown_summary';
+
+// Temporary download state — passed via module variables instead of storage
+// because the lifecycle (set → dispatchEvent → get → clear) is synchronous.
+let _downloadUrl = null;
+let _downloadFilename = null;
 
 /**
  * Download a string with a file type
@@ -33,9 +39,8 @@ export function download(
     '.' +
     extension;
 
-  // Save download information to localStorage
-  localStorage.setItem('downloadUrl', url);
-  localStorage.setItem('downloadFilename', filename);
+  _downloadUrl = url;
+  _downloadFilename = filename;
 
   // Trigger an event to start the download
   const event = new CustomEvent('startDownload');
@@ -44,8 +49,8 @@ export function download(
 
 // Add download event listener
 window.addEventListener('startDownload', () => {
-  const url = localStorage.getItem('downloadUrl');
-  const filename = localStorage.getItem('downloadFilename');
+  const url = _downloadUrl;
+  const filename = _downloadFilename;
 
   if (url && filename) {
     const a = document.createElement('a');
@@ -58,9 +63,8 @@ window.addEventListener('startDownload', () => {
     // Release the URL after use
     URL.revokeObjectURL(url);
 
-    // Clear localStorage
-    localStorage.removeItem('downloadUrl');
-    localStorage.removeItem('downloadFilename');
+    _downloadUrl = null;
+    _downloadFilename = null;
   }
 });
 
@@ -105,10 +109,10 @@ ${section.isCode ? `<pre><code id='${section.title}-source'>${section.content}</
 </body></html>`;
 }
 
-export async function downloadLog() {
-  const log = localStorage.getItem(LOG_DATA_KEY);
-  const mins = localStorage.getItem(ROUNDING_UNIT_MINUTE_KEY);
-  const outputStr = generateFormattedLog(log, mins);
+export async function downloadLog(log = null) {
+  const logData = log ?? (await getItem(LOG_DATA_KEY));
+  const mins = await getItem(ROUNDING_UNIT_MINUTE_KEY);
+  const outputStr = generateFormattedLog(logData, mins);
   download(outputStr);
 }
 
