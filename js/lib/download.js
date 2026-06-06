@@ -1,4 +1,5 @@
 import Multilingualization from './multilingualization.js';
+import { getItem } from './storage.js';
 import {
   escapeHtml,
   fetchHourFromTime,
@@ -11,6 +12,11 @@ import {
 const HTML_SUMMARY = 'html_summary';
 const PLAINTEXT_LOG = 'plaintext_log';
 const MARKDOWN_SUMMARY = 'markdown_summary';
+
+// Temporary download state — passed via module variables instead of storage
+// because the lifecycle (set → dispatchEvent → get → clear) is synchronous.
+let _downloadUrl = null;
+let _downloadFilename = null;
 
 /**
  * Download a string with a file type
@@ -33,9 +39,8 @@ export function download(
     '.' +
     extension;
 
-  // Save download information to localStorage
-  localStorage.setItem('downloadUrl', url);
-  localStorage.setItem('downloadFilename', filename);
+  _downloadUrl = url;
+  _downloadFilename = filename;
 
   // Trigger an event to start the download
   const event = new CustomEvent('startDownload');
@@ -44,8 +49,8 @@ export function download(
 
 // Add download event listener
 window.addEventListener('startDownload', () => {
-  const url = localStorage.getItem('downloadUrl');
-  const filename = localStorage.getItem('downloadFilename');
+  const url = _downloadUrl;
+  const filename = _downloadFilename;
 
   if (url && filename) {
     const a = document.createElement('a');
@@ -58,9 +63,8 @@ window.addEventListener('startDownload', () => {
     // Release the URL after use
     URL.revokeObjectURL(url);
 
-    // Clear localStorage
-    localStorage.removeItem('downloadUrl');
-    localStorage.removeItem('downloadFilename');
+    _downloadUrl = null;
+    _downloadFilename = null;
   }
 });
 
@@ -88,8 +92,8 @@ export function generateFormattedLog(log, mins) {
 <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' integrity='sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==' crossorigin='anonymous' referrerpolicy='no-referrer' />
 </head><body>
 ${sections
-  .map(
-    (section) => `
+      .map(
+        (section) => `
 <h2>${Multilingualization.translate(section.title)}</h2>
 <i id='${section.title}-copy' class='fa-sharp fa-regular fa-copy btn btn-outline-secondary d-none'
 data-bs-trigger='manual' data-bs-toggle='tooltip' data-bs-placement='top' title='copy!'></i>
@@ -97,18 +101,19 @@ data-bs-trigger='manual' data-bs-toggle='tooltip' data-bs-placement='top' title=
 ${section.isCode ? `<pre><code id='${section.title}-source'>${section.content}</code></pre>` : section.content}
 </div>
 `,
-  )
-  .join('')}
+      )
+      .join('')}
 <script>
 (async()=>{const e=await(navigator?.permissions?.query({name:'clipboard-write'}));'granted'!==e?.state&&'prompt'!==e?.state||document.querySelectorAll('#${HTML_SUMMARY}-copy,#${PLAINTEXT_LOG}-copy,#${MARKDOWN_SUMMARY}-copy').forEach((e=>{const t=new bootstrap.Tooltip(e);e.classList.remove('d-none'),e.addEventListener('click',(async e=>{let a;e.preventDefault(),e.stopPropagation(),(a=document.querySelector(\`#\${e.target.id.replace('-copy','-source')}\`).textContent),'${HTML_SUMMARY}-copy'===e.target.id&&(a=a.replace(/\\n\\n/g,'<></>').replace(/\\n/g,'\\t').replace(/<><\\/>/g,'\\n')),await(navigator?.clipboard?.writeText(a.trim())),t.show(),setTimeout((()=>t.hide()),1e3)}))}))})();
 </script>
 </body></html>`;
 }
 
-export async function downloadLog() {
-  const log = localStorage.getItem(LOG_DATA_KEY);
-  const mins = localStorage.getItem(ROUNDING_UNIT_MINUTE_KEY);
-  const outputStr = generateFormattedLog(log, mins);
+export async function downloadLog(log = null) {
+  const logData = log ?? (await getItem(LOG_DATA_KEY)) ?? '';
+  const minsRaw = await getItem(ROUNDING_UNIT_MINUTE_KEY);
+  const mins = Number(minsRaw) > 0 ? Number(minsRaw) : 1;
+  const outputStr = generateFormattedLog(logData, mins);
   download(outputStr);
 }
 
