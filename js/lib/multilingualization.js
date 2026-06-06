@@ -145,7 +145,7 @@ export default class Multilingualization {
       help_main_screen_config:
         '<strong>Settings</strong>: Change application settings.',
       help_main_screen_delete_log:
-        '<strong>Delete Log</strong>: Delete all recorded content (a confirmation dialog will be displayed).',
+        '<strong>Delete Log</strong>: Delete the log entries for the currently selected date (a confirmation dialog will be displayed).',
       help_main_screen_install_pwd:
         '<strong>Install PWA</strong>: Install as an app from the browser (only displayed on supported devices).',
       help_main_screen_shortcut_settings_title: 'Shortcut Settings',
@@ -197,7 +197,7 @@ export default class Multilingualization {
         '<strong>Hint:</strong> To perform summaries smoothly, it\'s important to record group names consistently.Be careful, as similar meanings like "Meeting" and "Conference" will be tallied as separate groups if different notations are used. Date and time are recorded automatically, but you can also enter them explicitly as in the examples above.',
       help_main_screen_delete_log_title: 'About Deleting Logs',
       help_main_screen_delete_log_content:
-        'When you press the "Delete Log" button, a confirmation dialog will appear. Please note that once deletion is executed, all recorded content will be erased and cannot be restored.',
+        'When you press "Delete Log", a confirmation dialog appears. After confirming, <strong>only the log entries for the currently selected date are deleted</strong> — entries for other dates are preserved. The deletion cannot be undone, so please take care.',
       help_main_screen_offline_features_title: 'Offline Features',
       help_main_screen_offline_features_content:
         'When installed as a PWA, it can be used in environments without internet connection. Data is saved on the device.',
@@ -240,7 +240,20 @@ export default class Multilingualization {
       help_config_screen_save_setting: 'Saving Settings',
       help_config_screen_auto_save:
         'Settings are saved automatically. When you return to the main screen after making changes, the new settings are applied immediately.',
+      help_config_screen_date_roll_over_title: 'Date Roll-over Time',
+      help_config_screen_date_roll_over_content:
+        'Sets the time at which a new "day" begins. For example, with a roll-over time of 05:00, entries logged between midnight and 04:59 are counted as part of the previous day. This is useful for night-shift workers or anyone who works past midnight. The default is 05:00.',
       help_close_button: 'Close',
+      help_main_screen_date_input_title: 'Display Target Date',
+      help_main_screen_date_input_content:
+        "The date selector in the top-right corner controls which day's log entries are shown in the text area. Only entries within the 24-hour window starting at the configured roll-over time are displayed. The date defaults to the last day you edited, and future dates cannot be selected.",
+      notice_date_selector_title: 'New Feature: Display Target Date',
+      notice_date_selector_content:
+        '<p>This version adds a <strong>date selector</strong> in the top-right corner of the main screen.</p><p>You can now view and edit log entries for a specific day. Only entries within the 24-hour window starting at the configured roll-over time are shown.</p><p>All your existing log entries have been preserved.</p>',
+      help_tab_changelog: 'Changelog',
+      help_changelog_title: 'Version History',
+      help_changelog:
+        '<div class="mb-4"><h3 class="h5">v26.06.06 <small class="text-muted fw-normal">2026-06-06</small></h3><ul><li>Migrated storage from localStorage to IndexedDB for larger capacity and more reliable data persistence</li><li>Added date selector to view and edit logs for a specific day</li><li>Added configurable Date Roll-over Time setting (the hour at which a new day begins)</li><li>Improved shortcut input placeholders in the config screen</li><li>One-time automatic migration of existing localStorage data on first launch</li></ul></div><div class="mb-4"><h3 class="h5">v26.02.19 <small class="text-muted fw-normal">2026-03-03</small></h3><ul><li>Added Playwright end-to-end tests</li><li>Switched linter to Biome v2</li><li>Improved CI/CD pipeline</li><li>Added supply chain security scanning (Takumi Guard)</li></ul></div><div class="mb-4"><h3 class="h5">v25.12 <small class="text-muted fw-normal">2025-12-13</small></h3><ul><li>Added help screen (this screen)</li><li>Added multilingual support (Japanese / English)</li><li>Fixed IME and Enter-key handling on Android</li><li>Prevented translation flicker on page load</li></ul></div><div class="mb-4"><h3 class="h5">v24.08 <small class="text-muted fw-normal">2024-08-11</small></h3><ul><li>Added delete-confirmation dialog (Bootstrap)</li><li>Added save-state indicator (dirty / saved lamp)</li><li>Fixed Android IME blocking Enter-key log submission</li></ul></div><div class="mb-4"><h3 class="h5">v24.07 <small class="text-muted fw-normal">2024-07-06</small></h3><ul><li>Initial release</li><li>Added dark theme support</li><li>Added XSS prevention with <code>escapeHtml()</code></li><li>Added PWA install button</li></ul></div>',
     },
     ja: {
       app_name: 'Fast logbook PWA',
@@ -317,7 +330,7 @@ export default class Multilingualization {
       help_main_screen_config:
         '<strong>設定</strong>：アプリの設定を変更します。',
       help_main_screen_delete_log:
-        '<strong>ログの削除</strong>：記録内容をすべて削除します（確認ダイアログが表示されます）。',
+        '<strong>ログの削除</strong>：現在選択中の日付のログを削除します（確認ダイアログが表示されます）。',
       help_main_screen_install_pwd:
         '<strong>PWAのインストール</strong>：ブラウザからアプリとしてインストールできます（対応デバイスのみ表示）。',
       help_main_screen_shortcut_settings_title: 'ショートカット設定',
@@ -368,7 +381,7 @@ export default class Multilingualization {
         '<strong>ヒント：</strong>集計をスムーズに行うためには、一貫した形式でグループ名を記録することが重要です。「会議」と「ミーティング」のように似た意味でも異なる表記を使うと別グループとして集計されるため注意しましょう。日付と時刻は自動的に記録されますが、上記の例のように明示的に入力することもできます。',
       help_main_screen_delete_log_title: 'ログの削除について',
       help_main_screen_delete_log_content:
-        '「ログの削除」ボタンを押すと確認ダイアログが表示されます。削除を実行すると、記録内容はすべて消去され元に戻せませんのでご注意ください。',
+        '「ログの削除」ボタンを押すと確認ダイアログが表示されます。削除を実行すると、<strong>現在選択中の日付のログのみ</strong>が消去されます。他の日付のログは保持されます。なお、削除した内容は元に戻せませんのでご注意ください。',
       help_main_screen_offline_features_title: 'オフライン機能',
       help_main_screen_offline_features_content:
         'PWAとしてインストールすると、インターネット接続がない環境でも利用できます。データは端末上に保存されます。',
@@ -410,7 +423,20 @@ export default class Multilingualization {
       help_config_screen_save_setting: '設定の保存',
       help_config_screen_auto_save:
         '設定内容は自動的に保存されます。変更後はメイン画面に戻ると、すぐに新しい設定が適用されます。',
+      help_config_screen_date_roll_over_title: '日付変更時刻',
+      help_config_screen_date_roll_over_content:
+        '「今日」の開始時刻を設定します。例えば「05:00」に設定すると、深夜0時〜4時59分に記録したログは前日分として扱われます。夜勤や深夜作業がある方に便利な機能です。デフォルトは05:00です。',
       help_close_button: '閉じる',
+      help_main_screen_date_input_title: '表示対象日',
+      help_main_screen_date_input_content:
+        '画面右上の日付入力で、テキストエリアに表示するログの対象日を切り替えます。設定した日付変更時刻を起点とした24時間分のエントリーのみが表示されます。初期値は最後に編集した日付で、未来日付は選択できません。',
+      notice_date_selector_title: '新機能：表示対象日の選択',
+      notice_date_selector_content:
+        '<p>このバージョンから、メイン画面の右上に<strong>表示対象日</strong>の選択欄が追加されました。</p><p>日付を選択すると、その日に記録したログだけがテキストエリアに表示されます。表示範囲は設定した日付変更時刻を起点とした24時間です。</p><p>これまでのログはすべて保持されています。</p>',
+      help_tab_changelog: '変更履歴',
+      help_changelog_title: 'バージョン履歴',
+      help_changelog:
+        '<div class="mb-4"><h3 class="h5">v26.06.06 <small class="text-muted fw-normal">2026-06-06</small></h3><ul><li>ストレージをlocalStorageからIndexedDBに移行（大容量・高信頼性）</li><li>特定の日付のログを表示・編集できる日付選択機能を追加</li><li>「今日」の開始時刻を設定できる日付変更時刻機能を追加</li><li>設定画面のショートカット入力欄にプレースホルダーを表示するよう改善</li><li>初回起動時のlocalStorageからのデータ自動移行に対応</li></ul></div><div class="mb-4"><h3 class="h5">v26.02.19 <small class="text-muted fw-normal">2026-03-03</small></h3><ul><li>Playwright E2Eテストを追加</li><li>リンターをBiome v2に変更</li><li>CI/CDパイプラインを改善</li><li>サプライチェーンセキュリティスキャン（Takumi Guard）を導入</li></ul></div><div class="mb-4"><h3 class="h5">v25.12 <small class="text-muted fw-normal">2025-12-13</small></h3><ul><li>ヘルプ画面（この画面）を追加</li><li>日本語・英語の多言語対応を追加</li><li>Android IMEとEnterキーの処理バグを修正</li><li>ページ読み込み時の翻訳ちらつきを防止</li></ul></div><div class="mb-4"><h3 class="h5">v24.08 <small class="text-muted fw-normal">2024-08-11</small></h3><ul><li>Bootstrapによる削除確認ダイアログを追加</li><li>保存状態ランプ（変更中/保存済み）を追加</li><li>Android IMEがEnterキーによるログ送信をブロックする問題を修正</li></ul></div><div class="mb-4"><h3 class="h5">v24.07 <small class="text-muted fw-normal">2024-07-06</small></h3><ul><li>初回リリース</li><li>ダークテーマ対応を追加</li><li><code>escapeHtml()</code>によるXSS対策を実装</li><li>PWAインストールボタンを追加</li></ul></div>',
     },
   };
 

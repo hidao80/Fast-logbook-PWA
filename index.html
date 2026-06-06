@@ -156,6 +156,24 @@
         </div>
     </div>
 
+    <!-- Date selector feature notice modal (shown once for existing users) -->
+    <div class="modal fade" id="dateFeatureNoticeModal" tabindex="-1"
+        aria-labelledby="dateFeatureNoticeModalLabel" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dateFeatureNoticeModalLabel"
+                        data-translate="notice_date_selector_title"></h5>
+                </div>
+                <div class="modal-body" data-translate="notice_date_selector_content"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="dateFeatureNoticeOkButton">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Help modal -->
     <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
@@ -177,6 +195,10 @@
                                             data-bs-target="#nav-config" type="button" role="tab"
                                             aria-controls="nav-config" aria-selected="false"
                                             data-translate="help_tab_config_screen"></button>
+                                        <button class="nav-link" id="nav-changelog-tab" data-bs-toggle="tab"
+                                            data-bs-target="#nav-changelog" type="button" role="tab"
+                                            aria-controls="nav-changelog" aria-selected="false"
+                                            data-translate="help_tab_changelog"></button>
                                     </div>
                                 </nav>
 
@@ -209,6 +231,11 @@
                                                 <li data-translate="help_main_screen_delete_log"></li>
                                                 <li data-translate="help_main_screen_install_pwd"></li>
                                             </ul>
+                                        </section>
+
+                                        <section class="mb-4">
+                                            <h2 class="h3" data-translate="help_main_screen_date_input_title"></h2>
+                                            <p data-translate="help_main_screen_date_input_content"></p>
                                         </section>
 
                                         <section class="mb-4">
@@ -357,8 +384,22 @@
                                         </section>
 
                                         <section class="mb-4">
+                                            <h3 class="h4" data-translate="help_config_screen_date_roll_over_title"></h3>
+                                            <p data-translate="help_config_screen_date_roll_over_content"></p>
+                                        </section>
+
+                                        <section class="mb-4">
                                             <h3 class="h4" data-translate="help_config_screen_save_setting"></h3>
                                             <p data-translate="help_config_screen_auto_save"></p>
+                                        </section>
+                                    </div>
+
+                                    <!-- Changelog -->
+                                    <div class="tab-pane fade" id="nav-changelog" role="tabpanel"
+                                        aria-labelledby="nav-changelog-tab">
+                                        <section class="mb-4">
+                                            <h2 class="h3" data-translate="help_changelog_title"></h2>
+                                            <div data-translate="help_changelog"></div>
                                         </section>
                                     </div>
                                 </div>

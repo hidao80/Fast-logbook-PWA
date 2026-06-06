@@ -20,6 +20,12 @@ const bc = new BroadcastChannel('fast-logbook-sync');
 const DATE_ROLL_OVER_TIME_KEY = 'date-roll-over-time';
 const LAST_EDITED_DATE_KEY = 'last_edited_date';
 const MIGRATION_VERSION_KEY = 'migration_version';
+const NOTICE_DATE_SELECTOR_KEY = 'notice_date_selector';
+
+// Guard: prevents saveLogs() from writing an empty buffer before loadLogs() has run.
+// Bootstrap modals move focus on open, firing window/input blur events that would otherwise
+// overwrite IndexedDB data with an empty textarea before initialization completes.
+let initialized = false;
 
 /**
  * Run all pending data migrations in version order.
@@ -163,6 +169,7 @@ async function loadLogs() {
  * even if the user navigates away and comes back later.
  */
 function saveLogs() {
+  if (!initialized) return;
   try {
     localStorage.setItem('log_buffer', trimNewLine($$one('textarea').value));
     localStorage.setItem('log_buffer_date', $$one('#target-date').value);
@@ -217,6 +224,23 @@ async function flushBuffer() {
  */
 document.addEventListener('DOMContentLoaded', async () => {
   await runMigrations();
+
+  // Show a one-time notice for existing users upgrading to the date-selector version.
+  const noticeShown = await getItem(NOTICE_DATE_SELECTOR_KEY);
+  if (!noticeShown) {
+    const existingLog = await getItem(LOG_DATA_KEY);
+    if (existingLog && existingLog !== 'undefined' && existingLog.trim()) {
+      if (typeof bootstrap !== 'undefined') {
+        new bootstrap.Modal($$one('#dateFeatureNoticeModal')).show();
+      }
+    }
+  }
+
+  $$one('#dateFeatureNoticeOkButton').addEventListener('click', async () => {
+    await setItem(NOTICE_DATE_SELECTOR_KEY, '1');
+    const modal = bootstrap.Modal.getInstance($$one('#dateFeatureNoticeModal'));
+    if (modal) modal.hide();
+  });
 
   // Initialize date input: restore the last edited date, falling back to roll-over today.
   const rollOverForDate = (await getItem(DATE_ROLL_OVER_TIME_KEY)) ?? '05:00';
@@ -473,6 +497,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load the log entries for the date initialized above
   await loadLogs();
+
+  // Allow saveLogs() now that the textarea has been populated.
+  initialized = true;
 
   // When install_pwa is pressed, install the PWA
   installPWA($$one('#install_pwa'));
