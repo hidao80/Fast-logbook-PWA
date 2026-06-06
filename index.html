@@ -157,9 +157,8 @@
     </div>
 
     <!-- Date selector feature notice modal (shown once for existing users) -->
-    <div class="modal fade" id="dateFeatureNoticeModal" tabindex="-1"
-        aria-labelledby="dateFeatureNoticeModalLabel" aria-hidden="true"
-        data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="dateFeatureNoticeModal" tabindex="-1" aria-labelledby="dateFeatureNoticeModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -168,7 +167,8 @@
                 </div>
                 <div class="modal-body" data-translate="notice_date_selector_content"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="dateFeatureNoticeOkButton">OK</button>
+                    <button type="button" class="btn btn-primary" id="dateFeatureNoticeOkButton" data-bs-dismiss="modal"
+                        data-translate="date_selector_feature_notice_ok">OK</button>
                 </div>
             </div>
         </div>
@@ -384,7 +384,8 @@
                                         </section>
 
                                         <section class="mb-4">
-                                            <h3 class="h4" data-translate="help_config_screen_date_roll_over_title"></h3>
+                                            <h3 class="h4" data-translate="help_config_screen_date_roll_over_title">
+                                            </h3>
                                             <p data-translate="help_config_screen_date_roll_over_content"></p>
                                         </section>
 

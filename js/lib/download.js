@@ -92,8 +92,8 @@ export function generateFormattedLog(log, mins) {
 <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' integrity='sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==' crossorigin='anonymous' referrerpolicy='no-referrer' />
 </head><body>
 ${sections
-  .map(
-    (section) => `
+      .map(
+        (section) => `
 <h2>${Multilingualization.translate(section.title)}</h2>
 <i id='${section.title}-copy' class='fa-sharp fa-regular fa-copy btn btn-outline-secondary d-none'
 data-bs-trigger='manual' data-bs-toggle='tooltip' data-bs-placement='top' title='copy!'></i>
@@ -101,8 +101,8 @@ data-bs-trigger='manual' data-bs-toggle='tooltip' data-bs-placement='top' title=
 ${section.isCode ? `<pre><code id='${section.title}-source'>${section.content}</code></pre>` : section.content}
 </div>
 `,
-  )
-  .join('')}
+      )
+      .join('')}
 <script>
 (async()=>{const e=await(navigator?.permissions?.query({name:'clipboard-write'}));'granted'!==e?.state&&'prompt'!==e?.state||document.querySelectorAll('#${HTML_SUMMARY}-copy,#${PLAINTEXT_LOG}-copy,#${MARKDOWN_SUMMARY}-copy').forEach((e=>{const t=new bootstrap.Tooltip(e);e.classList.remove('d-none'),e.addEventListener('click',(async e=>{let a;e.preventDefault(),e.stopPropagation(),(a=document.querySelector(\`#\${e.target.id.replace('-copy','-source')}\`).textContent),'${HTML_SUMMARY}-copy'===e.target.id&&(a=a.replace(/\\n\\n/g,'<></>').replace(/\\n/g,'\\t').replace(/<><\\/>/g,'\\n')),await(navigator?.clipboard?.writeText(a.trim())),t.show(),setTimeout((()=>t.hide()),1e3)}))}))})();
 </script>
@@ -110,8 +110,9 @@ ${section.isCode ? `<pre><code id='${section.title}-source'>${section.content}</
 }
 
 export async function downloadLog(log = null) {
-  const logData = log ?? (await getItem(LOG_DATA_KEY));
-  const mins = await getItem(ROUNDING_UNIT_MINUTE_KEY);
+  const logData = log ?? (await getItem(LOG_DATA_KEY)) ?? '';
+  const minsRaw = await getItem(ROUNDING_UNIT_MINUTE_KEY);
+  const mins = Number(minsRaw) > 0 ? Number(minsRaw) : 1;
   const outputStr = generateFormattedLog(logData, mins);
   download(outputStr);
 }

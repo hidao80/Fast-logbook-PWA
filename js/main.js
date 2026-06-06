@@ -38,7 +38,8 @@ let initialized = false;
  */
 async function runMigrations() {
   const stored = await getItem(MIGRATION_VERSION_KEY);
-  const version = Number(stored ?? 0);
+  const parsedVersion = Number(stored);
+  const version = Number.isFinite(parsedVersion) && parsedVersion >= 0 ? parsedVersion : 0;
 
   if (version < 1) {
     // v1: Move all app data from localStorage to IndexedDB.

@@ -24,13 +24,14 @@ export default class Multilingualization {
       // data-translate属性を持つ要素を翻訳
       if (elem.hasAttribute?.('data-translate')) {
         const key = elem.dataset.translate;
-        const translated = window.__i18n_t(key);
+        const dict = Multilingualization.dictionaries[currentLang] ?? {};
+        const translated = dict[key];
         if (elem.tagName === 'TITLE') {
-          elem.textContent = translated;
+          elem.textContent = translated ?? key;
         } else if (elem.tagName === 'INPUT' || elem.tagName === 'TEXTAREA') {
-          if (translated) elem.placeholder = translated;
+          elem.placeholder = translated ?? '';
         } else {
-          elem.innerHTML = translated;
+          elem.innerHTML = translated ?? key;
         }
       }
 
@@ -73,6 +74,7 @@ export default class Multilingualization {
     en: {
       app_name: 'Fast logbook PWA',
       popup_title: 'Fast logbook PWA',
+      date_selector_feature_notice_ok: 'OK',
       popup_description: 'Time-stamped work notes PWA',
       configure: 'Configure',
       config_title: 'Config - Fast logbook PWA',
@@ -258,6 +260,7 @@ export default class Multilingualization {
     ja: {
       app_name: 'Fast logbook PWA',
       popup_title: 'Fast logbook PWA',
+      date_selector_feature_notice_ok: 'OK',
       popup_description: '開始時間付き作業メモPWA',
       configure: '設定',
       config_title: '設定 - Fast logbook PWA',

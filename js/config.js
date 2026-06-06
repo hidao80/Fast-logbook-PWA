@@ -73,7 +73,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const target =
       key === ROUNDING_UNIT_MINUTE_KEY
         ? $$one('select')
-        : $$one(`[data-translate='${key}']`);
+        : key === 'date-roll-over-time'
+          ? $$one('input[type="time"]')
     if (target) target.value = value;
   });
 });
