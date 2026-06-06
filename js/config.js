@@ -27,11 +27,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize shortcut text inputs — scoped to [type="text"] to avoid double-processing
   // the time input, which is handled separately below.
   for (const node of $$all('input[type="text"][data-translate]')) {
+    node.placeholder =
+      Multilingualization.translate(node.dataset.translate) ?? '';
     const str = await getItem(node.dataset.translate);
-    node.value =
-      str && str !== 'undefined'
-        ? str
-        : Multilingualization.translate(node.dataset.translate);
+    node.value = str && str !== 'undefined' ? str : '';
 
     // Save the input when focus is removed or changed
     node.addEventListener('change', async (e) => {

@@ -256,11 +256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   for (const node of $$all('label[data-shortcut-key]')) {
     const key = `shortcut_${node.dataset.shortcutKey}`;
     const str = await getItem(key);
-    if (str && str !== 'undefined') {
-      node.textContent = str;
-    } else {
-      node.textContent = Multilingualization.translate(node.dataset.translate);
-    }
+    node.textContent = str && str !== 'undefined' ? str : '';
 
     node.addEventListener('click', async (e) => {
       e.stopPropagation();

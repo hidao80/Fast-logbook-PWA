@@ -27,6 +27,8 @@ export default class Multilingualization {
         const translated = window.__i18n_t(key);
         if (elem.tagName === 'TITLE') {
           elem.textContent = translated;
+        } else if (elem.tagName === 'INPUT' || elem.tagName === 'TEXTAREA') {
+          if (translated) elem.placeholder = translated;
         } else {
           elem.innerHTML = translated;
         }
