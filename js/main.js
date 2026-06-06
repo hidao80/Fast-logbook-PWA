@@ -19,6 +19,54 @@ const bc = new BroadcastChannel('fast-logbook-sync');
 
 const DATE_ROLL_OVER_TIME_KEY = 'date-roll-over-time';
 const LAST_EDITED_DATE_KEY = 'last_edited_date';
+const MIGRATION_VERSION_KEY = 'migration_version';
+
+/**
+ * Run all pending data migrations in version order.
+ *
+ * Each version block is guarded by `version < N` so it runs exactly once.
+ * The version number is written to IndexedDB only after the block completes,
+ * so an interrupted migration will be retried on the next load.
+ *
+ * Adding future migrations: append a new `if (version < N)` block and bump N.
+ */
+async function runMigrations() {
+  const stored = await getItem(MIGRATION_VERSION_KEY);
+  const version = Number(stored ?? 0);
+
+  if (version < 1) {
+    // v1: Move all app data from localStorage to IndexedDB.
+    await migrateFromLocalStorage([
+      LOG_DATA_KEY,
+      ROUNDING_UNIT_MINUTE_KEY,
+      DATE_ROLL_OVER_TIME_KEY,
+      'shortcut_1',
+      'shortcut_2',
+      'shortcut_3',
+      'shortcut_4',
+      'shortcut_5',
+      'shortcut_6',
+      'shortcut_7',
+      'shortcut_8',
+      'shortcut_9',
+    ]);
+
+    // The roll-over time was once stored under the key 'date-roll-over-time-value'
+    // (the data-translate attribute value). Consolidate to the canonical key if
+    // the canonical key was not already migrated above.
+    const oldRollOver = localStorage.getItem('date-roll-over-time-value');
+    if (oldRollOver && !(await getItem(DATE_ROLL_OVER_TIME_KEY))) {
+      await setItem(DATE_ROLL_OVER_TIME_KEY, oldRollOver);
+    }
+    localStorage.removeItem('date-roll-over-time-value');
+
+    // Remove any stale transient localStorage keys from the old implementation.
+    localStorage.removeItem('downloadUrl');
+    localStorage.removeItem('downloadFilename');
+
+    await setItem(MIGRATION_VERSION_KEY, '1');
+  }
+}
 
 /**
  * Returns 'YYYY-MM-DD' for the logical "today", adjusted for the roll-over time.
@@ -168,21 +216,7 @@ async function flushBuffer() {
  * Code executed when form loading is complete
  */
 document.addEventListener('DOMContentLoaded', async () => {
-  // One-time migration from localStorage to IndexedDB
-  await migrateFromLocalStorage([
-    LOG_DATA_KEY,
-    ROUNDING_UNIT_MINUTE_KEY,
-    DATE_ROLL_OVER_TIME_KEY,
-    'shortcut_1',
-    'shortcut_2',
-    'shortcut_3',
-    'shortcut_4',
-    'shortcut_5',
-    'shortcut_6',
-    'shortcut_7',
-    'shortcut_8',
-    'shortcut_9',
-  ]);
+  await runMigrations();
 
   // Initialize date input: restore the last edited date, falling back to roll-over today.
   const rollOverForDate = (await getItem(DATE_ROLL_OVER_TIME_KEY)) ?? '05:00';
