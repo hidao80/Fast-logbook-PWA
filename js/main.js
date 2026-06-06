@@ -1,10 +1,11 @@
-import { initAnalytics } from './lib/analytics.js';
 import { downloadLog, generateFormattedLog } from './lib/download.js';
 import { $$all, $$disableConsole, $$one } from './lib/indolence.min.js';
 import Multilingualization from './lib/multilingualization.js';
+import { getItem, migrateFromLocalStorage, setItem } from './lib/storage.js';
 import {
   appendTime,
   autoSetTheme,
+  getTodayString,
   installPWA,
   LOG_DATA_KEY,
   ROUNDING_UNIT_MINUTE_KEY,
@@ -12,6 +13,46 @@ import {
 } from './lib/utils.js';
 
 /* global bootstrap */
+
+// Cross-tab synchronization via BroadcastChannel
+const bc = new BroadcastChannel('fast-logbook-sync');
+
+const DATE_ROLL_OVER_TIME_KEY = 'date-roll-over-time';
+const LAST_EDITED_DATE_KEY = 'last_edited_date';
+
+/**
+ * Returns 'YYYY-MM-DD' for the logical "today", adjusted for the roll-over time.
+ * If the current wall-clock time is before the roll-over, "today" is yesterday.
+ *
+ * @param {string} rollOver - 'HH:MM'
+ * @returns {string} 'YYYY-MM-DD'
+ */
+function getDateWithRollOver(rollOver) {
+  const [rollHour, rollMin] = rollOver.split(':').map(Number);
+  const now = new Date();
+  if (now.getHours() * 60 + now.getMinutes() < rollHour * 60 + rollMin) {
+    const prev = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const y = prev.getFullYear().toString().padStart(4, '0');
+    const m = (prev.getMonth() + 1).toString().padStart(2, '0');
+    const d = prev.getDate().toString().padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+  return getTodayString();
+}
+
+/**
+ * Compute the [start, end) timestamp boundaries for a given date and roll-over time.
+ * The "day" spans from selectedDate@rollOver to (selectedDate+1)@rollOver.
+ *
+ * @param {string} selectedDate - 'YYYY-MM-DD'
+ * @param {string} rollOver     - 'HH:MM'
+ * @returns {{ start: Date, end: Date }}
+ */
+function getDateBoundaries(selectedDate, rollOver) {
+  const start = new Date(`${selectedDate}T${rollOver}:00`);
+  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+  return { start, end };
+}
 
 /**
  * Add one log entry
@@ -29,30 +70,54 @@ export function appendLog(tag) {
 }
 
 /**
- * Load work logs
+ * Load and display only the log entries that fall within the date shown
+ * in input[type="date"], using the date-roll-over-time boundary.
  *
  * @return {Promise}
  */
 async function loadLogs() {
-  // A similar object is input instead of an empty string
-  const str = localStorage.getItem(LOG_DATA_KEY);
-  if (str && str !== 'undefined') {
-    const textarea = $$one('textarea');
-    textarea.value = str;
+  const allLog = await getItem(LOG_DATA_KEY);
+  const textarea = $$one('textarea');
 
-    // Always scroll to the bottom
-    textarea.scrollTo(0, textarea.scrollHeight);
+  if (!allLog || allLog === 'undefined') {
+    textarea.value = '';
+    return;
   }
+
+  const rollOver = (await getItem(DATE_ROLL_OVER_TIME_KEY)) ?? '05:00';
+  const selectedDate = $$one('#target-date').value;
+  if (!selectedDate) {
+    textarea.value = '';
+    return;
+  }
+  const { start, end } = getDateBoundaries(selectedDate, rollOver);
+
+  const filtered = allLog
+    .split('\n')
+    .filter((line) => {
+      if (line.length < 16) return false;
+      // Log format: 'YYYY-MM-DD HH:MM...' — first 16 chars are the timestamp
+      const t = new Date(`${line.slice(0, 10)}T${line.slice(11, 16)}:00`);
+      return t >= start && t < end;
+    })
+    .join('\n');
+
+  textarea.value = filtered;
+  textarea.scrollTo(0, textarea.scrollHeight);
 }
 
 /**
- * Save work logs
+ * Buffer the textarea content to localStorage.
  *
- * @return {Promise}
+ * This is intentionally synchronous and lightweight — it runs on every
+ * keystroke (via debounce) and must not block the UI. The date is saved
+ * alongside the content so flushBuffer() knows which day's range to update,
+ * even if the user navigates away and comes back later.
  */
 function saveLogs() {
   try {
-    localStorage.setItem(LOG_DATA_KEY, trimNewLine($$one('textarea').value));
+    localStorage.setItem('log_buffer', trimNewLine($$one('textarea').value));
+    localStorage.setItem('log_buffer_date', $$one('#target-date').value);
   } catch (e) {
     if (e.name === 'QuotaExceededError') {
       alert('ストレージ容量が不足しています');
@@ -62,11 +127,84 @@ function saveLogs() {
 }
 
 /**
+ * Merge the localStorage buffer into the IndexedDB log entry for its date.
+ *
+ * Call this before any operation that reads the full log (date change,
+ * page navigation, formatted-log view/download). No-op when the buffer
+ * is absent, so it is safe to call unconditionally.
+ *
+ * @return {Promise}
+ */
+async function flushBuffer() {
+  const buffer = localStorage.getItem('log_buffer');
+  const bufferDate = localStorage.getItem('log_buffer_date');
+  if (buffer === null || !bufferDate) return;
+
+  const rollOver = (await getItem(DATE_ROLL_OVER_TIME_KEY)) ?? '05:00';
+  const { start, end } = getDateBoundaries(bufferDate, rollOver);
+
+  const allLog = (await getItem(LOG_DATA_KEY)) ?? '';
+  const editedLines = trimNewLine(buffer).split('\n').filter(Boolean);
+
+  // Keep lines that belong to dates outside the buffer's date range
+  const otherLines = allLog.split('\n').filter((line) => {
+    if (!line || line.length < 16) return !!line;
+    const t = new Date(`${line.slice(0, 10)}T${line.slice(11, 16)}:00`);
+    return t < start || t >= end;
+  });
+
+  const merged = [...otherLines, ...editedLines]
+    .filter(Boolean)
+    .sort((a, b) => a.slice(0, 16).localeCompare(b.slice(0, 16)));
+
+  const value = trimNewLine(merged.join('\n'));
+  await setItem(LOG_DATA_KEY, value);
+  localStorage.removeItem('log_buffer');
+  localStorage.removeItem('log_buffer_date');
+  bc.postMessage({ key: LOG_DATA_KEY, value });
+}
+
+/**
  * Code executed when form loading is complete
  */
 document.addEventListener('DOMContentLoaded', async () => {
+  // One-time migration from localStorage to IndexedDB
+  await migrateFromLocalStorage([
+    LOG_DATA_KEY,
+    ROUNDING_UNIT_MINUTE_KEY,
+    DATE_ROLL_OVER_TIME_KEY,
+    'shortcut_1',
+    'shortcut_2',
+    'shortcut_3',
+    'shortcut_4',
+    'shortcut_5',
+    'shortcut_6',
+    'shortcut_7',
+    'shortcut_8',
+    'shortcut_9',
+  ]);
+
+  // Initialize date input: restore the last edited date, falling back to roll-over today.
+  const rollOverForDate = (await getItem(DATE_ROLL_OVER_TIME_KEY)) ?? '05:00';
+  const todayStr = getTodayString();
+  const lastDate = await getItem(LAST_EDITED_DATE_KEY);
+  const initialDate =
+    lastDate && lastDate <= todayStr
+      ? lastDate
+      : getDateWithRollOver(rollOverForDate);
+
+  const dateInput = $$one('#target-date');
+  dateInput.max = todayStr;
+  dateInput.value = initialDate;
+  await setItem(LAST_EDITED_DATE_KEY, initialDate);
+
+  dateInput.addEventListener('change', async () => {
+    await setItem(LAST_EDITED_DATE_KEY, dateInput.value);
+    await flushBuffer(); // commit buffer for the outgoing date before switching
+    await loadLogs();
+  });
+
   $$disableConsole();
-  initAnalytics();
 
   // Set the theme automatically
   autoSetTheme();
@@ -83,7 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // When a preset tag is clicked
   for (const node of $$all('label[data-shortcut-key]')) {
     const key = `shortcut_${node.dataset.shortcutKey}`;
-    const str = localStorage.getItem(key);
+    const str = await getItem(key);
     if (str && str !== 'undefined') {
       node.textContent = str;
     } else {
@@ -117,8 +255,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // When 0 is pressed, focus on the input field
         e.preventDefault();
         e.stopPropagation();
-        $$one('input').focus();
-        $$one('input').value = '';
+        $$one('input[type="text"]').focus();
+        $$one('input[type="text"]').value = '';
       } else {
         // For 1-9, stamp the preset tag
         const node = $$one(`label[data-shortcut-key='${inputDigit}']`);
@@ -149,14 +287,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // When input to the 0th element is confirmed, stamp the entered log for PC
-  $$one('input').addEventListener('keydown', async (e) => {
+  $$one('input[type="text"]').addEventListener('keydown', async (e) => {
     // Ignore events processed by IME
     if (!e.isComposing && e.keyCode !== 229 && e.key === 'Enter') {
       processInput(e.target);
     }
   });
   // When input to the 0th element is confirmed, stamp the entered log for Android
-  $$one('input').addEventListener('blur', async (e) => {
+  $$one('input[type="text"]').addEventListener('blur', async (e) => {
     processInput(e.target);
   });
 
@@ -194,7 +332,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // When the popup loses focus, save the content of textarea
-  [$$one('input'), window].forEach((node) => {
+  [$$one('input[type="text"]'), window].forEach((node) => {
     node.addEventListener('blur', async () => {
       await saveLogs();
     });
@@ -217,34 +355,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // When textarea content changes, synchronize
-  window.addEventListener('storage', (event) => {
-    if (event.key === LOG_DATA_KEY) {
-      $$one('textarea').value = event.newValue;
+  // Cross-tab synchronization: flush own buffer then reload when another tab commits
+  bc.addEventListener('message', async (event) => {
+    const key = event.data?.key;
+    if (key === LOG_DATA_KEY) {
+      await flushBuffer();
+      await loadLogs();
+    } else if (key === DATE_ROLL_OVER_TIME_KEY) {
+      await flushBuffer();
+      $$one('#target-date').value = getDateWithRollOver(event.data.value);
+      await loadLogs();
     }
   });
 
-  // When view_formatted_log link is pressed, display the content of downloadLog() in a new tab without downloading
-  $$one('a#view_formatted_log').addEventListener('click', () => {
-    const log = localStorage.getItem(LOG_DATA_KEY);
-    let mins = localStorage.getItem(ROUNDING_UNIT_MINUTE_KEY);
+  // When view_formatted_log link is pressed, display the current date's log in a new tab
+  $$one('a#view_formatted_log').addEventListener('click', async () => {
+    const log = $$one('textarea').value;
+    let mins = await getItem(ROUNDING_UNIT_MINUTE_KEY);
     if (!mins) {
-      // Set default value to 1 if not set
       mins = 1;
-      localStorage.setItem(ROUNDING_UNIT_MINUTE_KEY, mins);
+      await setItem(ROUNDING_UNIT_MINUTE_KEY, String(mins));
     }
     const outputStr = generateFormattedLog(log, mins);
-    const newTab = window.open(
-      Multilingualization.translate('log_viewer'),
-      '_log_viewer',
-    );
-    newTab.document.write(outputStr);
-    newTab.document.close();
+    const blob = new Blob([outputStr], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_log_viewer');
   });
 
-  // When download_formatted_log link is pressed, download the content of downloadLog()
+  // When download_formatted_log link is pressed, download the current date's log
   $$one('a#download_formatted_log').addEventListener('click', async () => {
-    await downloadLog();
+    await downloadLog($$one('textarea').value);
   });
 
   // When delete_log link is pressed, delete the log
@@ -263,7 +403,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   $$one('#confirmDeleteButton').addEventListener('click', async () => {
     const textarea = $$one('textarea');
     textarea.value = '';
-    await saveLogs();
+    saveLogs(); // write empty buffer for current date
+    await flushBuffer(); // commit deletion to IndexedDB immediately
 
     // モーダルを閉じる
     if (typeof bootstrap !== 'undefined') {
@@ -288,7 +429,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     navigator.serviceWorker.register('sw.js');
   }
 
-  // Load the last saved log
+  // Commit the buffer to IndexedDB whenever the page is hidden (tab switch, minimize, close).
+  // This ensures data reaches IndexedDB even without an explicit date change or navigation.
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'hidden') {
+      saveLogs(); // capture the very latest textarea state before suspending
+      await flushBuffer();
+    }
+  });
+
+  // Recover any unsaved buffer left by a previous session (e.g. after navigating to config.html)
+  await flushBuffer();
+
+  // Load the log entries for the date initialized above
   await loadLogs();
 
   // When install_pwa is pressed, install the PWA

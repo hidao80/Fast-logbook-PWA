@@ -1,10 +1,14 @@
 import { $$all, $$one } from './lib/indolence.min.js';
 import Multilingualization from './lib/multilingualization.js';
+import { getItem, setItem } from './lib/storage.js';
 import {
   autoSetTheme,
   getRoundingUnit,
   ROUNDING_UNIT_MINUTE_KEY,
 } from './lib/utils.js';
+
+// Cross-tab synchronization via BroadcastChannel
+const bc = new BroadcastChannel('fast-logbook-sync');
 
 /**
  * Code to be executed upon completion of form loading
@@ -20,45 +24,57 @@ document.addEventListener('DOMContentLoaded', async () => {
       $$one('#version_number').textContent = manifest.version;
     });
 
-  // Initialize tags
-  $$all('input').forEach((node) => {
-    const str = localStorage.getItem(node.dataset.translate);
+  // Initialize shortcut text inputs — scoped to [type="text"] to avoid double-processing
+  // the time input, which is handled separately below.
+  for (const node of $$all('input[type="text"][data-translate]')) {
+    const str = await getItem(node.dataset.translate);
     node.value =
       str && str !== 'undefined'
         ? str
         : Multilingualization.translate(node.dataset.translate);
 
     // Save the input when focus is removed or changed
-    node.addEventListener('change', (e) => {
+    node.addEventListener('change', async (e) => {
       try {
-        localStorage.setItem(e.target.dataset.translate, e.target.value.trim());
+        const value = e.target.value.trim();
+        await setItem(e.target.dataset.translate, value);
+        bc.postMessage({ key: e.target.dataset.translate, value });
       } catch (e) {
         if (e.name === 'QuotaExceededError') {
           alert('ストレージ容量が不足しています');
         }
       }
     });
-  });
+  }
 
   // Initialize rounding unit
-  const min = localStorage.getItem(ROUNDING_UNIT_MINUTE_KEY);
+  const min = await getItem(ROUNDING_UNIT_MINUTE_KEY);
   $$one('select').value = getRoundingUnit(min);
 
   // Save the value when the rounding unit is changed
-  $$one('select').addEventListener('change', (e) => {
-    localStorage.setItem(ROUNDING_UNIT_MINUTE_KEY, e.target.value);
+  $$one('select').addEventListener('change', async (e) => {
+    await setItem(ROUNDING_UNIT_MINUTE_KEY, e.target.value);
+    bc.postMessage({ key: ROUNDING_UNIT_MINUTE_KEY, value: e.target.value });
   });
 
-  // Synchronize when the setting changes
-  window.addEventListener('storage', (event) => {
-    if (event.storageArea === localStorage) {
-      const target =
-        event.key === ROUNDING_UNIT_MINUTE_KEY
-          ? $$one('select')
-          : $$one(`[data-translate='${event.key}']`);
-      if (target) {
-        target.value = event.newValue;
-      }
-    }
+  // Initialize date roll-over time
+  const targetDate = await getItem('date-roll-over-time');
+  $$one('input[type="time"]').value = targetDate || '05:00';
+
+  // Save the value when the date roll-over time is changed
+  $$one('input[type="time"]').addEventListener('change', async (e) => {
+    await setItem('date-roll-over-time', e.target.value);
+    bc.postMessage({ key: 'date-roll-over-time', value: e.target.value });
+  });
+
+  // Cross-tab synchronization: reflect settings changes from other tabs
+  bc.addEventListener('message', (event) => {
+    const { key, value } = event.data ?? {};
+    if (!key) return;
+    const target =
+      key === ROUNDING_UNIT_MINUTE_KEY
+        ? $$one('select')
+        : $$one(`[data-translate='${key}']`);
+    if (target) target.value = value;
   });
 });
