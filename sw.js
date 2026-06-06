@@ -19,10 +19,10 @@ const assets = [
   "/js/main.js",
   "/js/config.js",
   "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js",
-  "/js/lib/analytics.js",
   "/js/lib/download.js",
   "/js/lib/indolence.min.js",
   "/js/lib/multilingualization.js",
+  "/js/lib/storage.js",
   "/js/lib/utils.js",
 ];
 
