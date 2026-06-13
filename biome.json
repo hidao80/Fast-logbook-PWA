@@ -1,7 +1,7 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.2/schema.json",
   "files": {
-    "includes": ["js/**/*.js", "!js/lib/indolence.min.js"]
+    "includes": ["src/**/*.ts", "src/**/*.tsx"]
   },
   "formatter": {
     "enabled": true,
@@ -22,8 +22,8 @@
       "correctness": {
         "noUnusedVariables": "warn"
       },
-      "complexity": {
-        "noStaticOnlyClass": "off"
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
       }
     }
   }
