@@ -238,7 +238,7 @@ export default function App() {
       setInstallBtnVisible(true);
     });
 
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && import.meta.env.PROD) {
       // Only reload on SW *update* (not initial install)
       if (navigator.serviceWorker.controller) {
         navigator.serviceWorker.addEventListener('controllerchange', () => {
