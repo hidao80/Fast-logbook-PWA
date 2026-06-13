@@ -8,6 +8,16 @@ interface DrawerProps {
   children: ReactNode;
 }
 
+/**
+ * Slide-in side drawer using Bootstrap offcanvas. Closes on Escape or backdrop click.
+ *
+ * @param props.isOpen - whether the drawer is visible
+ * @param props.onClose - callback invoked on close
+ * @param props.title - text shown in the offcanvas header
+ * @param props.children - body content
+ * @returns portal-rendered offcanvas element, or null when closed
+ * @example <Drawer isOpen={open} onClose={() => setOpen(false)} title="Menu">...</Drawer>
+ */
 export function Drawer({ isOpen, onClose, title, children }: DrawerProps) {
   useEffect(() => {
     if (!isOpen) return;

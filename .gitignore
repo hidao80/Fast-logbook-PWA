@@ -1,5 +1,5 @@
 node_modules/
-# dist/
+dist/
 .claude/histories
 .claude/settings.local.json
 pnpm-lock.yaml

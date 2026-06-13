@@ -11,6 +11,12 @@ import {
 
 const DATE_ROLL_OVER_TIME_KEY = 'date-roll-over-time';
 
+/**
+ * Settings page component. Manages rounding unit, shortcut strings,
+ * and date roll-over time, syncing changes across tabs via BroadcastChannel.
+ *
+ * @returns the configuration UI
+ */
 export default function ConfigApp() {
   const { t } = useTranslation();
 
@@ -80,7 +86,7 @@ export default function ConfigApp() {
       bcRef.current?.postMessage({ key, value: value.trim() });
     } catch (e) {
       if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-        alert('ストレージ容量が不足しています');
+        alert(t('storage_quota_exceeded'));
       }
     }
     setShortcuts((prev) => {
@@ -92,18 +98,30 @@ export default function ConfigApp() {
 
   const handleRoundingChange = async (value: string) => {
     const n = getRoundingUnit(value);
-    setRoundingUnit(n);
-    await setItem(ROUNDING_UNIT_MINUTE_KEY, String(n));
-    bcRef.current?.postMessage({
-      key: ROUNDING_UNIT_MINUTE_KEY,
-      value: String(n),
-    });
+    try {
+      await setItem(ROUNDING_UNIT_MINUTE_KEY, String(n));
+      setRoundingUnit(n);
+      bcRef.current?.postMessage({
+        key: ROUNDING_UNIT_MINUTE_KEY,
+        value: String(n),
+      });
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+        alert(t('storage_quota_exceeded'));
+      }
+    }
   };
 
   const handleRollOverChange = async (value: string) => {
-    setRollOverTime(value);
-    await setItem(DATE_ROLL_OVER_TIME_KEY, value);
-    bcRef.current?.postMessage({ key: DATE_ROLL_OVER_TIME_KEY, value });
+    try {
+      await setItem(DATE_ROLL_OVER_TIME_KEY, value);
+      setRollOverTime(value);
+      bcRef.current?.postMessage({ key: DATE_ROLL_OVER_TIME_KEY, value });
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+        alert(t('storage_quota_exceeded'));
+      }
+    }
   };
 
   return (

@@ -28,6 +28,12 @@ function getDateBoundaries(
   return { start, end };
 }
 
+/**
+ * Root page component. Handles log CRUD, shortcut insertion, date selection,
+ * formatted-log export, and PWA install prompt.
+ *
+ * @returns the main logbook UI
+ */
 export default function App() {
   const { t } = useTranslation();
 
@@ -106,7 +112,7 @@ export default function App() {
       localStorage.setItem('log_buffer_date', targetDateRef.current);
     } catch (e) {
       if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-        alert('ストレージ容量が不足しています');
+        alert(t('storage_quota_exceeded'));
       }
     }
     setIsDirty(false);
@@ -145,7 +151,8 @@ export default function App() {
     if (!ta) return;
     ta.value = trimNewLine(`${ta.value}\n${tag}`);
     ta.scrollTo(0, ta.scrollHeight);
-  }, []);
+    saveLogs();
+  }, [saveLogs]);
 
   const runMigrations = useCallback(async () => {
     const stored = await getItem(MIGRATION_VERSION_KEY);
@@ -292,7 +299,7 @@ export default function App() {
         } else {
           const idx = parseInt(inputDigit, 10) - 1;
           const text = shortcuts[idx];
-          if (text) appendLog(appendTime(text));
+          if (text) appendLog(appendTime(text, targetDateRef.current));
         }
       }
     };
@@ -362,7 +369,7 @@ export default function App() {
   function processInput(elem: HTMLInputElement) {
     const str = elem.value.trim();
     if (!str) return;
-    appendLog(appendTime(str));
+    appendLog(appendTime(str, targetDateRef.current));
     elem.value = '';
   }
 
@@ -525,7 +532,7 @@ export default function App() {
                     className="form-control text-start"
                     onClick={() => {
                       const text = shortcuts[n - 1];
-                      if (text) appendLog(appendTime(text));
+                      if (text) appendLog(appendTime(text, targetDateRef.current));
                     }}
                   >
                     {shortcuts[n - 1]}
@@ -542,7 +549,7 @@ export default function App() {
                     className="form-control text-start"
                     onClick={() => {
                       const text = shortcuts[n - 1];
-                      if (text) appendLog(appendTime(text));
+                      if (text) appendLog(appendTime(text, targetDateRef.current));
                     }}
                   >
                     {shortcuts[n - 1]}

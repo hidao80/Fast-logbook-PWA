@@ -1,4 +1,6 @@
+/** localStorage / IndexedDB key for the raw log text. */
 export const LOG_DATA_KEY = 'log';
+/** localStorage / IndexedDB key for the rounding unit (minutes). */
 export const ROUNDING_UNIT_MINUTE_KEY = 'rounding_mins';
 
 /**
@@ -18,7 +20,7 @@ export function getTodayString(): string {
 /**
  * Get the hour from a date and time.
  *
- * @param time - 'Y-m-d H:i:s' or null for current time
+ * @param time - 'YYYY-MM-DD HH:MM' (or longer) or null for current time
  * @param isInt - return as number when true, zero-padded string when false
  * @example fetchHourFromTime('2021-01-01 09:04:56') -> 9
  * @example fetchHourFromTime('2021-01-01 09:04:56', false) -> '09'
@@ -29,15 +31,18 @@ export function fetchHourFromTime(
   time: string | null = null,
   isInt = true,
 ): number | string {
-  const date = time === null ? new Date() : new Date(time);
-  const hour = date.getHours().toString().padStart(2, '0');
+  // Extract directly from "YYYY-MM-DD HH:MM..." to avoid Invalid Date in Safari
+  const hour =
+    time === null
+      ? new Date().getHours().toString().padStart(2, '0')
+      : time.slice(11, 13);
   return isInt ? parseInt(hour, 10) : hour;
 }
 
 /**
  * Get minutes from a date and time.
  *
- * @param time - 'Y-m-d H:i:s' or null for current time
+ * @param time - 'YYYY-MM-DD HH:MM' (or longer) or null for current time
  * @param isInt - return as number when true, zero-padded string when false
  * @example fetchMinFromTime('2021-01-01 12:04:56') -> 4
  * @example fetchMinFromTime('2021-01-01 12:34:56', false) -> '04'
@@ -48,8 +53,11 @@ export function fetchMinFromTime(
   time: string | null = null,
   isInt = true,
 ): number | string {
-  const date = time === null ? new Date() : new Date(time);
-  const min = date.getMinutes().toString().padStart(2, '0');
+  // Extract directly from "YYYY-MM-DD HH:MM..." to avoid Invalid Date in Safari
+  const min =
+    time === null
+      ? new Date().getMinutes().toString().padStart(2, '0')
+      : time.slice(14, 16);
   return isInt ? parseInt(min, 10) : min;
 }
 
@@ -78,12 +86,14 @@ export function getRoundingUnit(value: number | string | null): number {
  * Add a timestamp prefix to a work tag.
  *
  * @param tag - raw tag string
+ * @param date - date portion 'YYYY-MM-DD'; defaults to today when omitted
  * @returns 'YYYY-MM-DD HH:MM<tag>'
  * @example appendTime('Meeting') -> '2023-01-01 09:00Meeting'
+ * @example appendTime('Meeting', '2023-01-01') -> '2023-01-01 09:00Meeting'
  */
-export function appendTime(tag: string): string {
+export function appendTime(tag: string, date?: string): string {
   return (
-    getTodayString() +
+    (date ?? getTodayString()) +
     ' ' +
     fetchHourFromTime(null, false) +
     ':' +

@@ -10,6 +10,18 @@ interface ModalProps {
   fullscreen?: boolean;
 }
 
+/**
+ * Bootstrap modal dialog rendered via a portal. Closes on Escape or outside click.
+ *
+ * @param props.isOpen - whether the modal is visible
+ * @param props.onClose - optional callback invoked on close; omit to make modal non-dismissible
+ * @param props.title - text shown in the modal header
+ * @param props.children - body content
+ * @param props.footer - optional footer slot
+ * @param props.fullscreen - when true, uses Bootstrap's fullscreen modal variant
+ * @returns portal-rendered modal element, or null when closed
+ * @example <Modal isOpen={open} onClose={() => setOpen(false)} title="Confirm">...</Modal>
+ */
 export function Modal({
   isOpen,
   onClose,

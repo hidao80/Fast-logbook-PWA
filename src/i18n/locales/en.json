@@ -121,6 +121,7 @@
   "help_config_screen_auto_save": "Settings are saved automatically. When you return to the main screen after making changes, the new settings are applied immediately.",
   "help_config_screen_date_roll_over_title": "Date Roll-over Time",
   "help_config_screen_date_roll_over_content": "Sets the time at which a new \"day\" begins. For example, with a roll-over time of 05:00, entries logged between midnight and 04:59 are counted as part of the previous day. This is useful for night-shift workers or anyone who works past midnight. The default is 05:00.",
+  "storage_quota_exceeded": "Storage quota exceeded.",
   "help_close_button": "Close",
   "help_main_screen_date_input_title": "Display Target Date",
   "help_main_screen_date_input_content": "The date selector in the top-right corner controls which day's log entries are shown in the text area. Only entries within the 24-hour window starting at the configured roll-over time are displayed. The date defaults to the last day you edited, and future dates cannot be selected.",

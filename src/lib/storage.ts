@@ -51,7 +51,7 @@ export async function migrateFromLocalStorage(keys: string[]): Promise<void> {
     const value = localStorage.getItem(key);
     if (value !== null && value !== 'undefined') {
       await setItem(key, value);
+      localStorage.removeItem(key);
     }
-    localStorage.removeItem(key);
   }
 }

@@ -126,7 +126,7 @@ export function toHtml(log: string, mins: number): string {
   const breakMark = '^';
   let sum = 0;
   let total = 0;
-  let output = `</head><body><table class='table table-striped-columns'><thead class='table-light'><thead class='table-light'>
+  let output = `<table class='table table-striped-columns'><thead class='table-light'>
 <tr>
 <th class='text-center'>${i18next.t('work_category')}</th>
 <th class='text-center'>${i18next.t('work_detail')}</th>
