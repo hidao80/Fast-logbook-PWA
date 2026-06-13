@@ -232,6 +232,12 @@ export default function App() {
     });
 
     if ('serviceWorker' in navigator) {
+      // Only reload on SW *update* (not initial install)
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload();
+        });
+      }
       navigator.serviceWorker.register('sw.js');
     }
 

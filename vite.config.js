@@ -12,7 +12,7 @@ export default defineConfig({
       filename: 'sw.js',
       manifest: false,
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,ico,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,png,ico,svg,woff2,json}'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/cdn\.jsdelivr\.net\/.*/i,
