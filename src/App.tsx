@@ -238,6 +238,11 @@ export default function App() {
       setInstallBtnVisible(true);
     });
 
+    window.addEventListener('appinstalled', () => {
+      deferredPromptRef.current = null;
+      setInstallBtnVisible(false);
+    });
+
     if ('serviceWorker' in navigator) {
       // Only reload on SW *update* (not initial install)
       if (navigator.serviceWorker.controller) {
@@ -494,14 +499,15 @@ export default function App() {
           <span className="outline-dark mt-3">
             ver. <span>{version}</span>
           </span>
-          <button
-            type="button"
-            className="btn btn-outline-info mt-3"
-            onClick={handleInstallPWA}
-            disabled={!installBtnVisible}
-          >
-            {t('install_pwa')}
-          </button>
+          {installBtnVisible && (
+            <button
+              type="button"
+              className="btn btn-outline-info mt-3"
+              onClick={handleInstallPWA}
+            >
+              {t('install_pwa')}
+            </button>
+          )}
         </div>
       </Drawer>
 
