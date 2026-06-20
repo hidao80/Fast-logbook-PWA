@@ -345,6 +345,31 @@ Fixed the `beforeinstallprompt` capture and button-visibility logic, and explici
 
 ---
 
+## ADR-018: Removing the unused `@juliusbrussee/caveman-code` dependency and standardizing on pnpm
+
+- Status: Accepted
+- Date: 2026-06-20
+
+### Context
+A CI run of `npm audit --audit-level=high` failed with a high-severity advisory in `undici` and a moderate one in `protobufjs`. Tracing the dependency graph (`npm ls protobufjs undici`) showed both came in transitively through `@juliusbrussee/caveman-code` (a `dependencies` entry in `package.json`), which itself pulled in `@juliusbrussee/caveman-agent`, `@juliusbrussee/caveman-ai`, `@juliusbrussee/caveman-tui`, and `@google/genai` — none of which are imported anywhere under `src/`. These are AI-agent-tooling packages unrelated to a client-only work-logging PWA, and confirmed unused via a project-wide search.
+
+Separately, the project had been running two package managers in parallel: npm for local/Docker/Netlify installs (`package-lock.json` committed) and pnpm only for the audit CI step (`pnpm-lock.yaml` present locally but gitignored, stemming from ADR-008's CI switch). The two lockfiles could drift, and in this instance `npm audit` and `pnpm audit` reported different results against them — `pnpm install` after removing the dependency immediately resolved to "no known vulnerabilities found," while the stale `package-lock.json` still showed the failure.
+
+### Decision
+1. Removed `@juliusbrussee/caveman-code` from `package.json`'s `dependencies`.
+2. Removed `package-lock.json` and regenerated a fresh `pnpm-lock.yaml` via `pnpm install` (363 packages dropped from the dependency tree).
+3. Pinned the package manager via `"packageManager": "pnpm@10.33.2"` in `package.json`.
+4. Updated `.gitignore` to track `pnpm-lock.yaml` and ignore `package-lock.json` instead (reversing the prior state).
+5. Updated every `npm run`/`npm ci`/`npm install`/`npm audit` reference to its `pnpm` equivalent across `.github/workflows/audit.yml` (added `pnpm/action-setup`), `Dockerfile` (added `corepack enable`), `netlify.toml`, `playwright.config.ts`, `README.md`, `.claude/CLAUDE.md`, `.claude/rules/security.md`, and `docs/design.md`/`docs/spec/overview.md`/`docs/spec/todo.md`.
+
+### Consequences
+- `pnpm audit --audit-level=high` now reports zero vulnerabilities, unblocking CI.
+- A single lockfile (`pnpm-lock.yaml`) is now the source of truth for installs everywhere (local dev, CI, Docker, Netlify), removing the class of bug where two lockfiles disagree about what's actually installed.
+- Anyone relying on `npm` locally must switch to `pnpm` (`corepack enable` or a global `pnpm` install) — this is a workflow change for contributors, documented in the updated `README.md`/`CLAUDE.md`.
+- This incident is a concrete illustration of why `docs/ADR.md`/`docs/design.md` flag supply-chain hygiene (ADR-008, ADR-011) as an ongoing concern: an unused dependency, added without a clear record of why, was the actual vector for the vulnerable transitive packages.
+
+---
+
 ## Addendum: Items not yet finalized and not reflected in this log
 
 - While tracing `git log`, two commit objects were found that are not part of the current branch (`develop`)'s history and are unreachable locally: `feat: add pnpm workspace configuration and update App component for improved date handling` (`871e8ae`) and `fix: update version number to 26.06.20 in package.json` (`cd4c079`). These belong to no branch and are not contained in `develop`/`main`/`origin/*`, so they have not been turned into ADRs as finalized decisions. If their content (pnpm workspace adoption, improved date-handling in the App component) is formally merged in the future, a separate ADR should be added at that time.

@@ -62,5 +62,5 @@ When fixing this bug, use the `CACHE_NAME` variable. Writing to the wrong cache 
 
 ## Development Server
 
-`npm run dev` does not use HTTPS. Modern browsers treat `localhost` as a secure context, so Service Worker registration and testing work over HTTP on `localhost`.
+`pnpm run dev` does not use HTTPS. Modern browsers treat `localhost` as a secure context, so Service Worker registration and testing work over HTTP on `localhost`.
 HTTPS is required only when testing on non-localhost origins (e.g. a staging server or a device on the local network). In those cases, use a local HTTPS proxy or the production environment.

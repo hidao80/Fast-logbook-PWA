@@ -195,7 +195,7 @@ Script to bump `package.json` and the manifest version together (also resolves i
 **Effort**: 3 hours
 
 ### 27. Extend CI/CD
-**Current**: `lint.yml` (Biome via reviewdog) and `audit.yml` (`npm audit --audit-level=high` + Takumi Guard) exist.
+**Current**: `lint.yml` (Biome via reviewdog) and `audit.yml` (`pnpm audit --audit-level=high` + Takumi Guard) exist.
 
 **Remaining**: a test-running workflow (once Vitest is added, item #2), a build-and-deploy workflow, release automation.
 

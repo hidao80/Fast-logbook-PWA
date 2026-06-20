@@ -5,26 +5,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Local development (no build step needed)
-npm run dev
+# Local development
+pnpm run dev
 
 # Lint (Biome)
-npm run lint
+pnpm run lint
 
 # Lint with auto-fix
-npm run lint:fix
+pnpm run lint:fix
 
 # E2E tests (Playwright — requires dev server running or uses webServer auto-start)
-npm test
+pnpm test
 
 # E2E with interactive UI
-npm run test:e2e:ui
+pnpm run test:e2e:ui
 
 # Screenshots only (mobile/tablet/fhd viewports → screenshots/)
-npm run screenshot
+pnpm run screenshot
 ```
 
-Playwright tests live in `tests/e2e/` and run against `http://localhost:3000`. The config auto-starts `npm run dev` when not in CI.
+Playwright tests live in `tests/e2e/` and run against `http://localhost:3000`. The config auto-starts `pnpm run dev` when not in CI.
 
 ## Architecture
 
@@ -64,7 +64,7 @@ Dependencies are one-way: `main.js / config.js → lib/`. No circular deps withi
 
 - **Biome v2** for lint + format. Config: [biome.json](biome.json). `noStaticOnlyClass` is disabled to preserve the `Multilingualization` static class.
 - `indolence.min.js` is excluded from Biome.
-- CI runs `npm run lint` and `npm audit --audit-level=high` on push/PR to `main`/`develop`.
+- CI runs `pnpm run lint` and `pnpm audit --audit-level=high` on push/PR to `main`/`develop`.
 
 ### Code Comments
 
