@@ -1,149 +1,150 @@
 # Screen Inventory & Navigation
 
+> Rewritten for the React SPA. There are no longer two separate HTML files (`index.html` + `config.html`) — both screens are routes within a single-page app, navigated via `react-router-dom`'s `createHashRouter`.
+
 ## Overview
 
-Fast Logbook PWA consists of two HTML screens plus one dynamically generated viewer. Navigation between screens is explicit (no routing library).
+Fast Logbook PWA is a single-page application with two routes plus one dynamically generated viewer window.
+
+```
+index.html  →  <div id="root">  →  RouterProvider (createHashRouter)
+                                        ├── "/"        → <App />
+                                        └── "/config"  → <ConfigApp />
+```
+
+URLs use the hash form (e.g. `/#/config`), which avoids needing server-side rewrite rules on static hosts (though Netlify's `netlify.toml` includes a defensive SPA-fallback redirect rule regardless — see `docs/design.md` §8.1).
 
 ---
 
-## Screen 1: Main Application (`index.html`)
+## Route 1: Main Application (`/`)
 
-**URL**: `/` or `/index.html`
-**Entry Point**: Yes (PWA `start_url`)
-**Module**: [js/main.js](../../js/main.js)
+**Component**: [src/App.tsx](../../src/App.tsx)
 
 ### Purpose
 
-Primary interface for logging time-stamped work activities.
+Primary interface for logging time-stamped work activities, scoped to one logical "day" at a time.
 
 ### Screen States
 
 | State | Description | Trigger |
 |-------|-------------|---------|
-| **Initial Load** | Empty textarea, shortcuts initialized | `DOMContentLoaded` |
-| **Log Loaded** | Textarea populated from localStorage | `loadLogs()` on init |
-| **Dirty** | Save status red (●), unsaved changes | User types in textarea |
-| **Saving** | Debounce timer active (300ms) | Input event |
-| **Saved** | Save status green (●) | `saveLogs()` completes |
-| **Sidebar Open** | Offcanvas menu visible | Toggler button click or `[` key |
-| **Delete Modal** | Confirmation dialog shown | "Delete log" menu item |
-| **Help Modal** | Fullscreen help dialog | Help button (`?` icon) |
+| **Initial Load** | Migrations run, log loaded for the resolved initial date, shortcuts loaded | mount `useEffect` |
+| **Day Loaded** | Textarea populated with the active day's lines, filtered from the full log | `loadLogs(date)` |
+| **Dirty** | Save-status dot is red (no `saved` class) | user types (non-line-break input) |
+| **Saving** | 300ms debounce timer pending | `onInput` |
+| **Saved** | Save-status dot is green (`saved` class) | `saveLogs()` completes |
+| **Side Menu Open** | `Drawer` visible | toggler button click |
+| **Delete Confirm Modal** | confirmation `Modal` shown | "Delete log" menu item |
+| **Date-selector Notice Modal** | one-time notice shown to upgrading users with existing data | first load after upgrade, gated by `notice_date_selector` |
+| **Help Modal** | fullscreen `Modal` with 3 tabs (home/config/changelog) | help button click |
+| **Install Button Visible** | shown inside the `Drawer` | `beforeinstallprompt` fired |
 
 ### Navigation Flows
 
 ```
-index.html
-    ├── [Configure menu] → config.html
-    ├── [View Formatted Log] → opens new browser tab (generated HTML)
-    ├── [Download Formatted Log] → triggers file download (.html)
-    └── [Delete Log] → confirmation modal → clears data, stays on index.html
+"/"  (App)
+  ├── [Drawer: Configure]            → "/" → "/config" (client-side route change)
+  ├── [Drawer: View Formatted Log]   → opens a popup window (generated HTML)
+  ├── [Drawer: Download Formatted Log] → triggers a file download (.html)
+  └── [Drawer: Delete Log]           → confirmation Modal → clears the active day, stays on "/"
 ```
 
-### Key DOM Elements
+### Key Elements / State
 
-| Selector | Role |
-|----------|------|
-| `.navbar-toggler` | Opens/closes sidebar |
-| `.navbar-save-status` | Save state indicator (green/red ●) |
-| `#help_button` | Opens help modal |
-| `#sideMenu` | Offcanvas sidebar |
-| `#view_formatted_log` | View log in new tab |
-| `#download_formatted_log` | Download log as HTML |
-| `#configure` | Navigate to config.html |
-| `#delete_log` | Open delete confirmation |
-| `#install_pwa` | PWA install button (hidden until `beforeinstallprompt`) |
-| `#version_number` | Displays version from manifest.json |
-| `label[data-shortcut-key]` | Shortcut buttons (1-9) |
-| `input[type=text]` | Free-form input (key 0) |
-| `textarea` | Main log editing area |
-| `#deleteConfirmModal` | Delete confirmation dialog |
-| `#confirmDeleteButton` | Confirm delete action |
-| `#helpModal` | Fullscreen help dialog |
+| Element / State | Role |
+|------------------|------|
+| navbar toggler `<button>` | opens the `Drawer` |
+| `.navbar-save-status` `<span>` | save-state indicator (`saved` class toggles green/red) |
+| help `<button>` | opens the `HelpModal` |
+| `Drawer` | side menu (view/download/configure/delete/version/install) |
+| `<input type="date">` | the per-day date picker (`targetDate` state) |
+| shortcut `<button>`s (1–9) | append a timestamped log line |
+| free-form `<input type="text">` (key `0`) | append custom timestamped text |
+| `<textarea ref={textareaRef}>` | the active day's editable log |
+| delete confirmation `Modal` | confirm before clearing the active day |
+| date-selector notice `Modal` | non-dismissible until acknowledged |
+| `HelpModal` | fullscreen, tabbed help content |
 
 ---
 
-## Screen 2: Configuration (`config.html`)
+## Route 2: Configuration (`/config`)
 
-**URL**: `/config.html`
-**Entry Point**: No (reached from main screen sidebar)
-**Module**: [js/config.js](../../js/config.js)
+**Component**: [src/ConfigApp.tsx](../../src/ConfigApp.tsx)
 
 ### Purpose
 
-Settings management for shortcut button labels and time rounding unit.
+Settings management for shortcut button labels, time-rounding unit, and the date roll-over time.
 
 ### Screen States
 
 | State | Description | Trigger |
 |-------|-------------|---------|
-| **Initial Load** | Inputs populated from localStorage | `DOMContentLoaded` |
-| **Editing** | User types in input field | User input |
-| **Auto-saved** | Change immediately persisted | `change` event on input/select |
-| **Quota Error** | Alert shown for storage full | `QuotaExceededError` |
+| **Initial Load** | inputs populated from IndexedDB | mount `useEffect` |
+| **Editing** | user types in a shortcut input | user input |
+| **Auto-saved** | change persisted to IndexedDB and broadcast to other tabs | `onChange`/`onBlur` |
+| **Quota Error** | alert shown (`storage_quota_exceeded`) | `QuotaExceededError` |
 
 ### Navigation Flows
 
 ```
-config.html
-    └── [Back/Home link in sidebar] → index.html
+"/config"  (ConfigApp)
+    └── [Drawer: Back] → "/" (client-side route change, no full page reload)
 ```
 
-### Early i18n Initialization
+### Key Elements
 
-Unlike `index.html`, `config.html` runs `Multilingualization.init()` synchronously in `<head>` to prevent translation flicker:
+| Element | Role |
+|---------|------|
+| `<select>` | rounding-unit dropdown (1/5/10/15/30/60 min) |
+| shortcut `<input>`s (1–9) | shortcut text fields |
+| `<input type="time">` | the roll-over-time field |
+| `Drawer` | side menu with a `Link` back to `/` and the version display |
 
-```html
-<script type="module">
-  import Multilingualization from '/js/lib/multilingualization.js';
-  Multilingualization.init();
-</script>
-```
-
-### Key DOM Elements
-
-| Selector | Role |
-|----------|------|
-| `select` | Rounding unit dropdown (1/5/10/15/30/60 min) |
-| `input[data-translate^="shortcut_"]` | Shortcut text inputs (1-9) |
-| `#version_number` | Displays app version |
+There is no longer a separate "early i18n init script in `<head>`" for this route — i18next is initialized once in `main.tsx` before any route renders, and React's render cycle doesn't suffer the translation-flash problem that motivated the old early-init pattern (see `docs/design.md` §6.1).
 
 ---
 
-## Screen 3: Formatted Log Viewer (Generated)
+## Generated Window: Formatted Log Viewer
 
-**URL**: `javascript:` blob opened in new tab
-**Module**: [js/lib/download.js](../../js/lib/download.js)
-**Entry Point**: No (generated dynamically)
+**Module**: [src/lib/download.ts](../../src/lib/download.ts) (`generateFormattedLog()`)
+**Trigger**: `App.tsx`'s `handleViewLog()`
+**Entry Point**: No — generated dynamically, opened in a popup window, not part of the router.
 
 ### Purpose
 
-Read-only display of parsed log data in three formats with copy-to-clipboard functionality.
+Read-only display of the parsed log in three formats with clipboard-copy support.
 
 ### How It Is Generated
 
-```javascript
-// main.js
-const log = localStorage.getItem(LOG_DATA_KEY);
+```typescript
+// App.tsx — handleViewLog()
+if (!logViewerRef.current || logViewerRef.current.closed) {
+  logViewerRef.current = window.open('', '_log_viewer'); // opened before any await, to dodge popup blockers
+}
 const outputStr = generateFormattedLog(log, mins);
-const tab = window.open('', '_blank');
-tab.document.write(outputStr);
-tab.document.title = Multilingualization.translate('log_viewer');
+viewer.document.open();
+viewer.document.write(outputStr);
+viewer.document.close();
 ```
+
+Reusing a named window (`_log_viewer`) means repeated clicks refresh the same tab instead of opening a new one each time.
 
 ### Content Sections
 
 | Section ID | Format | Description |
-|-----------|--------|-------------|
-| `html_summary` | HTML table | Work time summary with category breakdown |
-| `plaintext_log` | Plain text (`<pre>`) | Raw log entries |
-| `markdown_summary` | Markdown in `<pre>` | Table format for documentation |
+|-----------|--------|--------------|
+| `html_summary` | HTML `<table>` | work-time summary, grouped by category |
+| `plaintext_log` | `<pre><code>` | the raw log text for the exported range |
+| `markdown_summary` | Markdown in `<pre>` | a pipe-table for documentation use |
 
-Each section includes a **copy button** (Font Awesome icon) with clipboard-write permission check and tooltip feedback.
+Each section includes a clipboard-copy button (Font Awesome icon), gated by a `clipboard-write` permission check, with a tooltip confirming the copy.
 
-### External Dependencies (in generated HTML)
+### External Dependencies (in the generated HTML only)
 
-- Bootstrap 5.3.0 CSS (CDN) — for table styling
-- Font Awesome 6.4.0 (CDN) — for copy button icons
+- Bootstrap CSS/JS (CDN, with SRI `integrity`)
+- Font Awesome (CDN, with SRI `integrity`)
+
+These remain CDN-loaded **only** in this exported artifact — the live app shell bundles Bootstrap via npm instead (see [`components.md`](components.md)).
 
 ---
 
@@ -152,26 +153,24 @@ Each section includes a **copy button** (Font Awesome icon) with clipboard-write
 ```
 [PWA Launch / Browser Open]
         ↓
-  index.html ←────────────────────────────┐
-        │                                  │
-        ├─[Sidebar: Configure]──→ config.html
-        │                                  │
-        ├─[Sidebar: View Log]──→ New Tab (generated HTML)
+   "/" (App) ←───────────────────────────┐
+        │                                 │
+        ├─[Drawer: Configure]──→ "/config" (ConfigApp)
         │
-        └─[Sidebar: Download]──→ File Download (.html)
+        ├─[Drawer: View Log]──→ Popup Window (generated HTML)
+        │
+        └─[Drawer: Download]──→ File Download (.html)
 ```
 
 ---
 
 ## Responsive Behavior
 
-Both screens use Bootstrap 5.3.0's responsive grid:
+Both routes use Bootstrap's responsive grid:
 
-| Breakpoint | Shortcut Layout | Sidebar |
-|-----------|----------------|---------|
-| `< 768px` (mobile) | Single column (keys 1-9 stacked) | Full-width offcanvas |
-| `≥ 768px` (tablet+) | Two columns (1-5 left, 6-9+0 right) | Same offcanvas |
+| Breakpoint | Shortcut Layout | Side Menu |
+|-----------|------------------|-----------|
+| `< 768px` (mobile) | single column (keys 1–9 stacked) | full-width offcanvas-style `Drawer` |
+| `≥ 768px` (tablet+) | two columns (1–5 left, 6–9+`0` right) | same `Drawer` |
 
----
-
-<!-- commit: ef46e13 -->
+Playwright E2E coverage (`tests/e2e/screenshot.spec.ts`) exercises three viewport projects defined in `playwright.config.ts`: `mobile` (375×812), `tablet` (768×1024), and `fhd` (1920×1080).

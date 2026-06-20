@@ -1,7 +1,8 @@
 {
   "name": "fast-logbook-pwa",
-  "version": "26.02.19",
+  "version": "26.06:20",
   "description": "Time-stamped work notes PWA",
+  "packageManager": "pnpm@10.33.2",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -33,7 +34,6 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "@juliusbrussee/caveman-code": "^0.65.2",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "global": "^4.4.0",

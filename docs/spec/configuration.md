@@ -1,255 +1,148 @@
 # Configuration System
 
+> Rewritten for the IndexedDB-based storage layer (`src/lib/storage.ts`). The previous version of this document described `localStorage` + the `storage` event, which has been replaced.
+
 ## Overview
 
-Fast Logbook PWA uses browser `localStorage` for configuration persistence. All settings are stored client-side and synchronized across browser tabs using the Storage API.
+Fast Logbook PWA persists configuration in **IndexedDB** (database `fast-logbook-pwa`, object store `kv`), accessed through the small wrapper in [src/lib/storage.ts](../../src/lib/storage.ts). Settings are synchronized across open tabs/windows using `BroadcastChannel`, not the `storage` event (IndexedDB writes don't fire `storage` events the way `localStorage` writes do).
 
 ## Configuration Storage
 
-### localStorage Keys
+### Keys
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `log` | string | `''` | Raw time-stamped log entries (newline-separated) |
-| `rounding_mins` | number | `1` | Time rounding unit in minutes |
-| `shortcut_1` to `shortcut_9` | string | i18n default | User-defined shortcut button texts |
+| `rounding_mins` | string (numeric) | `1` | Time rounding unit in minutes |
+| `shortcut_1` to `shortcut_9` | string | `''` (empty) | User-defined shortcut button texts |
+| `date-roll-over-time` | string `HH:MM` | `05:00` | Logical-day boundary used by the per-day log view |
+| `migration_version` | string (numeric) | `0` | Tracks which one-time migrations have already run |
+| `notice_date_selector` | string | unset | Set to `'1'` once the user dismisses the per-day-view notice |
+| `last_edited_date` | string `YYYY-MM-DD` | unset | Last date the user had open; used to restore the view on reload |
 
 ### Storage Constants
 
-Defined in [js/lib/utils.js:1-2](js/lib/utils.js#L1-L2):
+Defined in [src/lib/utils.ts](../../src/lib/utils.ts):
 
-```javascript
+```typescript
 export const LOG_DATA_KEY = 'log';
 export const ROUNDING_UNIT_MINUTE_KEY = 'rounding_mins';
 ```
 
+The other keys (`date-roll-over-time`, `migration_version`, `notice_date_selector`, `last_edited_date`) are defined as local constants inside `App.tsx`/`ConfigApp.tsx` rather than exported from `utils.ts`, since they are only consumed there.
+
 ## Configuration UI
 
-### Config Page Structure
+### `ConfigApp` (`/config` route)
 
-File: [config.html](config.html)
+File: [src/ConfigApp.tsx](../../src/ConfigApp.tsx)
 
-The configuration page provides:
-1. **Rounding Unit Selector**: Dropdown to select time rounding precision
+Provides:
+1. **Rounding Unit Selector**: `<select>` for time-rounding precision
 2. **Shortcut Items**: 9 text inputs for customizing shortcut button labels
-3. **Version Display**: Shows current app version from manifest.json
-4. **Back Navigation**: Link to return to main application
+3. **Roll-over Time**: `<input type="time">` for the logical-day boundary
+4. **Version Display**: shows the app version (currently read from `/manifest.json` at runtime — see `known_bugs.md` for the version-string mismatch caveat)
+5. **Back Navigation**: a `Link` to `/`
 
 ### Rounding Unit Options
 
-Available values (defined in `<select>` dropdown):
-- 1 minute
-- 5 minutes
-- 10 minutes
-- 15 minutes
-- 30 minutes
-- 60 minutes
-
-These values affect how work time is rounded during summary calculation.
+Available values: `1`, `5`, `10`, `15`, `30`, `60` minutes. These affect how work time is rounded during summary calculation (see [`utilities.md`](utilities.md) `parse()`).
 
 ### Default Shortcut Values
 
-Defined in [js/lib/multilingualization.js:80-88](js/lib/multilingualization.js#L80-L88) (English):
-
-```javascript
-'shortcut_1': '@work +PromotionalExams;Study',
-'shortcut_2': '@wrivate +housework;Cleaning',
-'shortcut_3': '@work +PromotionalExams;Research',
-'shortcut_4': '@work +PromotionalExams;Report',
-'shortcut_5': '@work +PromotionalExams;Presentation',
-'shortcut_6': '',
-'shortcut_7': '',
-'shortcut_8': '',
-'shortcut_9': '',
-```
+Shortcut inputs default to an **empty string** placeholder text drawn from the i18n key `shortcut_N` (`t('shortcut_1')`, etc., used as the `placeholder` attribute) rather than being pre-filled with example values, unlike the vanilla-JS version which seeded `shortcut_1`–`5` with example text (`@work +PromotionalExams;Study`, etc.). Users start with all 9 shortcuts blank and fill them in via the Config screen.
 
 ## Configuration Logic
 
-### Initialization
+### Initialization (`ConfigApp`)
 
-Implemented in [js/config.js:8-43](js/config.js#L8-L43):
-
-1. **Theme Setup**: Automatically detect and apply dark/light theme
-2. **Version Display**: Fetch version from manifest.json
-3. **Shortcut Initialization**:
-   - Load saved values from localStorage
-   - Fall back to i18n defaults if not set
-   - Attach change event listeners for auto-save
-4. **Rounding Unit Initialization**:
-   - Load saved value from localStorage
-   - Validate and apply default if invalid
+On mount (`useEffect`):
+1. `autoSetTheme()` — apply dark/light theme
+2. Open a `BroadcastChannel('fast-logbook-sync')`
+3. Fetch `/manifest.json` for the version string
+4. Load all 9 shortcuts (`Promise.all` over `getItem('shortcut_N')`)
+5. Load `rounding_mins`, validated via `getRoundingUnit()`
+6. Load `date-roll-over-time`, defaulting to `'05:00'`
 
 ### Auto-save Behavior
 
-**Shortcut Inputs** ([js/config.js:25-33](js/config.js#L25-L33)):
-- Trigger: `change` event (when input loses focus or value changes)
-- Action: Save trimmed value to localStorage with key `data-translate` attribute
-- Error Handling: Alert user if `QuotaExceededError` occurs
+**Shortcut Inputs** (`handleShortcutChange`):
+- Trigger: `onChange` and `onBlur`
+- Action: `await setItem('shortcut_N', value.trim())`, then broadcast `{ key, value }` over the channel
+- Error Handling: alerts the user (`t('storage_quota_exceeded')`) on `DOMException` named `QuotaExceededError`
 
-**Rounding Unit** ([js/config.js:41-43](js/config.js#L41-L43)):
-- Trigger: `change` event on `<select>` dropdown
-- Action: Save value to localStorage with key `ROUNDING_UNIT_MINUTE_KEY`
+**Rounding Unit** (`handleRoundingChange`):
+- Trigger: `onChange` on the `<select>`
+- Action: validates via `getRoundingUnit()`, persists, updates local state, broadcasts the change
+
+**Roll-over Time** (`handleRollOverChange`):
+- Trigger: `onChange` on the `<input type="time">`
+- Action: persists and broadcasts the new value; `App.tsx` reacts to this broadcast by recomputing `targetDate` and reloading the visible day
 
 ### Cross-tab Synchronization
 
-Implemented in [js/config.js:46-53](js/config.js#L46-L53):
+Both `App.tsx` and `ConfigApp.tsx` listen on the same `BroadcastChannel('fast-logbook-sync')`:
 
-```javascript
-window.addEventListener('storage', (event) => {
-  if (event.storageArea === localStorage) {
-    const target = event.key === ROUNDING_UNIT_MINUTE_KEY
-      ? $$one('select')
-      : $$one(`[data-translate='${event.key}']`);
-    if (target) {
-      target.value = event.newValue;
-    }
+```typescript
+bc.addEventListener('message', (event: MessageEvent<{ key: string; value: string }>) => {
+  const { key, value } = event.data ?? {};
+  if (key === ROUNDING_UNIT_MINUTE_KEY) {
+    setRoundingUnit(getRoundingUnit(value));
+  } else if (key === DATE_ROLL_OVER_TIME_KEY) {
+    setRollOverTime(value);
+  } else if (key.startsWith('shortcut_')) {
+    // update the corresponding shortcut slot
   }
 });
 ```
 
-When configuration changes in another tab:
-- Detect changes via `storage` event
-- Update corresponding UI element with new value
-- Maintains consistency across all open tabs
+Unlike the old `storage` event (which only fires in *other* tabs, never the writing tab, and only for `localStorage`), `BroadcastChannel` messages are explicit and work uniformly across same-origin tabs regardless of which storage backend changed.
 
 ## Validation Functions
 
-### getRoundingUnit()
+### `getRoundingUnit()`
 
-Defined in [js/lib/utils.js:55-67](js/lib/utils.js#L55-L67):
+Defined in [src/lib/utils.ts](../../src/lib/utils.ts):
 
-```javascript
-export function getRoundingUnit(value) {
-  let mins = 1;
+```typescript
+export function getRoundingUnit(value: number | string | null): number {
   switch (Number(value)) {
-    case 1:
-    case 5:
-    case 10:
-    case 15:
-    case 30:
-    case 60:
-      mins = Number(value);
+    case 1: case 5: case 10: case 15: case 30: case 60:
+      return Number(value);
+    default:
+      return 1;
   }
-  return mins;
 }
 ```
 
-**Purpose**: Validates rounding unit value
-**Input**: Any value (number, string, NaN)
-**Output**: Valid rounding unit (1, 5, 10, 15, 30, or 60)
-**Default**: Returns 1 if input is invalid
+**Purpose**: validates a rounding-unit value (from IndexedDB, a `BroadcastChannel` message, or a `<select>` change), defaulting to `1` for anything else.
 
 ## Error Handling
 
 ### Storage Quota Exceeded
 
-When localStorage quota is exceeded (typically 5-10MB):
-
-```javascript
+```typescript
 try {
-  localStorage.setItem(key, value);
+  await setItem(key, value);
 } catch (e) {
-  if (e.name === 'QuotaExceededError') {
-    alert('ストレージ容量が不足しています'); // Japanese: "Storage capacity is insufficient"
+  if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+    alert(t('storage_quota_exceeded'));
   }
 }
 ```
 
-**Location**:
-- [js/config.js:29-31](js/config.js#L29-L31)
-- [js/main.js:48-51](js/main.js#L48-L51)
+`storage_quota_exceeded` is a proper i18next key, present in both `en.json` and `ja.json` — the previously hard-coded Japanese-only alert string (a documented bug in the vanilla-JS version) has been fixed.
 
-**User Impact**: Alert displayed, data not saved
-**Recovery**: User must clear old logs or browser data
-
-## Configuration Usage in Main App
-
-### Loading Shortcuts
-
-Implemented in [js/main.js:74-82](js/main.js#L74-L82):
-
-```javascript
-for (const node of $$all('label[data-shortcut-key]')) {
-  const key = 'shortcut_' + node.dataset.shortcutKey;
-  const str = localStorage.getItem(key);
-  if (str && str !== 'undefined') {
-    node.textContent = str;
-  } else {
-    node.textContent = Multilingualization.translate(node.dataset.translate);
-  }
-  // ... event listener attachment
-}
-```
-
-### Loading Rounding Unit
-
-Used in log formatting ([js/main.js:217-222](js/main.js#L217-L222)):
-
-```javascript
-let mins = localStorage.getItem(ROUNDING_UNIT_MINUTE_KEY);
-if (!mins) {
-  // Set default value to 1 if not set
-  mins = 1;
-  localStorage.setItem(ROUNDING_UNIT_MINUTE_KEY, mins);
-}
-const outputStr = generateFormattedLog(log, mins);
-```
-
-## Multilingual Support
-
-### Language Detection
-
-Implemented in [js/lib/multilingualization.js](js/lib/multilingualization.js):
-
-```javascript
-static language() {
-  const browserLang = navigator.language || navigator.userLanguage;
-  return browserLang?.startsWith('ja') ? 'ja' : 'en';
-}
-```
-
-**Supported Languages**:
-- Japanese (`ja`)
-- English (`en`, default)
-
-### Translation System
-
-**Early Translation Prevention** ([config.html:14-17](config.html#L14-L17)):
-
-```html
-<script type="module">
-  import Multilingualization from '/js/lib/multilingualization.js';
-  Multilingualization.init();
-</script>
-```
-
-This script runs synchronously in `<head>` to prevent translation flicker by:
-1. Setting up global translation function `window.__i18n_t`
-2. Creating MutationObserver to translate elements as they're added to DOM
-3. Translating existing `[data-translate]` elements on DOMContentLoaded
-
-### Configuration Text Translation
-
-All UI text is marked with `data-translate` attribute:
-- Dropdown option labels
-- Input placeholders
-- Help text
-- Button labels
-
-Example:
-```html
-<option value="1" data-translate="1min" selected></option>
-<input type="text" class="form-control" data-translate="shortcut_1">
-```
+**User Impact**: alert displayed, data not saved.
+**Recovery**: user must clear old logs or browser data.
 
 ## Theme Configuration
 
 ### Auto-theme Detection
 
-Implemented in [js/lib/utils.js:135-142](js/lib/utils.js#L135-L142):
+Implemented in [src/lib/utils.ts](../../src/lib/utils.ts):
 
-```javascript
-export function autoSetTheme() {
+```typescript
+export function autoSetTheme(): void {
   const theme = document.documentElement.getAttribute('data-bs-theme') ?? 'light';
   if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     document.documentElement.setAttribute('data-bs-theme', 'dark');
@@ -259,38 +152,53 @@ export function autoSetTheme() {
 }
 ```
 
-**Behavior**:
-- Reads `data-bs-theme` attribute from `<html>` element
-- If set to `auto`, detects system preference via media query
-- Sets Bootstrap theme to `dark` or `light` accordingly
-- Called on both main and config pages during initialization
+Called once per page (`App`/`ConfigApp`) inside a `useEffect` on mount. Behavior is unchanged from the earlier vanilla-JS implementation.
 
-## Best Practices
+## Multilingual Support
 
-### Data Integrity
-1. Always validate values before applying (e.g., `getRoundingUnit()`)
-2. Handle `undefined` and `'undefined'` string cases
-3. Trim user input before saving
-4. Provide fallback to i18n defaults
+### Language Detection
 
-### Performance
-1. Use event delegation where possible
-2. Debounce localStorage writes (300ms in main app)
-3. Only update UI when values actually change
+Implemented in [src/i18n/index.ts](../../src/i18n/index.ts):
 
-### User Experience
-1. Auto-save on blur/change (no manual save button needed)
-2. Cross-tab synchronization for consistency
-3. Visual feedback for save status (in main app)
-4. Graceful degradation if localStorage unavailable
+```typescript
+const detectedLang = (() => {
+  const lang = (navigator.languages?.[0] ?? navigator.language ?? 'en').slice(0, 2);
+  return lang in { en: 1, ja: 1 } ? lang : 'en';
+})();
+```
+
+**Supported Languages**: Japanese (`ja`), English (`en`, fallback).
+
+### Translation System
+
+`i18next` + `react-i18next` are initialized once, in `main.tsx`, before any component renders — there is no longer a separate "early init script in `<head>`" step, since React's render cycle itself avoids the translation-flash problem that motivated that pattern in the vanilla-JS version (see `docs/design.md` §6.1).
+
+Components call `const { t } = useTranslation()` and reference keys via `t('key_name')`. Non-component modules (`download.ts`) import the configured `i18next` instance directly. There is no `data-translate` HTML attribute system anymore — translation is expressed through JSX.
 
 ## Migration & Versioning
 
-Currently, there is no configuration migration logic. The app relies on:
-1. Backward-compatible localStorage keys
-2. Validation functions that provide safe defaults
-3. Version displayed to user but not used for data migration
+Unlike the earlier version of this document, **migration logic now exists**. `App.tsx`'s `runMigrations()` reads `migration_version` from IndexedDB and, if it is below `1`:
 
-**Future Consideration**: Add version-based migration if localStorage schema changes.
+1. Calls `migrateFromLocalStorage([...])` (see [`database.md`](database.md)) to move the legacy `localStorage` keys (`log`, `rounding_mins`, `date-roll-over-time`, `shortcut_1`–`9`) into IndexedDB.
+2. Migrates the old `date-roll-over-time-value` key, if present, into the current `date-roll-over-time` key.
+3. Removes stray legacy keys (`downloadUrl`, `downloadFilename`) left over from the old `localStorage`-based download hand-off.
+4. Sets `migration_version` to `'1'`, so this block only runs once per browser profile.
 
-<!-- commit: ef46e13 -->
+**Future Consideration**: if the IndexedDB schema needs another breaking change, bump the check to `version < 2` and add the new migration step, following the same pattern.
+
+## Best Practices (unchanged from the earlier version)
+
+### Data Integrity
+1. Always validate values before applying (e.g., `getRoundingUnit()`)
+2. Handle `undefined` and the string `'undefined'` (a leftover possibility from the `localStorage` era; `getItem()` in `storage.ts` already normalizes missing keys to `null`)
+3. Trim user input before saving
+4. Provide sensible defaults when a key is unset
+
+### Performance
+1. Debounce writes to the per-day `localStorage` buffer (300ms) rather than writing to IndexedDB on every keystroke
+2. Only update UI state when values actually change
+
+### User Experience
+1. Auto-save on blur/change — no manual save button needed
+2. Cross-tab synchronization via `BroadcastChannel` for consistency
+3. Visual feedback for save status (main app only)

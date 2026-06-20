@@ -2,7 +2,7 @@ node_modules/
 dist/
 .claude/histories
 .claude/settings.local.json
-pnpm-lock.yaml
+package-lock.json
 
 # Playwright
 test-results/

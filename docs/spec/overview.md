@@ -3,88 +3,109 @@
 ## Project Information
 
 **Project Name:** Fast logbook PWA
-**Version:** 26.02.05
+**`package.json` Version:** 26.02.19
+**PWA Manifest Version (`vite.config.js`):** 26.06.13 — these two version strings have drifted apart; see [`known_bugs.md`](known_bugs.md) and `docs/design.md` §7.4.
 **Description:** Time-stamped work notes Progressive Web Application
 **License:** MIT
 **Author:** hidao80
 
 ## Purpose
 
-Fast Logbook PWA is a productivity tool designed to help users track time-stamped work activities. It allows users to quickly log tasks with timestamps and generate formatted summaries of their work time. The application is designed as a PWA (Progressive Web App) to work offline and provide a native-like experience on both desktop and mobile devices.
+Fast Logbook PWA is a productivity tool designed to help users track time-stamped work activities. It allows users to quickly log tasks with timestamps and generate formatted summaries of their work time. The application is built as a PWA (Progressive Web App) to work offline and provide a native-like experience on both desktop and mobile devices.
 
 ## Key Features
 
 1. **Time-stamped Logging**: Automatically append timestamps to work log entries
 2. **Shortcut Keys**: 9 customizable shortcut buttons (1-9) for frequently used tasks
-3. **Free-form Input**: Custom text input field (0 key) for ad-hoc entries
-4. **Work Time Calculation**: Automatically calculates time spent on each category of work
-5. **Multiple Export Formats**: View and download logs as HTML tables, Markdown, or plain text
-6. **Time Rounding**: Configurable time rounding (1, 5, 10, 15, 30, or 60 minutes)
-7. **Multilingual Support**: Japanese and English language support with automatic detection
-8. **Offline Capability**: Full PWA functionality with service worker caching
-9. **Auto-save**: Automatic saving with visual feedback (debounced 300ms)
-10. **Category Grouping**: Semicolon-separated format for category and detail grouping
-11. **Dark Mode**: Automatic theme detection based on system preferences
+3. **Free-form Input**: Custom text input field (key `0`) for ad-hoc entries
+4. **Per-day Log View with Date Roll-over**: A configurable roll-over time (default `05:00`) defines the boundary of a "logical day"; the visible textarea is scoped to one day at a time, with a date picker to navigate between days
+5. **Work Time Calculation**: Automatically calculates time spent on each category of work
+6. **Multiple Export Formats**: View (new tab) and download formatted logs as HTML tables, Markdown, or plain text — bundled in one self-contained HTML file
+7. **Time Rounding**: Configurable time rounding (1, 5, 10, 15, 30, or 60 minutes)
+8. **Multilingual Support**: Japanese and English, with automatic browser-language detection (i18next)
+9. **Offline Capability**: Full PWA functionality via a Workbox-generated service worker
+10. **Auto-save**: Debounced auto-save (300ms) with a visual save-status indicator
+11. **Category Grouping**: Semicolon-separated format for category and detail grouping
+12. **Dark Mode**: Automatic theme detection based on system preference
+13. **Cross-tab Sync**: Open tabs/windows stay in sync via `BroadcastChannel`
+14. **One-time Data Migration**: Existing `localStorage` data is migrated to IndexedDB automatically, versioned via a migration counter
 
 ## Technology Stack
 
 ### Frontend
-- **HTML5**: Semantic markup with Bootstrap 5.3.0
-- **CSS3**: Custom styling with Bootstrap framework
-- **JavaScript (ES Modules)**: Modern ES2020+ features, `"type": "module"` in package.json
-- **Bootstrap 5.3.0**: UI framework for responsive design
-- **Bootstrap Icons 1.11.1**: Icon library
+- **React 19** + **TypeScript** (strict mode)
+- **react-router-dom** (`createHashRouter`) for client-side routing (`/`, `/config`)
+- **react-i18next** / **i18next** for internationalization
+- **Bootstrap 5.3.8** + **Bootstrap Icons 1.13.1** — installed as pnpm-managed packages and imported in `main.tsx` (no longer CDN-loaded for the app shell)
+- **idb** — a Promise-based IndexedDB wrapper used for data persistence
 
 ### Build & Development
-- **Biome 2.4.2**: Unified linter and formatter (replaced ESLint + Prettier)
-- **Package Manager**: npm (primary), pnpm supported
+- **Vite 8** (`@vitejs/plugin-react`) — dev server (`pnpm run dev`, port 3000) and production build (`pnpm run build` → `dist/`)
+- **vite-plugin-pwa** (Workbox `generateSW` strategy) — generates `sw.js` and `manifest.json` from `vite.config.js`
+- **Biome 2.4.2**: Unified linter and formatter, scoped to `src/**/*.ts(x)`
+- **Package Manager**: **pnpm** (sole package manager; `pnpm-lock.yaml` is committed, pinned via `"packageManager": "pnpm@10.33.2"` in `package.json`). `package-lock.json` has been removed and is gitignored.
 
 ### CI/CD
-- **GitHub Actions**: `lint.yml` (biome check) and `audit.yml` (npm audit --audit-level=high)
+- **GitHub Actions**: `lint.yml` (Biome via `reviewdog-action-biome`) and `audit.yml` (`pnpm install --frozen-lockfile` + `pnpm audit --audit-level=high` + Takumi Guard supply-chain scan)
 
 ### PWA Features
-- **Service Worker**: Offline caching and asset management
-- **Web App Manifest**: PWA installation metadata
-- **localStorage**: Client-side data persistence
-- **Speculation Rules API**: Prerendering and prefetching
+- **Service Worker**: Generated by `vite-plugin-pwa`/Workbox; `registerType: 'autoUpdate'`, `devOptions.enabled: true` so it also runs under `pnpm run dev`
+- **Web App Manifest**: Defined inline in `vite.config.js`'s `VitePWA({ manifest: {...} })`, not a static file
+- **IndexedDB**: Primary client-side data store (database `fast-logbook-pwa`, object store `kv`)
+- **localStorage**: Used only for the short-lived per-day edit buffer (`log_buffer`, `log_buffer_date`) and as the one-time migration source
+- **Speculation Rules API**: Prerendering and prefetching (in `index.html`)
 
 ## Architecture
 
 ### Project Structure
 ```
 Fast-logbook-PWA/
-├── index.html              # Main application page
-├── config.html             # Configuration page
-├── manifest.json           # PWA manifest (version: 26.02.05)
-├── sw.js                   # Service worker
-├── package.json            # Project dependencies ("type": "module")
-├── biome.json              # Biome lint + format configuration
-├── Dockerfile              # Multi-stage Docker build (node → nginx:alpine)
-├── docker-compose.yml      # Local development compose
-├── css/                    # Stylesheets
-│   ├── main.css           # Main page styles
-│   └── config.css         # Config page styles
-├── js/                     # JavaScript modules
-│   ├── main.js            # Main application logic
-│   ├── config.js          # Configuration page logic
-│   └── lib/               # Library modules
-│       ├── analytics.js   # Google Analytics event tracking
-│       ├── download.js    # Log formatting and download
-│       ├── indolence.min.js # DOM utility functions (minified)
-│       ├── multilingualization.js # i18n support
-│       └── utils.js       # Utility functions
-├── img/                    # PWA icons (48-512px)
-└── docs/                   # Documentation
-    ├── design.md           # Technical design document
-    └── spec/              # API / component specifications
+├── index.html              # SPA shell (<div id="root">)
+├── vite.config.js          # Vite + vite-plugin-pwa (manifest, Workbox) configuration
+├── tsconfig.json            # TypeScript configuration (strict, bundler resolution)
+├── package.json             # Project dependencies ("type": "module")
+├── biome.json                # Biome lint + format configuration (scoped to src/)
+├── playwright.config.ts      # Playwright E2E configuration
+├── netlify.toml               # Netlify build/headers/redirects
+├── Dockerfile                 # Multi-stage Docker build (node → nginx:alpine)
+├── docker-compose.yml         # Local development compose
+├── src/
+│   ├── main.tsx              # Entry point — mounts HashRouter ("/", "/config")
+│   ├── App.tsx                # Main page: log CRUD, shortcuts, date roll-over, export, PWA install
+│   ├── ConfigApp.tsx           # Settings page
+│   ├── globals.d.ts            # Ambient types (BeforeInstallPromptEvent)
+│   ├── components/
+│   │   ├── Drawer.tsx           # Offcanvas side menu (portal)
+│   │   └── Modal.tsx             # Modal dialog (portal)
+│   ├── i18n/
+│   │   ├── index.ts              # i18next + react-i18next setup
+│   │   └── locales/{en,ja}.json
+│   └── lib/
+│       ├── storage.ts            # IndexedDB key-value wrapper + localStorage migration
+│       ├── download.ts           # Log parsing, time calculation, formatted export
+│       └── utils.ts              # Date/time helpers, HTML escaping, theme, PWA install
+├── public/img/                # PWA icons (48-512px)
+├── tests/e2e/                  # Playwright tests (screenshot.spec.ts)
+└── docs/                       # Documentation
+    ├── design.md                # Technical design document
+    ├── ADR.md                    # Architecture Decision Records
+    └── spec/                     # API / component specifications (this directory)
 ```
 
 ## Data Storage
 
-### localStorage Keys
-- **`log`**: Raw time-stamped log entries (newline-separated)
+### IndexedDB ("kv" object store in the "fast-logbook-pwa" database)
+- **`log`**: Raw time-stamped log entries (newline-separated), for the entire history
 - **`rounding_mins`**: Time rounding unit (1, 5, 10, 15, 30, 60)
 - **`shortcut_1` through `shortcut_9`**: User-defined shortcut texts
+- **`date-roll-over-time`**: Logical-day boundary, `HH:MM` (default `05:00`)
+- **`last_edited_date`**: Last date the user had open, used to restore the view on reload
+- **`migration_version`**: Tracks which one-time migrations have run
+- **`notice_date_selector`**: Whether the user has dismissed the one-time "per-day view" notice
+
+### localStorage (transient only)
+- **`log_buffer`** / **`log_buffer_date`**: The currently-open day's edits, merged into the IndexedDB `log` on tab-hide, date change, or load (see `docs/design.md` §4.4)
+- Legacy keys (`log`, `rounding_mins`, `shortcut_1`–`9`, `date-roll-over-time`, `date-roll-over-time-value`, `downloadUrl`, `downloadFilename`) are read once during migration and then removed
 
 ### Data Formats
 
@@ -105,47 +126,40 @@ Example:
 
 ## User Workflow
 
-1. **Main Screen**: User logs activities using shortcuts (1-9) or custom input (0)
-2. **Timestamp Addition**: System automatically prepends current date/time
-3. **Auto-save**: Changes are saved to localStorage with 300ms debounce
-4. **View/Export**: User can view formatted summary or download as file
-5. **Configuration**: User can customize shortcuts and time rounding settings
+1. **Main Screen** (`/`): user logs activities using shortcuts (1-9) or custom input (0); a date picker scopes the view to one logical day
+2. **Timestamp Addition**: the app prepends the current date/time automatically
+3. **Auto-save**: edits debounce-save (300ms) into a `localStorage` per-day buffer, then merge into IndexedDB on tab-hide/date-change
+4. **View/Export**: user can view a formatted summary (new tab) or download it as a self-contained HTML file
+5. **Configuration** (`/config`): user can customize shortcuts, time rounding, and the date roll-over time
 
 ## Browser Compatibility
 
-The application uses modern web APIs and requires:
-- ES2020+ JavaScript support (ES Modules)
-- localStorage API
-- Service Worker API
-- Web App Manifest support
-- Speculation Rules API (progressive enhancement)
+The application requires:
+- A modern evergreen browser supporting ES2020+, IndexedDB, Service Worker, and the Web App Manifest
+- `BroadcastChannel` for cross-tab sync
+- Speculation Rules API is a progressive enhancement (Chrome/Edge 108+; silently ignored elsewhere)
 
-Target browsers: Modern evergreen browsers (Chrome, Firefox, Safari, Edge)
+Target browsers: Chrome, Firefox, Safari, Edge (latest versions)
 
 ## Performance Characteristics
 
-- **Instant Loading**: Service worker caches all assets for offline use
-- **Debounced Saves**: 300ms debounce prevents excessive localStorage writes
-- **Lightweight**: Minimal dependencies, mostly vanilla JavaScript
-- **Responsive**: Mobile-first design with Bootstrap grid system
+- **Instant Loading**: Workbox-generated service worker precaches all build assets for offline use
+- **Debounced Saves**: 300ms debounce, writing to `localStorage` (fast, synchronous) rather than directly to IndexedDB on every keystroke
+- **Per-day Scoping**: only the active day's lines are rendered in the textarea, keeping the DOM small even as the full log grows
+- **Responsive**: Mobile-first design with the Bootstrap grid system
 
 ## Security Considerations
 
-- **Client-side Only**: No server communication, all data stays local
-- **localStorage Quota**: Handles QuotaExceededError gracefully
-- **No Sensitive Data**: Designed for work logging, not confidential information
-- **XSS Protection**: HTML escaping in log output functions (`escapeHtml()`)
+- **Client-side Only**: No server communication; all data stays in IndexedDB/`localStorage` on the device
+- **No Telemetry**: Google Analytics (GA4) tracking, present in earlier versions, has been removed entirely
+- **Quota Errors**: `QuotaExceededError` is caught and surfaced via an i18next-translated alert (`storage_quota_exceeded`)
+- **XSS Protection**: `escapeHtml()` sanitizes log content before it is interpolated into the exported HTML (`src/lib/download.ts`); the live React UI relies on JSX's default escaping
+- **No CSP configured**: still an open item — see `known_bugs.md`
 
 ## Deployment
 
-The application is designed for static hosting and can be deployed to:
-- Netlify (current deployment: https://fast-logbook.netlify.app)
-- GitHub Pages
-- Any static file hosting service
-- Docker containers (Dockerfile and docker-compose.yml included; nginx:alpine serving on port 80)
+- **Netlify** (current deployment target): `netlify.toml` runs `pnpm run build` and publishes `dist/`
+- **Docker**: multi-stage build (`node:24-bookworm-slim` → `nginx:alpine`), `pnpm install --frozen-lockfile` + `pnpm run build`, served by Nginx on port 80
+- A production **build step is now required** — the app can no longer be run by opening `index.html` directly (see `docs/design.md` §2.2)
 
-No build process is required for deployment — all files are production-ready.
-
----
-
-<!-- commit: ef46e13 -->
+<!-- Reflects the source tree as of the React/TypeScript/Vite rewrite (~2026-06-13). See docs/ADR.md for migration history. -->

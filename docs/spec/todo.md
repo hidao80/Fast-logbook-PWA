@@ -1,737 +1,256 @@
 # TODO & Future Enhancements
 
-## Immediate Fixes (High Priority)
+> Rewritten to reflect the current React + TypeScript + Vite + IndexedDB codebase. Most "Immediate Fixes" from the vanilla-JS era are now complete (either fixed directly, or made moot by the rewrite — see [`known_bugs.md`](known_bugs.md) for details and `docs/ADR.md` for the decision history). This document tracks what's left.
 
-### 1. ~~Fix IME Composition Handling~~ ✓ COMPLETED
-**Issue**: [known_bugs.md#2](known_bugs.md#2-ime-composition-handling)
-**File**: [js/main.js:141-143](js/main.js#L141-L143)
+## Completed Since the Last Revision
 
-**Status**: ✓ Completed in version 25.12.13
+- [x] IME composition handling (Enter-key processing) — fixed pre-rewrite, preserved in `App.tsx`
+- [x] Internationalize the storage-quota error message — `storage_quota_exceeded` i18next key now exists
+- [x] Service worker cache-name race condition / hardcoded `'my-cache'` key — moot; Workbox (`vite-plugin-pwa`) now owns cache naming entirely
+- [x] Add a build process (Vite) — done, though note this made "zero-build" no longer possible (see `docs/design.md` §2.2)
+- [x] Migrate to IndexedDB — done (`src/lib/storage.ts`, via `idb`), with a one-time migration from `localStorage`
+- [x] i18n system replacement — `Multilingualization` class replaced by `i18next`/`react-i18next`
+- [x] E2E test framework — Playwright is configured (`tests/e2e/screenshot.spec.ts`, 3 viewport projects)
+- [x] Architecture diagrams / decision history — see `docs/ADR.md` and `docs/design.md`
+- [x] Per-day log separation (partial) — date roll-over + per-day view implemented; date-range *export* filtering is still open (see below)
+- [x] Remove GA4 analytics — removed entirely, not just made optional (privacy-first decision, see `docs/ADR.md` ADR-005)
 
-**Applied Fix**:
-```javascript
-$$one('input').addEventListener('keydown', async e => {
-  // Only process on Enter key, ignore IME composition
-  if (!e.isComposing && e.keyCode !== 229 && e.key === 'Enter') {
-    processInput(e.target);
-  }
-});
-```
+## Open Items
 
-**Impact**: Fixed incorrect input processing behavior
+### High Priority
 
----
+#### 1. Resolve the `package.json` / manifest version-string drift
+**Issue**: [known_bugs.md#1](known_bugs.md#1-version-string-mismatch-between-packagejson-and-the-pwa-manifest)
+**Files**: `package.json`, `vite.config.js`
 
-### 2. Internationalize Error Messages
-**Issue**: [known_bugs.md#3](known_bugs.md#3-storage-quota-exceeded-handling)
-**Files**: [js/main.js:50](js/main.js#L50), [js/config.js:30](js/config.js#L30)
-
-**Steps**:
-1. Add translation keys to [js/lib/multilingualization.js](js/lib/multilingualization.js):
-   ```javascript
-   'storage_quota_exceeded': 'Storage capacity is insufficient',
-   ```
-2. Replace hard-coded Japanese strings:
-   ```javascript
-   alert(Multilingualization.translate('storage_quota_exceeded'));
-   ```
-
-**Effort**: 15 minutes
-**Impact**: Better UX for non-Japanese users
-
----
-
-### 3. Fix Service Worker Cache Name Race Condition
-**Issue**: [known_bugs.md#4](known_bugs.md#4-service-worker-cache-name-initialization)
-**File**: [sw.js:30-42](sw.js#L30-L42)
-
-**Current Implementation**:
-```javascript
-let CACHE_NAME = "";
-
-(() => {
-  fetch('/manifest.json')
-    .then(response => response.json())
-    .then(manifestData => {
-      CACHE_NAME = APP_NAME + "_" + manifestData.version;
-    });
-})();
-```
-
-**Fix Option 1** (Simplest): Hard-code version from package.json
-```javascript
-const VERSION = "25.12.13";
-const CACHE_NAME = APP_NAME + "_" + VERSION;
-```
-
-**Fix Option 2** (Better): Load synchronously in install event
-```javascript
-let CACHE_NAME = "";
-
-self.addEventListener("install", (e) => {
-  e.waitUntil(
-    fetch('/manifest.json')
-      .then(response => response.json())
-      .then(manifestData => {
-        CACHE_NAME = APP_NAME + "_" + manifestData.version;
-        return caches.open(CACHE_NAME);
-      })
-      .then((cache) => {
-        return cache.addAll(assets).catch(error => {
-          console.error('Failed to add to cache:', error);
-        });
-      })
-  );
-});
-```
-
-**Effort**: 30 minutes
-**Impact**: Ensures consistent cache naming
-
----
-
-### 4. Fix Hard-coded Cache Name in Fetch Handler
-**Issue**: [known_bugs.md#5](known_bugs.md#5-hard-coded-cache-name-in-fetch-handler)
-**File**: [sw.js:75](sw.js#L75)
-
-**Change**:
-```javascript
-// Before
-caches.open('my-cache').then((cache) => {
-
-// After
-caches.open(CACHE_NAME).then((cache) => {
-```
-
-**Effort**: 2 minutes
-**Impact**: Fixes cache inconsistency and cleanup issues
-
----
-
-### ~~4b. Add analytics.js to Service Worker Cache~~ ✓ COMPLETED
-**Issue**: [known_bugs.md#24b](known_bugs.md#24b-analyticsjs-not-in-service-worker-cache)
-**File**: [sw.js:6-26](sw.js#L6-L26)
-
-**Status**: ✓ `/js/lib/analytics.js` added to the `assets` array in [sw.js](sw.js)
-
----
-
-### 5. ~~Fix or Remove Textarea Enter Key Handler~~ ✓ COMPLETED
-**Issue**: [known_bugs.md#6](known_bugs.md#6-textarea-enter-key-handling)
-**File**: [js/main.js:151-158](js/main.js#L151-L158)
-
-**Status**: ✓ Completed in version 25.12.13
-
-**Applied Fix**: Fixed the logic with explicit Enter key check
-```javascript
-$$one('textarea').addEventListener('keydown', async e => {
-  if ('Enter' == e.code) {
-    // Ignore events processed by IME
-    if (!e.isComposing && e.keyCode !== 229 && e.key === 'Enter') {
-      return;
-    }
-    await saveLogs();
-  }
-});
-```
-
-**Impact**: Properly handles Enter key events with IME composition
-
----
-
-## Bug Fixes (Medium Priority)
-
-### 6. Add Save Status Visual Feedback
-**Issue**: [known_bugs.md#16](known_bugs.md#16-save-status-indicator-race-condition)
-**File**: [js/main.js:162-175](js/main.js#L162-L175)
-
-**Enhancement**:
-1. Add three states: saved (green), dirty (red), saving (yellow/animated)
-2. Update CSS for `.navbar-save-status.saving` class
-3. Set "saving" state immediately when debounce timer starts
-4. Set "saved" state after save completes
+Generate the manifest `version` from `package.json` at build time instead of hardcoding it separately.
 
 **Effort**: 1 hour
-**Impact**: Better UX clarity
 
 ---
 
-### 7. Add Color-blind Friendly Save Indicator
-**Issue**: [known_bugs.md#23](known_bugs.md#23-color-only-save-status-indicator)
-**File**: [index.html:42](index.html#L42)
+#### 2. Add unit tests with Vitest
+**Issue**: [known_bugs.md#6](known_bugs.md#6-no-automated-unit-tests-for-srcclibts)
+**Target files**: `src/lib/utils.ts`, `src/lib/download.ts` (especially `parse()`, `toHtml()`, `toMarkdown()`)
 
-**Enhancement**:
-```html
-<!-- Before -->
-<span class="navbar-save-status saved" aria-label="Save status: saved">●</span>
+Cover: date/time helpers with edge-case inputs, rounding-unit validation, midnight-crossing time calculation, category exclusion (`^` prefix), HTML/Markdown formatting output.
 
-<!-- After -->
-<span class="navbar-save-status saved" aria-label="Save status: saved">
-  <i class="bi bi-check-circle"></i> <span class="status-text">Saved</span>
-</span>
-```
-
-Add i18n for status text, use Bootstrap Icons for visual + text indicator
-
-**Effort**: 30 minutes
-**Impact**: Improved accessibility
+**Effort**: 12 hours (initial setup + tests)
+**Impact**: Catches regressions in core log-parsing logic before they reach E2E/manual testing
 
 ---
 
-### 8. Improve Console Error Handling
-**Issue**: [known_bugs.md#1](known_bugs.md#1-console-error-handling)
-**Files**: [sw.js:53](sw.js#L53), [js/main.js:241](js/main.js#L241)
+#### 3. Add a Content Security Policy
+**Issue**: [known_bugs.md#3](known_bugs.md#3-no-content-security-policy)
 
-**Options**:
-1. Remove console.error calls
-2. Replace with custom error logging mechanism
-3. Show user-facing error messages for critical failures
-
-**Recommendation**: For now, keep as-is (console is disabled in production)
-
-**Effort**: 1 hour
-**Impact**: Cleaner production code
-
----
-
-## Feature Enhancements (High Value)
-
-### 9. Add Undo/Redo Functionality
-**Issue**: [known_bugs.md#13](known_bugs.md#13-no-undo-functionality)
-
-**Implementation**:
-1. Create history stack in memory (max 50 states)
-2. Push state on each save operation
-3. Add Undo (Ctrl+Z) and Redo (Ctrl+Shift+Z) keyboard shortcuts
-4. Add Undo button to UI
-
-**Effort**: 4 hours
-**Impact**: Prevents accidental data loss
-
----
-
-### 10. Add Search/Filter for Logs
-**Issue**: [known_bugs.md#14](known_bugs.md#14-no-search-or-filter-capability)
-
-**Implementation**:
-1. Add search input field above textarea
-2. Highlight matching lines as user types
-3. Add "Filter" mode to show only matching lines
-4. Support regex search
-
-**Effort**: 6 hours
-**Impact**: Improves usability with large logs
-
----
-
-### 11. Add Date Range Export
-**Issue**: [known_bugs.md#15](known_bugs.md#15-no-multi-day-log-separation)
-
-**Implementation**:
-1. Add date range picker to export modal
-2. Filter log entries by date before formatting
-3. Support "Today", "This Week", "This Month" presets
-4. Allow custom date range selection
-
-**Effort**: 8 hours
-**Impact**: More flexible export options
-
----
-
-### 12. Add Export Format Selection
-**Issue**: [known_bugs.md#17](known_bugs.md#17-no-data-export-format-selection)
-
-**Implementation**:
-1. Add checkboxes for HTML/Plaintext/Markdown in export dialog
-2. Generate only selected formats
-3. Remember user preference in localStorage
+Since the app shell no longer loads third-party scripts from a CDN, a `script-src 'self'` policy (plus an appropriately scoped `style-src`) is now feasible via Netlify headers / Nginx config.
 
 **Effort**: 2 hours
-**Impact**: Smaller export files, better UX
 
 ---
 
-### 13. Add Log Compression
-**Issue**: [known_bugs.md#20](known_bugs.md#20-no-log-compression)
+#### 4. Reintroduce production console suppression
+**Issue**: [known_bugs.md#2](known_bugs.md#2-no-production-console-suppression)
 
-**Implementation**:
-1. Add pako.js library for gzip compression
-2. Compress before localStorage.setItem()
-3. Decompress after localStorage.getItem()
-4. Add migration for existing uncompressed data
+Configure Vite to strip `console.*` calls in production builds (e.g. via `esbuild.drop` or a small plugin), rather than the old runtime `$$disableConsole()` DOM utility.
+
+**Effort**: 1 hour
+
+---
+
+## Feature Enhancements (Medium/High Value)
+
+### 5. Add date-range export filtering
+Filter log entries by date range before formatting, with "Today"/"This Week"/"This Month" presets, in addition to (or replacing) the always-export-everything behavior. Builds on the per-day view's existing date-boundary logic (`getDateBoundaries()` in `App.tsx`).
+
+**Effort**: 6 hours
+
+### 6. Add export format selection
+Add checkboxes for HTML/Plaintext/Markdown so users can export only what they need, instead of always bundling all three.
+
+**Effort**: 2 hours
+
+### 7. Add undo/redo functionality
+In-memory history stack for log edits and deletions; `Ctrl+Z`/`Ctrl+Shift+Z` shortcuts.
+
+**Effort**: 4 hours
+
+### 8. Add search/filter for logs
+Highlight or filter matching lines as the user types, ideally with optional regex support.
+
+**Effort**: 6 hours
+
+### 9. Add log compression
+Use the `CompressionStream` API to shrink the stored log before writing to IndexedDB (now relevant to IndexedDB quota, not `localStorage`'s 5-10MB limit, but still worthwhile for very large logs).
 
 **Effort**: 8 hours
-**Impact**: 80-90% storage savings
 
----
+### 10. Add import functionality
+Allow re-importing a previously exported HTML file's plaintext section, merging it into the existing log with conflict/duplicate handling.
 
-### 14. Migrate to IndexedDB
-**Issue**: [known_bugs.md#18](known_bugs.md#18-synchronous-localstorage-writes)
+**Effort**: 8 hours
 
-**Implementation**:
-1. Create IndexedDB schema with Dexie.js
-2. Migrate localStorage data to IndexedDB
-3. Update all read/write operations
-4. Keep localStorage as fallback
-
-**Effort**: 16 hours
-**Impact**: Better performance with large logs, async operations
-
----
-
-### 15. Add PWA Installation Instructions for iOS
-**Issue**: [known_bugs.md#8](known_bugs.md#8-pwa-installation-availability)
-
-**Implementation**:
-1. Detect iOS via user agent
-2. Show modal with installation instructions
-3. Include screenshots of "Add to Home Screen" process
-4. Dismiss permanently after user acknowledgment
+### 11. Add PWA installation instructions for iOS
+Detect iOS via user agent and show a modal with manual "Add to Home Screen" instructions, since `beforeinstallprompt` never fires there.
 
 **Effort**: 3 hours
-**Impact**: Better iOS user experience
 
----
-
-## Testing & Quality Improvements
-
-### 16. Add Unit Tests with Vitest
-**Issue**: [known_bugs.md#26](known_bugs.md#26-no-automated-tests)
-
-**Implementation**:
-1. Install Vitest and testing utilities
-2. Write tests for utility functions:
-   - Date/time functions
-   - Rounding validation
-   - String manipulation
-   - Log parsing
-   - HTML/Markdown formatting
-3. Set up CI pipeline to run tests
-
-**Effort**: 16 hours (initial setup + tests)
-**Impact**: Prevents regressions, improves confidence
-
----
-
-### 17. Add E2E Tests with Playwright
-**Issue**: [known_bugs.md#26](known_bugs.md#26-no-automated-tests)
-
-**Implementation**:
-1. Install Playwright
-2. Write E2E tests for:
-   - Log entry flow
-   - Configuration changes
-   - Export functionality
-   - Delete confirmation
-   - PWA installation
-3. Test on Chrome, Firefox, Safari
-
-**Effort**: 20 hours
-**Impact**: Comprehensive test coverage
-
----
-
-### 18. Add Test Data Generator
-**Issue**: [known_bugs.md#27](known_bugs.md#27-no-test-data-generators)
-
-**Implementation**:
-1. Create utility script to generate realistic log data
-2. Support various scenarios (small logs, large logs, edge cases)
-3. Add to dev tools or test fixtures
-
-**Effort**: 4 hours
-**Impact**: Easier testing of edge cases
-
----
-
-### 19. Improve JSDoc Coverage
-**Issue**: [known_bugs.md#28](known_bugs.md#28-no-api-documentation)
-
-**Implementation**:
-1. Add comprehensive JSDoc to all functions
-2. Include parameter types, return types, examples
-3. Generate HTML documentation with JSDoc tool
-4. Add to docs/ directory
-
-**Effort**: 8 hours
-**Impact**: Better developer experience
-
----
-
-## Performance Optimizations
-
-### 20. Add Virtual Scrolling for Large Logs
-**Issue**: [known_bugs.md#19](known_bugs.md#19-no-pagination-or-virtualization)
-
-**Implementation**:
-1. Implement virtual scrolling library (e.g., react-window equivalent)
-2. Render only visible log entries
-3. Maintain scroll position during updates
+### 12. Add a statistics dashboard
+Total work time today/week/month, category breakdown chart (e.g. Chart.js), most-used categories.
 
 **Effort**: 12 hours
-**Impact**: Smooth performance with 10,000+ entries
 
----
-
-### 21. Add Build Process with Vite
-**Issue**: [known_bugs.md#30](known_bugs.md#30-no-build-process)
-
-**Implementation**:
-1. Install Vite
-2. Configure build for production (minification, bundling)
-3. Update deployment pipeline
-4. Keep development mode simple (no build required)
+### 13. Add export to calendar (ICS)
+Convert log entries into calendar events and generate an `.ics` file for import into Google Calendar/Outlook.
 
 **Effort**: 6 hours
-**Impact**: Smaller bundle sizes, faster load times
-
----
-
-### 22. Lazy Load Bootstrap JavaScript
-**Current**: Bootstrap loaded from CDN on every page
-
-**Implementation**:
-1. Load Bootstrap JS only when needed (modals, offcanvas)
-2. Use dynamic import() for on-demand loading
-3. Reduce initial bundle size
-
-**Effort**: 2 hours
-**Impact**: Faster initial page load
 
 ---
 
 ## Accessibility Improvements
 
-### 23. Add Keyboard Shortcuts Configuration
-**Issue**: [known_bugs.md#21](known_bugs.md#21-limited-keyboard-shortcuts)
+### 14. Add a color-blind-friendly save indicator
+Add an icon and/or text label alongside the existing color-only save-status dot.
 
-**Implementation**:
-1. Add keyboard shortcut configuration UI
-2. Allow users to remap shortcut keys
-3. Support Ctrl/Cmd/Alt modifiers
-4. Save preferences in localStorage
+**Effort**: 30 minutes
 
-**Effort**: 8 hours
-**Impact**: Better accessibility for diverse users
-
----
-
-### 24. Add Screen Reader Announcements
-**Issue**: [known_bugs.md#22](known_bugs.md#22-no-screen-reader-announcements)
-
-**Implementation**:
-1. Add ARIA live region to HTML
-2. Announce save status changes
-3. Announce log entry additions
-4. Announce export/delete actions
+### 15. Add screen-reader announcements
+ARIA live region announcing save-status changes, log additions, and export/delete actions.
 
 **Effort**: 3 hours
-**Impact**: Better experience for visually impaired users
 
----
+### 16. Add keyboard shortcut configuration
+Allow remapping the digit-key shortcuts, with modifier support (`Ctrl`/`Cmd`/`Alt`).
 
-### 25. Accessibility Audit & Fixes
+**Effort**: 8 hours
 
-**Implementation**:
-1. Run automated accessibility tests (axe, Lighthouse)
-2. Manual testing with screen readers (NVDA, JAWS, VoiceOver)
-3. Keyboard-only navigation testing
-4. Fix identified issues (focus management, ARIA labels, etc.)
+### 17. Accessibility audit & fixes
+Automated checks (axe, Lighthouse) + manual screen-reader and keyboard-only navigation testing.
 
 **Effort**: 12 hours
-**Impact**: WCAG 2.1 Level AA compliance
 
 ---
 
 ## Security & Privacy
 
-### 26. Add Optional Data Encryption
-**Issue**: [known_bugs.md#24](known_bugs.md#24-no-data-encryption)
-
-**Implementation**:
-1. Add encryption option in config
-2. Use Web Crypto API to encrypt localStorage data
-3. Require password/passphrase from user
-4. Encrypt/decrypt on read/write operations
+### 18. Add optional data encryption
+Web Crypto API-based encryption of IndexedDB data behind a user-supplied passphrase, as an opt-in.
 
 **Effort**: 12 hours
-**Impact**: Privacy protection for sensitive data
-
----
-
-### 27. Improve Input Sanitization
-**Issue**: [known_bugs.md#25](known_bugs.md#25-no-input-sanitization-for-downloads)
-
-**Implementation**:
-1. Install DOMPurify library
-2. Sanitize all user input before rendering in HTML
-3. Add Content Security Policy headers
-
-**Effort**: 4 hours
-**Impact**: Prevents XSS in downloaded files
 
 ---
 
 ## UX/UI Enhancements
 
-### 28. Add Dark Mode Toggle
-
-**Current**: Auto-detects system preference only
-
-**Implementation**:
-1. Add manual dark mode toggle in UI
-2. Three options: Auto, Light, Dark
-3. Save preference in localStorage
-4. Update theme switching logic
+### 19. Add a manual dark-mode toggle
+Currently auto-detects system preference only (`autoSetTheme()`); add an explicit Auto/Light/Dark control in `ConfigApp`, persisted to IndexedDB.
 
 **Effort**: 3 hours
-**Impact**: User control over appearance
 
----
-
-### 29. Add Log Entry Templates
-
-**Implementation**:
-1. Allow users to create custom log templates
-2. Support placeholders (date, time, category, etc.)
-3. Manage templates in config screen
-4. Quick select template when logging
+### 20. Add log entry templates
+User-defined templates with placeholders (date, time, category), managed from the config screen — a more flexible alternative to the fixed 9 shortcuts.
 
 **Effort**: 8 hours
-**Impact**: More flexible than 9 shortcuts
 
----
-
-### 30. Add Statistics Dashboard
-
-**Implementation**:
-1. Create dashboard view showing:
-   - Total work time today/week/month
-   - Time breakdown by category (chart)
-   - Most used categories
-   - Average daily work time
-2. Use Chart.js or similar library
-3. Add to main menu
-
-**Effort**: 12 hours
-**Impact**: Better insights into work patterns
-
----
-
-### 31. Add Export to Calendar (ICS)
-
-**Implementation**:
-1. Parse log entries into calendar events
-2. Generate ICS file format
-3. Allow import into Google Calendar, Outlook, etc.
-
-**Effort**: 6 hours
-**Impact**: Integration with existing tools
-
----
-
-### 32. Add Multi-device Sync (Optional)
-
-**Implementation**:
-1. Add optional cloud sync feature
-2. Support providers: Google Drive, Dropbox, or custom server
-3. OAuth authentication
-4. Conflict resolution UI
+### 21. Add optional multi-device sync
+Cloud-sync (Google Drive/Dropbox/custom server) as an explicit opt-in, with OAuth and conflict resolution. Would be a deliberate exception to the no-backend principle (`docs/design.md` §2.1) and needs careful scoping.
 
 **Effort**: 40 hours
-**Impact**: Cross-device data access
-
----
-
-## Documentation
-
-### 33. Create User Guide
-
-**Implementation**:
-1. Comprehensive user guide with screenshots
-2. Cover all features and use cases
-3. FAQ section
-4. Troubleshooting guide
-
-**Effort**: 8 hours
-**Impact**: Better user onboarding
-
----
-
-### 34. Create Contributor Guide
-
-**Implementation**:
-1. Development setup instructions
-2. Code style guide
-3. Architecture overview
-4. Pull request guidelines
-
-**Effort**: 4 hours
-**Impact**: Easier for contributors to get started
-
----
-
-### 35. Add Architecture Diagrams
-
-**Implementation**:
-1. Create diagrams for:
-   - Data flow
-   - Component relationships
-   - Storage architecture
-   - Service worker lifecycle
-2. Use Mermaid or similar tool
-3. Embed in documentation
-
-**Effort**: 6 hours
-**Impact**: Better understanding of system
-
-**Note**: Partially completed in this spec documentation!
 
 ---
 
 ## Internationalization
 
-### 36. Add More Language Support
+### 22. Add more language support
+Candidates: Chinese (Simplified/Traditional), Korean, Spanish, French, German. Translation-only effort given the existing `i18next` infrastructure.
 
-**Current**: Japanese, English
+**Effort**: ~4 hours per language
 
-**Potential Languages**:
-- Chinese (Simplified/Traditional)
-- Korean
-- Spanish
-- French
-- German
+### 23. Add RTL language support
+Detect RTL languages (Arabic, Hebrew), apply RTL CSS, mirror layout components.
 
-**Effort**: 4 hours per language (translation only)
-**Impact**: Wider user base
+**Effort**: 8 hours
 
 ---
 
-### 37. Add RTL Language Support
+## Documentation
 
-**Implementation**:
-1. Detect RTL languages (Arabic, Hebrew)
-2. Apply RTL CSS styles
-3. Mirror layout components
-4. Test with RTL translations
+### 24. Create a user guide
+Screenshots, feature walkthrough, FAQ, troubleshooting.
 
 **Effort**: 8 hours
-**Impact**: Accessibility for RTL language users
+
+### 25. Create a contributor guide
+Dev setup, code style (already partly covered by `.claude/rules/code-style.md`), architecture overview, PR guidelines.
+
+**Effort**: 4 hours
 
 ---
 
 ## Deployment & DevOps
 
-### 38. Add Automated Version Bumping
-
-**Implementation**:
-1. Script to update version in package.json and manifest.json
-2. Git tag creation
-3. Changelog generation
-4. Integrate with CI/CD
+### 26. Add automated version bumping
+Script to bump `package.json` and the manifest version together (also resolves item #1 above), create a git tag, generate a changelog.
 
 **Effort**: 3 hours
-**Impact**: Streamlined release process
 
----
+### 27. Extend CI/CD
+**Current**: `lint.yml` (Biome via reviewdog) and `audit.yml` (`pnpm audit --audit-level=high` + Takumi Guard) exist.
 
-### 39. Add GitHub Actions CI/CD
-
-**Current**: Two workflows exist:
-- `lint.yml`: Biome lint check (`biome check js/`)
-- `audit.yml`: `npm audit --audit-level=high`
-
-**Remaining**:
-1. Add test running workflow (once tests are written)
-2. Add build and deploy workflow
-3. Add release automation
-4. Add PR checks (tests, lint, build)
-
-**Effort**: 4 hours (partial done)
-**Impact**: Automated quality checks
-
----
-
-### 40. Add Docker Deployment
-
-**Current**: Dockerfile exists but may need updates
-
-**Implementation**:
-1. Review and update Dockerfile
-2. Add docker-compose for local dev
-3. Document Docker deployment
-4. Add to CI/CD pipeline
+**Remaining**: a test-running workflow (once Vitest is added, item #2), a build-and-deploy workflow, release automation.
 
 **Effort**: 4 hours
-**Impact**: Easier deployment options
 
 ---
 
 ## Priority Roadmap
 
-### Phase 1: Bug Fixes (1-2 weeks)
-- [x] #1: Fix IME composition handling ✓ COMPLETED (v25.12.13)
-- [ ] #2: Internationalize error messages
-- [ ] #3: Fix service worker cache name race condition
-- [ ] #4: Fix hard-coded cache name in fetch handler
-- [x] #4b: Add analytics.js to Service Worker Cache ✓ COMPLETED
-- [x] #5: Fix or remove textarea Enter key handler ✓ COMPLETED (v25.12.13)
-- [ ] #7: Add color-blind friendly save indicator
+### Phase 1: Correctness & Hardening (1-2 weeks)
+- [ ] #1: Resolve version-string drift
+- [ ] #2: Add unit tests with Vitest
+- [ ] #3: Add a Content Security Policy
+- [ ] #4: Reintroduce production console suppression
 
 ### Phase 2: Essential Features (1 month)
-- [ ] #9: Add undo/redo functionality
-- [ ] #10: Add search/filter for logs
-- [ ] #12: Add export format selection
-- [ ] #15: Add PWA installation instructions for iOS
+- [ ] #5: Date-range export filtering
+- [ ] #6: Export format selection
+- [ ] #11: PWA installation instructions for iOS
 
-### Phase 3: Testing & Quality (1 month)
-- [ ] #16: Add unit tests with Vitest
-- [ ] #17: Add E2E tests with Playwright
-- [ ] #19: Improve JSDoc coverage
-- [ ] #25: Accessibility audit & fixes
+### Phase 3: Quality & Accessibility (1 month)
+- [ ] #14: Color-blind-friendly save indicator
+- [ ] #15: Screen-reader announcements
+- [ ] #17: Accessibility audit & fixes
 
-### Phase 4: Performance (2 weeks)
-- [ ] #6: Add save status visual feedback
-- [ ] #21: Add build process with Vite
-- [ ] #22: Lazy load Bootstrap JavaScript
+### Phase 4: Advanced Features (2-3 months)
+- [ ] #7: Undo/redo
+- [ ] #8: Search/filter
+- [ ] #9: Log compression
+- [ ] #10: Import functionality
+- [ ] #12: Statistics dashboard
+- [ ] #13: Export to calendar (ICS)
 
-### Phase 5: Advanced Features (2-3 months)
-- [ ] #11: Add date range export
-- [ ] #13: Add log compression
-- [ ] #14: Migrate to IndexedDB
-- [ ] #30: Add statistics dashboard
-- [ ] #31: Add export to calendar (ICS)
-
-### Phase 6: Nice-to-Have (Ongoing)
-- [ ] #26: Add optional data encryption
-- [ ] #29: Add log entry templates
-- [ ] #32: Add multi-device sync (optional)
-- [ ] #36: Add more language support
+### Phase 5: Nice-to-Have (Ongoing)
+- [ ] #18: Optional data encryption
+- [ ] #19: Manual dark-mode toggle
+- [ ] #20: Log entry templates
+- [ ] #21: Optional multi-device sync
+- [ ] #22/#23: More languages / RTL support
 
 ---
 
 ## Contribution Welcome
 
-All items in this TODO list are open for community contribution. Priority items are marked in the roadmap above.
-
-To contribute:
-1. Check existing issues in GitHub
-2. Comment on issue or create new one
-3. Fork repository
-4. Implement feature/fix
-5. Submit pull request
-
-See [CONTRIBUTING.md](../../.github/CONTRIBUTING.md) (to be created) for detailed guidelines.
+All items above are open for contribution. To contribute:
+1. Check existing issues on GitHub
+2. Comment on an existing issue or open a new one
+3. Fork the repository
+4. Implement the feature/fix
+5. Submit a pull request
 
 ---
 
 ## Progress Tracking
 
-This document will be updated as items are completed. Completed items will be:
-- [x] Marked with checkmark
-- Moved to separate CHANGELOG.md
-- Referenced in commit messages
+This document is updated as items are completed. See `docs/ADR.md` for the architectural decision history behind already-completed major changes (IndexedDB migration, the React/Vite rewrite, i18n replacement, etc.).
 
-Last updated: 2026-02-19
-
-<!-- commit: ef46e13 -->
+Last updated: 2026-06-20
