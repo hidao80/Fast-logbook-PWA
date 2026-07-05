@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fast Logbook PWA — Record with one tap. Instantly tally.</title>
+  <meta name="description" content="A lightweight PWA for recording and aggregating daily work logs. One-tap stamping, instant totals, 100% in-browser — no server, no account.">
+  <meta property="og:title" content="Fast Logbook PWA">
+  <meta property="og:description" content="Record with one tap. Instantly tally. No installation required.">
+  <meta property="og:image" content="https://github.com/user-attachments/assets/c990ed5d-1973-42c5-b36c-1c9910ca0e7a">
+  <link rel="icon" href="img/icon_256.png">
+  <style>
+    :root {
+      --accent: #62BF04;
+      --accent-dark: #4a9203;
+      --bg: #fafcf7;
+      --surface: #ffffff;
+      --text: #1c2419;
+      --text-sub: #55604f;
+      --border: #e2e8dc;
+      --shadow: 0 2px 12px rgba(28, 36, 25, .08);
+      --radius: 14px;
+      color-scheme: light dark;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --accent: #7ede1e;
+        --accent-dark: #62BF04;
+        --bg: #141812;
+        --surface: #1d231a;
+        --text: #e8eee3;
+        --text-sub: #a3ae9b;
+        --border: #2e372a;
+        --shadow: 0 2px 12px rgba(0, 0, 0, .4);
+      }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    /* --- language switching --- */
+    html[data-lang="en"] [lang="ja"] { display: none; }
+    html[data-lang="ja"] [lang="en"] { display: none; }
+
+    a { color: var(--accent-dark); }
+    img { max-width: 100%; height: auto; }
+    section { padding: 4.5rem 1.25rem; }
+    .container { max-width: 960px; margin: 0 auto; }
+
+    /* --- header --- */
+    header {
+      position: sticky; top: 0; z-index: 10;
+      background: color-mix(in srgb, var(--bg) 85%, transparent);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav {
+      max-width: 960px; margin: 0 auto; padding: .6rem 1.25rem;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .nav img { width: 28px; height: 28px; border-radius: 6px; }
+    .nav strong { font-size: 1rem; }
+    .nav .spacer { flex: 1; }
+    .nav a { text-decoration: none; color: var(--text-sub); font-size: .9rem; padding: .3rem .5rem; }
+    .nav a:hover { color: var(--accent-dark); }
+    #langToggle {
+      border: 1px solid var(--border); background: var(--surface); color: var(--text);
+      border-radius: 999px; padding: .25rem .8rem; font-size: .85rem; cursor: pointer;
+    }
+    #langToggle:hover { border-color: var(--accent); }
+
+    /* --- hero --- */
+    .hero { text-align: center; padding: 5rem 1.25rem 4rem; }
+    .hero .badge {
+      display: inline-block; font-size: .8rem; font-weight: 600;
+      color: var(--accent-dark); border: 1px solid var(--accent);
+      border-radius: 999px; padding: .15rem .9rem; margin-bottom: 1.2rem;
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+    .hero h1 {
+      font-size: clamp(1.9rem, 5vw, 3rem);
+      line-height: 1.25; letter-spacing: -.02em; margin-bottom: 1rem;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(120deg, var(--accent-dark), var(--accent));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero p.sub { color: var(--text-sub); font-size: 1.1rem; max-width: 620px; margin: 0 auto 2rem; }
+    .cta { display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem; }
+    .btn {
+      display: inline-block; text-decoration: none; font-weight: 600;
+      border-radius: 999px; padding: .7rem 1.8rem; font-size: 1rem;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn.primary {
+      background: linear-gradient(120deg, var(--accent-dark), var(--accent));
+      color: #fff; box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 40%, transparent);
+    }
+    .btn.ghost { border: 1.5px solid var(--border); color: var(--text); background: var(--surface); }
+    .hero .shot {
+      max-width: 380px; border-radius: var(--radius);
+      box-shadow: 0 12px 40px rgba(28, 36, 25, .18);
+      border: 1px solid var(--border);
+    }
+
+    /* --- 3 key points --- */
+    .points { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.6rem; box-shadow: var(--shadow);
+    }
+    .card .icon { font-size: 2rem; margin-bottom: .6rem; }
+    .card h3 { font-size: 1.15rem; margin-bottom: .4rem; }
+    .card p { color: var(--text-sub); font-size: .95rem; }
+
+    h2.section-title {
+      text-align: center; font-size: clamp(1.5rem, 4vw, 2.1rem);
+      letter-spacing: -.01em; margin-bottom: .6rem;
+    }
+    p.section-lead { text-align: center; color: var(--text-sub); max-width: 640px; margin: 0 auto 2.8rem; }
+
+    /* --- steps --- */
+    .step {
+      display: flex; align-items: center; gap: 2.5rem;
+      margin-bottom: 3.5rem; flex-wrap: wrap;
+    }
+    .step:nth-child(even) { flex-direction: row-reverse; }
+    .step > div { flex: 1 1 280px; }
+    .step img {
+      flex: 1 1 280px; max-width: 380px; margin: 0 auto;
+      border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+    .step .num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 2.2rem; height: 2.2rem; border-radius: 50%;
+      background: var(--accent); color: #fff; font-weight: 700; margin-bottom: .8rem;
+    }
+    .step h3 { font-size: 1.3rem; margin-bottom: .5rem; }
+    .step p { color: var(--text-sub); }
+    .step kbd {
+      background: var(--surface); border: 1px solid var(--border); border-bottom-width: 2px;
+      border-radius: 5px; padding: 0 .4em; font-size: .9em; font-family: inherit;
+    }
+
+    /* --- log format --- */
+    .logfmt {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      max-width: 640px; margin: 0 auto; overflow: hidden;
+    }
+    .logfmt .bar {
+      display: flex; gap: .4rem; padding: .6rem .9rem; border-bottom: 1px solid var(--border);
+    }
+    .logfmt .bar i { width: .7rem; height: .7rem; border-radius: 50%; background: var(--border); }
+    .logfmt pre {
+      padding: 1.2rem; overflow-x: auto; font-size: .88rem; line-height: 1.9;
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    .logfmt .dt { color: var(--text-sub); }
+    .logfmt .cat { color: var(--accent-dark); font-weight: 600; }
+    .logfmt .brk { opacity: .55; }
+
+    /* --- feature grid --- */
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; margin-top: 2.4rem; }
+    .features .card { padding: 1.3rem; }
+    .features .card:hover { border-color: var(--accent); }
+
+    /* --- privacy --- */
+    .privacy {
+      background: linear-gradient(120deg,
+        color-mix(in srgb, var(--accent) 12%, var(--bg)),
+        color-mix(in srgb, var(--accent) 4%, var(--bg)));
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .privacy .big { font-size: 3rem; }
+    .privacy .cta { margin-bottom: 0; }
+
+    footer { text-align: center; padding: 2.5rem 1.25rem; color: var(--text-sub); font-size: .9rem; }
+    footer a { color: var(--text-sub); }
+
+    /* --- scroll reveal (decorative, progressive enhancement) --- */
+    @media (prefers-reduced-motion: no-preference) {
+      @supports ((animation-timeline: view()) and (animation-range: entry)) {
+        @keyframes rise {
+          from { opacity: 0; transform: translateY(24px); }
+        }
+        .card, .step, .logfmt {
+          animation: rise auto ease-out backwards;
+          animation-timeline: view();
+          animation-range: entry 0% entry 60%;
+        }
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <img src="img/icon_256.png" alt="">
+    <strong>Fast Logbook</strong>
+    <span class="spacer"></span>
+    <a href="#how"><span lang="en">How it works</span><span lang="ja">使い方</span></a>
+    <a href="#features"><span lang="en">Features</span><span lang="ja">機能</span></a>
+    <a href="https://github.com/hidao80/Fast-logbook-PWA">GitHub</a>
+    <button id="langToggle" type="button" aria-label="Switch language">🌐 <span lang="en">日本語</span><span lang="ja">English</span></button>
+  </nav>
+</header>
+
+<section class="hero">
+  <span class="badge">PWA · Offline Ready · MIT License</span>
+  <h1 lang="en">Record with <em>one tap</em>.<br>Tally <em>instantly</em>.</h1>
+  <h1 lang="ja"><em>ワンタップ</em>で記録。<br><em>その場で</em>集計。</h1>
+  <p class="sub" lang="en">
+    Fast Logbook is a lightweight work-log PWA that runs entirely in your browser.
+    No installation, no account, no server — your data never leaves your device.
+  </p>
+  <p class="sub" lang="ja">
+    Fast Logbook は、ブラウザだけで完結する軽量な作業ログPWAです。
+    インストール不要、アカウント不要、サーバー不要 — データは端末の外に出ません。
+  </p>
+  <div class="cta">
+    <a class="btn primary" href="https://fast-logbook.netlify.app/">
+      <span lang="en">🚀 Try the Live Demo</span><span lang="ja">🚀 今すぐ試す</span>
+    </a>
+    <a class="btn ghost" href="https://github.com/hidao80/Fast-logbook-PWA">
+      <span lang="en">View on GitHub</span><span lang="ja">GitHub で見る</span>
+    </a>
+  </div>
+  <img class="shot" src="https://github.com/user-attachments/assets/c990ed5d-1973-42c5-b36c-1c9910ca0e7a" alt="Fast Logbook input screen" loading="eager" fetchpriority="high">
+</section>
+
+<section>
+  <div class="container points">
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h3 lang="en">Quick</h3><h3 lang="ja">速い</h3>
+      <p lang="en">Stamp a timestamped entry with a single tap — or just press keys 1–9. Logging takes literally one second.</p>
+      <p lang="ja">タップひとつ、またはキーボードの <kbd>1</kbd>〜<kbd>9</kbd> を押すだけで時刻付き記録が完了。記録にかかるのは文字どおり1秒です。</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h3 lang="en">Aggregate</h3><h3 lang="ja">集計</h3>
+      <p lang="en">Totals and grand totals per category are calculated instantly. Break time is excluded automatically with the <code>^</code> prefix.</p>
+      <p lang="ja">カテゴリ別の合計・総計を即座に算出。<code>^</code> プレフィックスを付けた休憩時間は自動で実働から除外されます。</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔒</div>
+      <h3 lang="en">Private</h3><h3 lang="ja">安全</h3>
+      <p lang="en">100% client-side. Data stays in your browser (IndexedDB). No server, no account, nothing to leak.</p>
+      <p lang="ja">100% クライアントサイド。データはブラウザ内 (IndexedDB) にのみ保存。サーバーもアカウントも存在しないため、漏れようがありません。</p>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="container">
+    <h2 class="section-title" lang="en">How it works</h2>
+    <h2 class="section-title" lang="ja">使い方は3ステップ</h2>
+    <p class="section-lead" lang="en">Set up once, then just tap. Your daily report writes itself.</p>
+    <p class="section-lead" lang="ja">最初に一度設定すれば、あとはタップするだけ。日報は勝手にできあがります。</p>
+
+    <div class="step">
+      <div>
+        <span class="num">1</span>
+        <h3 lang="en">Register your tasks</h3><h3 lang="ja">タスクを登録する</h3>
+        <p lang="en">Assign your routine tasks to keys 1–9 on the config screen. Prefix a task with <kbd>^</kbd> (e.g. break time) to exclude it from working-hour totals.</p>
+        <p lang="ja">設定画面で、よく使うタスクを <kbd>1</kbd>〜<kbd>9</kbd> に割り当てます。休憩など実働に含めたくないタスクは先頭に <kbd>^</kbd> を付けるだけで集計から除外されます。</p>
+      </div>
+      <img src="https://github.com/user-attachments/assets/ccc564a6-bff9-407c-ba66-974193939823" alt="Configuration screen" loading="lazy">
+    </div>
+
+    <div class="step">
+      <div>
+        <span class="num">2</span>
+        <h3 lang="en">Stamp as you work</h3><h3 lang="ja">作業の切り替え時に打刻</h3>
+        <p lang="en">Switching tasks? Tap the label — the current time is stamped automatically. Need something ad-hoc? Use the free-input field on <kbd>0</kbd>. Every entry stays editable.</p>
+        <p lang="ja">作業を切り替えたらラベルをタップ。現在時刻が自動で記録されます。定型外の作業は <kbd>0</kbd> の自由入力欄へ。記録後のテキストも自由に編集できます。</p>
+      </div>
+      <img src="https://github.com/user-attachments/assets/748b4f02-452a-4fee-8642-27c035245d03" alt="Input screen with task labels" loading="lazy">
+    </div>
+
+    <div class="step">
+      <div>
+        <span class="num">3</span>
+        <h3 lang="en">View or download the summary</h3><h3 lang="ja">集計を見る・ダウンロード</h3>
+        <p lang="en">One click generates a self-contained HTML report with an HTML table, plain text, and a Markdown table — each with a copy button. Paste it straight into your daily report.</p>
+        <p lang="ja">ワンクリックで、HTMLテーブル・プレーンテキスト・Markdownテーブルをコピーボタン付きでまとめた単一HTMLレポートを生成。日報にそのまま貼り付けられます。</p>
+      </div>
+      <img src="https://github.com/user-attachments/assets/650c8fd4-dc39-4c16-ae6b-d92ba7ddc236" alt="Exported summary HTML with totals" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2 class="section-title" lang="en">A log format you can read</h2>
+    <h2 class="section-title" lang="ja">人間が読めるログ形式</h2>
+    <p class="section-lead" lang="en">Everything is stored as plain text — one line per entry. No lock-in, ever.</p>
+    <p class="section-lead" lang="ja">すべてのデータは1行1レコードのプレーンテキスト。ロックインとは無縁です。</p>
+    <div class="logfmt">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <pre><span class="dt">2026-07-05 09:00</span><span class="cat">Meeting</span>;Daily stand-up
+<span class="dt">2026-07-05 09:15</span><span class="cat">Coding</span>;Fix login validation
+<span class="brk"><span class="dt">2026-07-05 12:00</span>^Break;Lunch</span>
+<span class="dt">2026-07-05 13:00</span><span class="cat">Coding</span>;Refactor storage module
+<span class="dt">2026-07-05 17:30</span><span class="cat">Review</span>;PR #42</pre>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="container">
+    <h2 class="section-title" lang="en">Everything you need, nothing you don't</h2>
+    <h2 class="section-title" lang="ja">必要なものだけ、全部入り</h2>
+    <div class="features">
+      <div class="card"><div class="icon">📱</div>
+        <h3 lang="en">Installable PWA</h3><h3 lang="ja">PWAインストール対応</h3>
+        <p lang="en">Works offline; installs as an app on PC and mobile.</p>
+        <p lang="ja">オフラインで動作。PC・スマホの両方にアプリとして追加できます。</p></div>
+      <div class="card"><div class="icon">⌨️</div>
+        <h3 lang="en">Keyboard-first</h3><h3 lang="ja">キーボード最速</h3>
+        <p lang="en">Keys 1–9 stamp presets; 0 jumps to free input.</p>
+        <p lang="ja"><kbd>1</kbd>〜<kbd>9</kbd> でプリセット打刻、<kbd>0</kbd> で自由入力へ。</p></div>
+      <div class="card"><div class="icon">📋</div>
+        <h3 lang="en">3-in-1 export</h3><h3 lang="ja">3形式エクスポート</h3>
+        <p lang="en">HTML table + plain text + Markdown, with copy buttons.</p>
+        <p lang="ja">HTMLテーブル・テキスト・Markdown をコピーボタン付きで出力。</p></div>
+      <div class="card"><div class="icon">☕</div>
+        <h3 lang="en">Break exclusion</h3><h3 lang="ja">休憩の自動除外</h3>
+        <p lang="en">The <code>^</code> prefix excludes entries from work-time totals.</p>
+        <p lang="ja"><code>^</code> プレフィックスで実働時間の集計から除外。</p></div>
+      <div class="card"><div class="icon">🌙</div>
+        <h3 lang="en">Dark mode</h3><h3 lang="ja">ダークモード</h3>
+        <p lang="en">Follows your system theme automatically.</p>
+        <p lang="ja">OSのテーマ設定に自動で追従します。</p></div>
+      <div class="card"><div class="icon">🌏</div>
+        <h3 lang="en">i18n built in</h3><h3 lang="ja">多言語対応</h3>
+        <p lang="en">English and Japanese, switched by browser locale.</p>
+        <p lang="ja">英語・日本語に対応。ブラウザの言語設定で自動切替。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="privacy">
+  <div class="container">
+    <div class="big">🛡️</div>
+    <h2 class="section-title" lang="en">Your data never leaves your device</h2>
+    <h2 class="section-title" lang="ja">データは端末から一歩も出ません</h2>
+    <p class="section-lead" lang="en">
+      Fast Logbook has no backend. Logs live in your browser's IndexedDB and nowhere else.
+      Built with React 19 + TypeScript + Vite, served as static files. The entire source is MIT-licensed and open.
+    </p>
+    <p class="section-lead" lang="ja">
+      Fast Logbook にバックエンドはありません。ログはブラウザの IndexedDB のみに保存されます。
+      React 19 + TypeScript + Vite 製の静的ファイル配信で、ソースコードは MIT ライセンスで全公開されています。
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="https://fast-logbook.netlify.app/">
+        <span lang="en">🚀 Start logging now</span><span lang="ja">🚀 いますぐ記録を始める</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <a href="https://github.com/hidao80/Fast-logbook-PWA">Fast Logbook PWA</a> — MIT License · Made by
+    <a href="https://github.com/hidao80">hidao80</a>
+  </p>
+</footer>
+
+<script>
+  const root = document.documentElement;
+  // localStorage can throw in some privacy modes; language detection still works without it
+  const store = {
+    get() { try { return localStorage.getItem('landing_lang'); } catch { return null; } },
+    set(v) { try { localStorage.setItem('landing_lang', v); } catch { /* ignore */ } }
+  };
+  const initial = store.get() || (navigator.language.startsWith('ja') ? 'ja' : 'en');
+  const apply = (l) => { root.dataset.lang = l; root.lang = l; };
+  apply(initial);
+  document.getElementById('langToggle').addEventListener('click', () => {
+    apply(root.dataset.lang === 'en' ? 'ja' : 'en');
+    store.set(root.dataset.lang);
+  });
+</script>
+
+</body>
+</html>
