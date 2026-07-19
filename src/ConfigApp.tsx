@@ -27,6 +27,7 @@ export default function ConfigApp() {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
 
   const bcRef = useRef<BroadcastChannel | null>(null);
+  const isComposingRef = useRef(false);
 
   useEffect(() => {
     autoSetTheme();
@@ -80,6 +81,14 @@ export default function ConfigApp() {
   }, []);
 
   const handleShortcutChange = async (idx: number, value: string) => {
+    setShortcuts((prev) => {
+      const next = [...prev];
+      next[idx] = value;
+      return next;
+    });
+
+    if (isComposingRef.current) return;
+
     const key = `shortcut_${idx + 1}`;
     try {
       await setItem(key, value.trim());
@@ -89,11 +98,6 @@ export default function ConfigApp() {
         alert(t('storage_quota_exceeded'));
       }
     }
-    setShortcuts((prev) => {
-      const next = [...prev];
-      next[idx] = value;
-      return next;
-    });
   };
 
   const handleRoundingChange = async (value: string) => {
@@ -182,6 +186,13 @@ export default function ConfigApp() {
                 placeholder={t(`shortcut_${idx + 1}`)}
                 value={val}
                 onChange={(e) => handleShortcutChange(idx, e.target.value)}
+                onCompositionStart={() => {
+                  isComposingRef.current = true;
+                }}
+                onCompositionEnd={(e) => {
+                  isComposingRef.current = false;
+                  handleShortcutChange(idx, e.currentTarget.value);
+                }}
                 onBlur={(e) => handleShortcutChange(idx, e.target.value)}
               />
             </div>
