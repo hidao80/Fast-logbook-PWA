@@ -1,6 +1,6 @@
 {
   "name": "fast-logbook-pwa",
-  "version": "26.07/19",
+  "version": "26.07.19",
   "description": "Time-stamped work notes PWA",
   "packageManager": "pnpm@10.33.2",
   "scripts": {

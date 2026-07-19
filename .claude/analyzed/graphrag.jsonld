@@ -796,7 +796,7 @@
     {
       "@id": "bug:version-typo",
       "@type": "KnownInconsistency",
-      "name": "package.json version '26.07/19' (colon typo) vs manifest '26.06.20'",
+      "name": "package.json version '26.07/19' (colon typo) vs manifest '26.07.19'",
       "verification": "factual"
     },
     {
