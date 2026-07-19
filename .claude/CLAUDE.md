@@ -75,3 +75,28 @@ Write all inline comments in English.
 Design rationale → [`docs/design.md`](docs/design.md)
 API/function specs → [`docs/spec/`](docs/spec/)
 Session history → [`.claude/histories/YYYYMM.md`](.claude/histories/)
+
+## Analyzed Documentation Index
+
+Codebase analysis snapshots under [`.claude/analyzed/`](analyzed/) (generated at commit `d363d07`; note that this analysis reflects the current React + TypeScript + Vite codebase — where it conflicts with the Architecture section above, the analyzed docs are newer):
+
+1. [dependencies](analyzed/dependencies.md) — packages, versions, licenses, audit status
+2. [infrastructure](analyzed/infrastructure.md) — CI/CD, Netlify, Docker/Nginx
+3. [databases](analyzed/databases.md) — IndexedDB/localStorage architecture and key inventory
+4. [screens](analyzed/screens.md) — entry points, hash routing, view structure
+5. [configurations](analyzed/configurations.md) — config file map, env-specific settings
+6. [components](analyzed/components.md) — app structure, dependency graph, mind map
+7. [utilities](analyzed/utilities.md) — `src/lib/` helper inventory
+8. [performance](analyzed/performance.md) — processing costs, bottleneck analysis
+9. [known_bugs](analyzed/known_bugs.md) — bugs, layer inconsistencies, limitations
+10. [security](analyzed/security.md) — OWASP Top 10 assessment, findings ranked
+11. [test](analyzed/test.md) — test inventory and gaps
+12. [development-workflow](analyzed/development-workflow.md) — dev loop, branching, quality gates
+13. [notes](analyzed/notes.md) — cross-cutting observations, doc-freshness warning
+14. [todo](analyzed/todo.md) — prioritized action items by category
+15. [naming_convention](analyzed/naming_convention.md) — identifier/file/storage-key naming
+16. [use_cases](analyzed/use_cases.md) — actor-goal inventory and use case diagram
+17. [graphrag.jsonld](analyzed/graphrag.jsonld) — JSON-LD call graph & ontology (models/controllers/views, data keys, user functions, known inconsistencies) for GraphRAG
+18. [ADR](analyzed/ADR.md) — git-log-derived decision timeline (2024-07 → 2026-06), supplemental ADR-101…108 for the pre-2026 era, and verification of docs/ADR.md
+
+<!-- commit-hash: d363d07ab70bdbae818bada7838fe13166f4ef08 -->

@@ -1,0 +1,186 @@
+{
+  "@context": {
+    "@vocab": "https://fast-logbook-pwa.local/ontology#",
+    "schema": "https://schema.org/",
+    "name": "schema:name",
+    "description": "schema:description",
+    "file": "schema:codeRepository",
+    "verification": "schema:additionalProperty",
+    "calls": { "@type": "@id", "@container": "@set" },
+    "reads": { "@type": "@id", "@container": "@set" },
+    "writes": { "@type": "@id", "@container": "@set" },
+    "manages": { "@type": "@id", "@container": "@set" },
+    "storedIn": { "@type": "@id" },
+    "renders": { "@type": "@id", "@container": "@set" },
+    "renderedBy": { "@type": "@id" },
+    "handledBy": { "@type": "@id" },
+    "notifies": { "@type": "@id", "@container": "@set" },
+    "listensTo": { "@type": "@id", "@container": "@set" },
+    "realizes": { "@type": "@id", "@container": "@set" },
+    "usesWebApi": { "@type": "@id", "@container": "@set" },
+    "affects": { "@type": "@id", "@container": "@set" },
+    "partOf": { "@type": "@id" }
+  },
+  "@graph": [
+    {
+      "@id": "meta:document",
+      "@type": "AnalysisDocument",
+      "name": "Fast logbook PWA — GraphRAG call graph & ontology",
+      "description": "MVC-mapped ontology for a client-only React 19 + TypeScript + Vite PWA. Model = src/lib/storage.ts + IndexedDB/localStorage keys; Controller = App.tsx/ConfigApp.tsx handlers + src/lib logic; View = JSX components + generated HTML artifacts. All nodes are 'factual' (verified by reading source at the stated commit) unless marked otherwise. No server, no HTTP API, no batch scheduler exists — those ontology sections record N/A explicitly with nearest equivalents.",
+      "verification": "factual"
+    },
+
+    { "@id": "store:indexeddb-kv", "@type": "DataStore", "name": "IndexedDB fast-logbook-pwa / store kv (v1)", "file": "src/lib/storage.ts", "description": "Canonical persistence. Plain string KV, no indexes.", "verification": "factual" },
+    { "@id": "store:localstorage", "@type": "DataStore", "name": "localStorage", "description": "Transient write buffer only (post-migration).", "verification": "factual" },
+
+    { "@id": "key:log", "@type": "DataEntity", "name": "log", "storedIn": "store:indexeddb-kv", "description": "Full raw log text; lines 'YYYY-MM-DD HH:MMCategory;Detail'; '^' category prefix = excluded from actual-time sum.", "verification": "factual" },
+    { "@id": "key:rounding_mins", "@type": "DataEntity", "name": "rounding_mins", "storedIn": "store:indexeddb-kv", "description": "Rounding unit 1/5/10/15/30/60.", "verification": "factual" },
+    { "@id": "key:date-roll-over-time", "@type": "DataEntity", "name": "date-roll-over-time", "storedIn": "store:indexeddb-kv", "description": "Logical-day boundary, default 05:00. Kebab-case key frozen for backward compatibility.", "verification": "factual" },
+    { "@id": "key:shortcut_1-9", "@type": "DataEntity", "name": "shortcut_1 … shortcut_9", "storedIn": "store:indexeddb-kv", "description": "Nine shortcut tag strings.", "verification": "factual" },
+    { "@id": "key:last_edited_date", "@type": "DataEntity", "name": "last_edited_date", "storedIn": "store:indexeddb-kv", "verification": "factual" },
+    { "@id": "key:migration_version", "@type": "DataEntity", "name": "migration_version", "storedIn": "store:indexeddb-kv", "verification": "factual" },
+    { "@id": "key:notice_date_selector", "@type": "DataEntity", "name": "notice_date_selector", "storedIn": "store:indexeddb-kv", "verification": "factual" },
+    { "@id": "key:log_buffer", "@type": "DataEntity", "name": "log_buffer / log_buffer_date", "storedIn": "store:localstorage", "description": "Unflushed active-day edits + their date.", "verification": "factual" },
+
+    {
+      "@id": "model:storage",
+      "@type": "Model",
+      "name": "storage.ts (IndexedDB KV wrapper)",
+      "file": "src/lib/storage.ts",
+      "manages": ["store:indexeddb-kv"],
+      "description": "getItem / setItem / removeItem / migrateFromLocalStorage. Only module touching IndexedDB.",
+      "usesWebApi": ["webapi:indexeddb"],
+      "verification": "factual"
+    },
+    {
+      "@id": "model:logformat",
+      "@type": "Model",
+      "name": "Log line format (implicit domain model)",
+      "description": "16-char datetime prefix + Category + ';' + Detail. Parsed by slice(0,16)/indexOf(';'). No class; the format contract IS the model.",
+      "storedIn": "key:log",
+      "verification": "factual"
+    },
+
+    {
+      "@id": "ctrl:App",
+      "@type": "Controller",
+      "name": "App.tsx (main-screen controller)",
+      "file": "src/App.tsx",
+      "renders": ["view:MainScreen"],
+      "listensTo": ["sys:broadcastchannel", "webapi:visibilitychange", "webapi:beforeinstallprompt"],
+      "verification": "factual"
+    },
+    { "@id": "fn:App.loadLogs", "@type": "Function", "partOf": "ctrl:App", "calls": ["fn:storage.getItem", "fn:App.getDateBoundaries"], "reads": ["key:log", "key:date-roll-over-time"], "description": "Filters full log to the selected logical day into the textarea.", "verification": "factual" },
+    { "@id": "fn:App.saveLogs", "@type": "Function", "partOf": "ctrl:App", "writes": ["key:log_buffer"], "description": "Debounced (300ms) textarea → localStorage buffer. QuotaExceededError alerted via i18n.", "verification": "factual" },
+    { "@id": "fn:App.flushBuffer", "@type": "Function", "partOf": "ctrl:App", "calls": ["fn:storage.getItem", "fn:storage.setItem", "fn:utils.trimNewLine"], "reads": ["key:log_buffer", "key:date-roll-over-time", "key:log"], "writes": ["key:log"], "notifies": ["sys:broadcastchannel"], "description": "Merge buffer into canonical log (replace day window, sort by 16-char prefix), then clear buffer and broadcast.", "verification": "factual" },
+    { "@id": "fn:App.appendLog", "@type": "Function", "partOf": "ctrl:App", "calls": ["fn:utils.trimNewLine", "fn:App.saveLogs"], "description": "Append one tag line to textarea and save.", "verification": "factual" },
+    { "@id": "fn:App.runMigrations", "@type": "Function", "partOf": "ctrl:App", "calls": ["fn:storage.migrateFromLocalStorage", "fn:storage.getItem", "fn:storage.setItem"], "reads": ["key:migration_version"], "writes": ["key:migration_version"], "description": "One-time (version-gated) localStorage→IndexedDB migration + legacy-key cleanup.", "verification": "factual" },
+    { "@id": "fn:App.getDateWithRollOver", "@type": "Function", "partOf": "ctrl:App", "description": "Now < roll-over time → previous calendar date.", "verification": "factual" },
+    { "@id": "fn:App.getDateBoundaries", "@type": "Function", "partOf": "ctrl:App", "description": "[selectedDate+rollOver, +24h) window. Module-level pure function.", "verification": "factual" },
+    { "@id": "fn:App.handleDateChange", "@type": "Function", "partOf": "ctrl:App", "calls": ["fn:storage.setItem", "fn:App.flushBuffer", "fn:App.loadLogs"], "writes": ["key:last_edited_date"], "verification": "factual" },
+    { "@id": "fn:App.processInput", "@type": "Function", "partOf": "ctrl:App", "calls": ["fn:utils.appendTime", "fn:App.appendLog"], "description": "Free-text slot 0 → timestamped line. Shortcut buttons/digit keys call the same pair.", "verification": "factual" },
+    { "@id": "fn:App.handleViewLog", "@type": "Function", "partOf": "ctrl:App", "calls": ["fn:storage.getItem", "fn:storage.setItem", "fn:download.generateFormattedLog"], "reads": ["key:rounding_mins"], "renders": ["view:LogViewerWindow"], "description": "window.open BEFORE any await (popup-blocker workaround), then document.write of escaped HTML.", "verification": "factual" },
+    { "@id": "fn:App.handleDownloadLog", "@type": "Function", "partOf": "ctrl:App", "calls": ["fn:download.downloadLog"], "verification": "factual" },
+    { "@id": "fn:App.handleConfirmDelete", "@type": "Function", "partOf": "ctrl:App", "calls": ["fn:App.saveLogs", "fn:App.flushBuffer"], "writes": ["key:log"], "description": "Clears textarea then flushes → removes the active day's lines from canonical log.", "verification": "factual" },
+    { "@id": "fn:App.handleInstallPWA", "@type": "Function", "partOf": "ctrl:App", "usesWebApi": ["webapi:beforeinstallprompt"], "verification": "factual" },
+
+    {
+      "@id": "ctrl:ConfigApp",
+      "@type": "Controller",
+      "name": "ConfigApp.tsx (settings controller)",
+      "file": "src/ConfigApp.tsx",
+      "renders": ["view:ConfigScreen"],
+      "listensTo": ["sys:broadcastchannel"],
+      "verification": "factual"
+    },
+    { "@id": "fn:Config.handleShortcutChange", "@type": "Function", "partOf": "ctrl:ConfigApp", "calls": ["fn:storage.setItem"], "writes": ["key:shortcut_1-9"], "notifies": ["sys:broadcastchannel"], "verification": "factual" },
+    { "@id": "fn:Config.handleRoundingChange", "@type": "Function", "partOf": "ctrl:ConfigApp", "calls": ["fn:storage.setItem", "fn:utils.getRoundingUnit"], "writes": ["key:rounding_mins"], "notifies": ["sys:broadcastchannel"], "verification": "factual" },
+    { "@id": "fn:Config.handleRollOverChange", "@type": "Function", "partOf": "ctrl:ConfigApp", "calls": ["fn:storage.setItem"], "writes": ["key:date-roll-over-time"], "notifies": ["sys:broadcastchannel"], "verification": "factual" },
+
+    {
+      "@id": "ctrl:download",
+      "@type": "Controller",
+      "name": "download.ts (export/summary logic)",
+      "file": "src/lib/download.ts",
+      "description": "Headless controller: parsing, summarizing, artifact generation, download trigger.",
+      "verification": "factual"
+    },
+    { "@id": "fn:download.parse", "@type": "Function", "partOf": "ctrl:download", "calls": ["fn:utils.fetchHourFromTime", "fn:utils.fetchMinFromTime"], "description": "Log text → {category: {time, detail, round}}; consecutive-timestamp diffs with midnight wrap; details deduped.", "verification": "factual" },
+    { "@id": "fn:download.toHtml", "@type": "Function", "partOf": "ctrl:download", "calls": ["fn:download.parse", "fn:utils.escapeHtml"], "description": "Bootstrap table + actual/total sums ('^' excluded from actual).", "verification": "factual" },
+    { "@id": "fn:download.toMarkdown", "@type": "Function", "partOf": "ctrl:download", "calls": ["fn:download.parse"], "verification": "factual" },
+    { "@id": "fn:download.generateFormattedLog", "@type": "Function", "partOf": "ctrl:download", "calls": ["fn:download.toHtml", "fn:download.toMarkdown", "fn:utils.escapeHtml"], "renders": ["view:ExportedHtmlArtifact"], "description": "Standalone HTML page (3 sections + clipboard script; CDN Bootstrap/FontAwesome with SRI).", "verification": "factual" },
+    { "@id": "fn:download.download", "@type": "Function", "partOf": "ctrl:download", "usesWebApi": ["webapi:blob"], "description": "Blob URL + module-level state + 'startDownload' CustomEvent → programmatic <a download> click.", "verification": "factual" },
+    { "@id": "fn:download.downloadLog", "@type": "Function", "partOf": "ctrl:download", "calls": ["fn:storage.getItem", "fn:download.generateFormattedLog", "fn:download.download"], "reads": ["key:log", "key:rounding_mins"], "verification": "factual" },
+
+    { "@id": "fn:storage.getItem", "@type": "Function", "partOf": "model:storage", "reads": ["store:indexeddb-kv"], "verification": "factual" },
+    { "@id": "fn:storage.setItem", "@type": "Function", "partOf": "model:storage", "writes": ["store:indexeddb-kv"], "verification": "factual" },
+    { "@id": "fn:storage.migrateFromLocalStorage", "@type": "Function", "partOf": "model:storage", "reads": ["store:localstorage"], "writes": ["store:indexeddb-kv"], "verification": "factual" },
+    { "@id": "fn:utils.appendTime", "@type": "Function", "file": "src/lib/utils.ts", "calls": ["fn:utils.fetchHourFromTime", "fn:utils.fetchMinFromTime"], "verification": "factual" },
+    { "@id": "fn:utils.fetchHourFromTime", "@type": "Function", "file": "src/lib/utils.ts", "description": "String-slice extraction (Safari Invalid Date avoidance).", "verification": "factual" },
+    { "@id": "fn:utils.fetchMinFromTime", "@type": "Function", "file": "src/lib/utils.ts", "verification": "factual" },
+    { "@id": "fn:utils.getRoundingUnit", "@type": "Function", "file": "src/lib/utils.ts", "description": "Whitelist validator → 1/5/10/15/30/60, default 1.", "verification": "factual" },
+    { "@id": "fn:utils.trimNewLine", "@type": "Function", "file": "src/lib/utils.ts", "verification": "factual" },
+    { "@id": "fn:utils.escapeHtml", "@type": "Function", "file": "src/lib/utils.ts", "description": "5-char escaper; sole XSS defense on user content in generated HTML.", "verification": "factual" },
+    { "@id": "fn:utils.autoSetTheme", "@type": "Function", "file": "src/lib/utils.ts", "description": "Called by both controllers at mount.", "verification": "factual" },
+    { "@id": "fn:utils.installPWA", "@type": "Function", "file": "src/lib/utils.ts", "description": "DEAD CODE — no importers; App.tsx re-implements the flow.", "affects": ["bug:dead-code"], "verification": "factual" },
+
+    { "@id": "view:MainScreen", "@type": "View", "name": "Main screen (#/)", "renderedBy": "ctrl:App", "description": "Navbar + save dot, date picker, 9 shortcut buttons + free-text slot 0, textarea, Drawer menu, 3 modals.", "verification": "factual" },
+    { "@id": "view:ConfigScreen", "@type": "View", "name": "Config screen (#/config)", "renderedBy": "ctrl:ConfigApp", "verification": "factual" },
+    { "@id": "view:Drawer", "@type": "View", "name": "Drawer.tsx", "file": "src/components/Drawer.tsx", "description": "Portal offcanvas; Escape/backdrop close. Shared by both screens.", "verification": "factual" },
+    { "@id": "view:Modal", "@type": "View", "name": "Modal.tsx", "file": "src/components/Modal.tsx", "description": "Portal modal; optional onClose = non-dismissible variant (date-notice modal).", "verification": "factual" },
+    { "@id": "view:HelpModal", "@type": "View", "name": "HelpModal (private in App.tsx)", "description": "3 tabs (main/config/changelog); static-translation dangerouslySetInnerHTML.", "verification": "factual" },
+    { "@id": "view:LogViewerWindow", "@type": "View", "name": "Log viewer window (_log_viewer)", "description": "document.write of generateFormattedLog output into a named window.", "verification": "factual" },
+    { "@id": "view:ExportedHtmlArtifact", "@type": "View", "name": "Exported HTML file", "description": "Same generated page saved as a file; loads CDN assets with SRI when opened.", "verification": "factual" },
+
+    { "@id": "sys:broadcastchannel", "@type": "SystemFunction", "name": "BroadcastChannel 'fast-logbook-sync'", "description": "Cross-tab {key, value} sync. ConfigApp broadcasts setting writes; App broadcasts log flushes; both listen. This is the ONLY controller-to-controller relationship (no direct imports between App and ConfigApp).", "verification": "factual" },
+    { "@id": "sys:serviceworker", "@type": "SystemFunction", "name": "Workbox service worker (sw.js)", "description": "Generated by vite-plugin-pwa (generateSW); precaches all static assets; registered manually in App.tsx; reload on controllerchange only for updates.", "verification": "factual" },
+    { "@id": "sys:pwa-manifest", "@type": "SystemFunction", "name": "manifest.json", "description": "Generated from vite.config.js; both controllers fetch it at runtime for the version display.", "verification": "factual" },
+    { "@id": "sys:speculationrules", "@type": "SystemFunction", "name": "Speculation Rules (index.html)", "description": "prerender/prefetch, Chromium-only progressive enhancement.", "verification": "factual" },
+
+    {
+      "@id": "api:none",
+      "@type": "ApiOntology",
+      "name": "HTTP/server API: none",
+      "description": "Client-only PWA — no REST/GraphQL endpoints exist. Runtime network surface: same-origin manifest.json fetch; CDN asset loads happen only when the user opens the exported artifact. Browser Web APIs used instead: IndexedDB, localStorage, BroadcastChannel, Blob/Object URL, beforeinstallprompt, Service Worker, Clipboard (in generated page), matchMedia.",
+      "verification": "factual"
+    },
+    { "@id": "webapi:indexeddb", "@type": "WebApi", "name": "IndexedDB (via idb)", "verification": "factual" },
+    { "@id": "webapi:blob", "@type": "WebApi", "name": "Blob / URL.createObjectURL", "verification": "factual" },
+    { "@id": "webapi:beforeinstallprompt", "@type": "WebApi", "name": "beforeinstallprompt / appinstalled", "description": "Chromium-only; no iOS fallback (known limitation).", "verification": "factual" },
+    { "@id": "webapi:visibilitychange", "@type": "WebApi", "name": "document.visibilitychange", "description": "hidden → saveLogs + flushBuffer.", "verification": "factual" },
+
+    { "@id": "uc:record-entry", "@type": "UserFunction", "name": "Record a timestamped entry", "handledBy": "ctrl:App", "realizes": ["fn:App.processInput", "fn:App.appendLog"], "description": "Digit keys 1-9 / shortcut buttons / free-text slot 0 (key 0 focuses it).", "verification": "factual" },
+    { "@id": "uc:edit-log", "@type": "UserFunction", "name": "Edit the day's log in the textarea", "handledBy": "ctrl:App", "realizes": ["fn:App.saveLogs", "fn:App.flushBuffer"], "verification": "factual" },
+    { "@id": "uc:switch-day", "@type": "UserFunction", "name": "Switch target day (roll-over aware)", "handledBy": "ctrl:App", "realizes": ["fn:App.handleDateChange"], "verification": "factual" },
+    { "@id": "uc:view-summary", "@type": "UserFunction", "name": "View formatted summary", "handledBy": "ctrl:App", "realizes": ["fn:App.handleViewLog"], "verification": "factual" },
+    { "@id": "uc:export", "@type": "UserFunction", "name": "Download formatted log (HTML+plaintext+MD)", "handledBy": "ctrl:App", "realizes": ["fn:App.handleDownloadLog"], "verification": "factual" },
+    { "@id": "uc:delete-day", "@type": "UserFunction", "name": "Delete active day's log (confirm modal)", "handledBy": "ctrl:App", "realizes": ["fn:App.handleConfirmDelete"], "verification": "factual" },
+    { "@id": "uc:configure", "@type": "UserFunction", "name": "Configure rounding / shortcuts / roll-over", "handledBy": "ctrl:ConfigApp", "realizes": ["fn:Config.handleRoundingChange", "fn:Config.handleShortcutChange", "fn:Config.handleRollOverChange"], "verification": "factual" },
+    { "@id": "uc:install", "@type": "UserFunction", "name": "Install as PWA", "handledBy": "ctrl:App", "realizes": ["fn:App.handleInstallPWA"], "verification": "factual" },
+    { "@id": "uc:help", "@type": "UserFunction", "name": "Read help / changelog", "handledBy": "ctrl:App", "realizes": [], "renderedBy": "view:HelpModal", "verification": "factual" },
+
+    {
+      "@id": "batch:none",
+      "@type": "BatchOntology",
+      "name": "Batch processing: none",
+      "description": "No cron/scheduler/worker jobs exist. Nearest equivalents (event-driven, not scheduled): fn:App.runMigrations (one-time, version-gated at startup), fn:App.flushBuffer (deferred merge on visibility/date/load/broadcast), 300ms debounced saveLogs, and Workbox precache refresh on new SW activation.",
+      "realizes": ["fn:App.runMigrations", "fn:App.flushBuffer"],
+      "verification": "factual"
+    },
+
+    { "@id": "bug:version-typo", "@type": "KnownInconsistency", "name": "package.json version '26.06:20' (colon typo) vs manifest '26.06.20'", "verification": "factual" },
+    { "@id": "bug:stale-e2e-url", "@type": "KnownInconsistency", "name": "tests/e2e/screenshot.spec.ts targets /config.html; config screen is #/config", "description": "Test-vs-implementation discrepancy: the test encodes the pre-rewrite contract. The 'config' screenshot does not capture the config screen.", "affects": ["view:ConfigScreen"], "verification": "factual" },
+    { "@id": "bug:stale-claude-docs", "@type": "KnownInconsistency", "name": ".claude/CLAUDE.md + .claude/rules/{code-style,security}.md describe the deleted vanilla-JS codebase", "verification": "factual" },
+    { "@id": "bug:dead-code", "@type": "KnownInconsistency", "name": "Unused: npm dep 'global'; fn:utils.installPWA", "verification": "factual" },
+    { "@id": "bug:ci-pr-reporter", "@type": "KnownInconsistency", "name": "CI workflows lack pull_request trigger while lint.yml uses reviewdog github-pr-review reporter", "description": "Likely no-op on plain pushes. Speculative — Actions logs not inspected.", "verification": "speculative" },
+
+    {
+      "@id": "meta:provenance",
+      "@type": "Provenance",
+      "name": "Generation notes",
+      "description": "Generated by /code-graph-jsonld. Reference generators (FuelPHP/Laravel JS tools) are inapplicable to this non-PHP, non-MVC-framework codebase; the graph was derived by direct source reading of all files under src/, index.html, vite.config.js, and tests/e2e/. Cross-checked against .claude/analyzed/*.md (same commit). The commit hash is recorded as the final property below instead of a trailing text line, to keep this file valid JSON.",
+      "verification": "factual"
+    }
+  ],
+  "commitHash": "d363d07ab70bdbae818bada7838fe13166f4ef08"
+}
