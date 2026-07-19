@@ -79,7 +79,19 @@ export default function ConfigApp() {
     };
   }, []);
 
-  const handleShortcutChange = async (idx: number, value: string) => {
+  const handleShortcutChange = async (
+    idx: number,
+    value: string,
+    isComposing: boolean,
+  ) => {
+    setShortcuts((prev) => {
+      const next = [...prev];
+      next[idx] = value;
+      return next;
+    });
+
+    if (isComposing) return;
+
     const key = `shortcut_${idx + 1}`;
     try {
       await setItem(key, value.trim());
@@ -89,11 +101,6 @@ export default function ConfigApp() {
         alert(t('storage_quota_exceeded'));
       }
     }
-    setShortcuts((prev) => {
-      const next = [...prev];
-      next[idx] = value;
-      return next;
-    });
   };
 
   const handleRoundingChange = async (value: string) => {
@@ -181,8 +188,14 @@ export default function ConfigApp() {
                 className="form-control"
                 placeholder={t(`shortcut_${idx + 1}`)}
                 value={val}
-                onChange={(e) => handleShortcutChange(idx, e.target.value)}
-                onBlur={(e) => handleShortcutChange(idx, e.target.value)}
+                onChange={(e) =>
+                  handleShortcutChange(
+                    idx,
+                    e.target.value,
+                    (e.nativeEvent as InputEvent).isComposing,
+                  )
+                }
+                onBlur={(e) => handleShortcutChange(idx, e.target.value, false)}
               />
             </div>
           ))}
