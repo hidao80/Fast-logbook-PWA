@@ -78,7 +78,7 @@ Session history → [`.claude/histories/YYYYMM.md`](.claude/histories/)
 
 ## Analyzed Documentation Index
 
-Codebase analysis snapshots under [`.claude/analyzed/`](analyzed/) (generated at commit `d363d07`; note that this analysis reflects the current React + TypeScript + Vite codebase — where it conflicts with the Architecture section above, the analyzed docs are newer):
+Codebase analysis snapshots under [`.claude/analyzed/`](analyzed/) (generated at commit `d363d07`, re-verified current as of `3984370`; note that this analysis reflects the current React + TypeScript + Vite codebase — where it conflicts with the Architecture section above, the analyzed docs are newer). Only [infrastructure](analyzed/infrastructure.md) (CI Node/pnpm version bump) and [notes](analyzed/notes.md) (IME fix extended to `ConfigApp.tsx`) changed since `d363d07`; the remaining 16 files are unchanged — no other source files were touched in the intervening commits:
 
 1. [dependencies](analyzed/dependencies.md) — packages, versions, licenses, audit status
 2. [infrastructure](analyzed/infrastructure.md) — CI/CD, Netlify, Docker/Nginx
@@ -99,4 +99,4 @@ Codebase analysis snapshots under [`.claude/analyzed/`](analyzed/) (generated at
 17. [graphrag.jsonld](analyzed/graphrag.jsonld) — JSON-LD call graph & ontology (models/controllers/views, data keys, user functions, known inconsistencies) for GraphRAG
 18. [ADR](analyzed/ADR.md) — git-log-derived decision timeline (2024-07 → 2026-06), supplemental ADR-101…108 for the pre-2026 era, and verification of docs/ADR.md
 
-<!-- commit-hash: d363d07ab70bdbae818bada7838fe13166f4ef08 -->
+<!-- commit-hash: 39843709093825c8ffe02e61d8b0d66a45783f68 -->

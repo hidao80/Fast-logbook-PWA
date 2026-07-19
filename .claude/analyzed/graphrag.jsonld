@@ -93,7 +93,7 @@
       "listensTo": ["sys:broadcastchannel"],
       "verification": "factual"
     },
-    { "@id": "fn:Config.handleShortcutChange", "@type": "Function", "partOf": "ctrl:ConfigApp", "calls": ["fn:storage.setItem"], "writes": ["key:shortcut_1-9"], "notifies": ["sys:broadcastchannel"], "verification": "factual" },
+    { "@id": "fn:Config.handleShortcutChange", "@type": "Function", "partOf": "ctrl:ConfigApp", "calls": ["fn:storage.setItem"], "writes": ["key:shortcut_1-9"], "notifies": ["sys:broadcastchannel"], "description": "IME-guarded (added 2026-07-19, commits 3c1d5dd/3984370): takes isComposing from (e.nativeEvent as InputEvent).isComposing per keystroke and skips the persist call while a CJK conversion is in progress. Local textarea state still updates every keystroke regardless.", "verification": "factual" },
     { "@id": "fn:Config.handleRoundingChange", "@type": "Function", "partOf": "ctrl:ConfigApp", "calls": ["fn:storage.setItem", "fn:utils.getRoundingUnit"], "writes": ["key:rounding_mins"], "notifies": ["sys:broadcastchannel"], "verification": "factual" },
     { "@id": "fn:Config.handleRollOverChange", "@type": "Function", "partOf": "ctrl:ConfigApp", "calls": ["fn:storage.setItem"], "writes": ["key:date-roll-over-time"], "notifies": ["sys:broadcastchannel"], "verification": "factual" },
 
@@ -182,5 +182,5 @@
       "verification": "factual"
     }
   ],
-  "commitHash": "d363d07ab70bdbae818bada7838fe13166f4ef08"
+  "commitHash": "39843709093825c8ffe02e61d8b0d66a45783f68"
 }

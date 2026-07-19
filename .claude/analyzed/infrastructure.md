@@ -2,7 +2,7 @@
 name: analyzed-infrastructure
 description: CI/CD pipelines, containerization, and hosting configuration.
 type: analysis
-commit-hash: d363d07ab70bdbae818bada7838fe13166f4ef08
+commit-hash: 39843709093825c8ffe02e61d8b0d66a45783f68
 ---
 
 # Infrastructure
@@ -20,7 +20,7 @@ Both workflows trigger on push to `main` / `develop`, run on `ubuntu-slim`, and 
 | Workflow | File | Steps |
 | --- | --- | --- |
 | Lint | [.github/workflows/lint.yml](../../.github/workflows/lint.yml) | Biome via `mongolyy/reviewdog-action-biome` (reporter: `github-pr-review`) |
-| Audit | [.github/workflows/audit.yml](../../.github/workflows/audit.yml) | pnpm 10.33.2 + Node 20 → `pnpm install --frozen-lockfile` → `pnpm audit --audit-level=high` |
+| Audit | [.github/workflows/audit.yml](../../.github/workflows/audit.yml) | pnpm (unpinned, via `pnpm/action-setup@v4`) + Node 24 → `pnpm install --frozen-lockfile` → `pnpm audit --audit-level=high` |
 
 ```mermaid
 flowchart LR
@@ -49,4 +49,4 @@ flowchart LR
 
 See [todo.md](todo.md): no test workflow, no build verification in CI, no release automation.
 
-d363d07ab70bdbae818bada7838fe13166f4ef08
+39843709093825c8ffe02e61d8b0d66a45783f68
