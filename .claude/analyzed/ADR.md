@@ -2,7 +2,7 @@
 name: analyzed-ADR
 description: Git-log-derived architecture decision timeline, supplemental ADRs for the pre-2026 era, and verification of docs/ADR.md against actual history.
 type: analysis
-commit-hash: d8eeb5f36f05c79f50b50acd7402d794fe5760d9
+commit-hash: 39843709093825c8ffe02e61d8b0d66a45783f68
 ---
 
 # Architecture Decision Records (git-log reconstruction)
@@ -15,7 +15,7 @@ commit-hash: d8eeb5f36f05c79f50b50acd7402d794fe5760d9
 
 ## Relation to docs/ADR.md
 
-[docs/ADR.md](../../docs/ADR.md) (ADR-001 … ADR-018) is the **canonical** decision record and covers 2026-02-19 onward, but not yet the 2026-07-05 commits below. This file is derived from the complete git history (192 commits reachable from `develop` including merges, 2024-07-06 → 2026-07-05, all hashes verified — Factual) and adds: (1) a one-page timeline, (2) supplemental ADRs numbered **ADR-101+** for eras docs/ADR.md does not cover (numbered separately to avoid collision), (3) discrepancy findings. Where the two disagree on dates, **this file follows commit dates**.
+[docs/ADR.md](../../docs/ADR.md) (ADR-001 … ADR-018) is the **canonical** decision record and covers 2026-02-19 onward, but not yet the 2026-07-05/2026-07-19 commits below. This file is derived from the complete git history (195 commits reachable from `develop` including merges, 2024-07-06 → 2026-07-19, all hashes verified — Factual) and adds: (1) a one-page timeline, (2) supplemental ADRs numbered **ADR-101+** for eras docs/ADR.md does not cover (numbered separately to avoid collision), (3) discrepancy findings. Where the two disagree on dates, **this file follows commit dates**.
 
 ## Decision Timeline
 
@@ -39,6 +39,7 @@ commit-hash: d8eeb5f36f05c79f50b50acd7402d794fe5760d9
 | 2026-06-13 | React + TypeScript + Vite full rewrite; Workbox SW; i18next; Netlify config; manifest into vite.config | `738e60b`…`2afbf5b` | docs ADR-012…017 |
 | 2026-06-20 | pnpm unification; caveman-code dependency removed; TypeScript consolidation of lib modules; `.actrc` | `5b8968c`, `67b881f`, `d363d07` | docs ADR-018 |
 | 2026-07-05 | GitHub Pages landing page (`docs/index.html`) added; CI hardening: `actions/checkout@v6`, Node 24 for audit workflow | `b7c61f6`, `2e39c80`, `7ee4625`, `d8eeb5f` | ADR-109 (not yet in docs/ADR.md) |
+| 2026-07-19 | IME `isComposing` guard extended from `App.tsx` to `ConfigApp.tsx` shortcut inputs | `3c1d5dd`, `3984370` | ADR-110 (not yet in docs/ADR.md) |
 
 ## Supplemental ADRs (pre-2026-02 era)
 
@@ -100,6 +101,12 @@ All Factual (reconstructed from commit messages; rationale beyond messages is in
 - Decision: Publish a static marketing/landing page under `docs/` for GitHub Pages, separate from the app itself (`docs/` is not part of the Vite build); bump CI action/runtime pins opportunistically in the same session.
 - Consequence: `docs/` now serves two purposes — Pages source and design-doc storage (`docs/design.md`, `docs/spec/`). No collision today since `index.html` is new, but future `docs/*.md` additions should confirm they don't get swept into the Pages site unintentionally.
 
+### ADR-110: IME composing-guard extended to ConfigApp shortcut inputs
+- Status: Accepted
+- Date: 2026-07-19 — Commits: `3c1d5dd` (guard `handleShortcutChange` on `isComposing`, defer persistence), `3984370` (replace a shared composition ref with a native `(e.nativeEvent as InputEvent).isComposing` check)
+- Decision: Apply the ADR-105 principle (never persist a value mid-IME-conversion) to the config screen's 9 shortcut text inputs, which had no such guard; drop a shared mutable ref in favor of reading `isComposing` directly off the native input event per keystroke.
+- Consequence: Second known call site for the IME-guard pattern, alongside `App.tsx`'s Enter-key handling (ADR-105). Confirms the "do not simplify the IME check" guidance in [notes.md](notes.md) generalizes beyond the original textarea — any future text input taking IME (Japanese/Chinese/Korean) input should be checked for the same gap.
+
 ## Verification: docs/ADR.md vs. git log
 
 Per the source-of-truth rule, discrepancies found when checking every commit reference in docs/ADR.md against the actual log:
@@ -110,11 +117,13 @@ Per the source-of-truth rule, discrepancies found when checking every commit ref
 4. **Orphan commits** `871e8ae` / `cd4c079` (docs ADR.md addendum): `871e8ae` re-verified as still reachable by no branch. (Factual)
 5. All other commit hashes cited in docs ADR-001…018 resolve and match their described content. (Factual)
 6. **docs/ADR.md has no entry for the 2026-07-05 commits** (`b7c61f6`, `2e39c80`, `7ee4625`, `d8eeb5f` — landing page + CI hardening, see ADR-109 above). (Factual)
+7. **docs/ADR.md has no entry for the 2026-07-19 commits** (`3c1d5dd`, `3984370` — ConfigApp IME guard, see ADR-110 above). (Factual)
 
 Correction options for docs/ADR.md (report only — not applied):
 - Fix the two date errors in docs ADR-001/002/005. ⭐️⭐️⭐️⭐️⭐️
 - Note the `8b59a81`-is-on-main caveat in docs ADR-007. ⭐️⭐️⭐️
 - Back-fill the 2024–2025 era into docs/ADR.md from ADR-101…108 above. ⭐️⭐️⭐️
 - Add an ADR-019 for the 2026-07-05 landing-page/CI-hardening commits (ADR-109 above). ⭐️⭐️⭐️
+- Add an ADR-020 for the 2026-07-19 ConfigApp IME-guard commits (ADR-110 above). ⭐️⭐️
 
-d8eeb5f36f05c79f50b50acd7402d794fe5760d9
+39843709093825c8ffe02e61d8b0d66a45783f68
