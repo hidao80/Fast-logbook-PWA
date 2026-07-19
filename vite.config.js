@@ -14,7 +14,7 @@ export default defineConfig({
       manifest: {
         name: 'Fast logbook PWA',
         short_name: 'Fast logbook',
-        version: '26.06.20',
+        version: '26.07.19',
         description: 'Time-stamped work notes PWA',
         start_url: '/index.html',
         display: 'standalone',
