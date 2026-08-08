@@ -1,7 +1,7 @@
 # Fast Logbook PWA
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![PWA](https://img.shields.io/badge/PWA-Yes-4BC51D.svg)
+![PWA](https://img.shields.io/badge/PWA-ready-4BC51D.svg)
 ![Lint](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/lint.yml/badge.svg)
 ![Audit](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/audit.yml/badge.svg)
 [![Security: Takumi Guard](https://img.shields.io/badge/Security-Takumi%20Guard-blue)](https://github.com/hidao80/Fast-logbook-PWA/actions/workflows/npm-scan.yml)
