@@ -2,7 +2,7 @@
 name: analyzed-ADR
 description: Git-log-derived architecture decision timeline, supplemental ADRs for the pre-2026 era, and verification of docs/ADR.md against actual history.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Architecture Decision Records (git-log reconstruction)
@@ -160,4 +160,4 @@ Correction options for docs/ADR.md (report only — not applied):
 - Add an ADR-020 for the 2026-07-19 ConfigApp IME-guard commits (ADR-110 above). ⭐️⭐️
 - Add an ADR-021 for the 2026-08-13 `AGENTS.md` consolidation + pnpm security overrides (ADR-112/113 above). ⭐️⭐️⭐️
 
-ceff98ab997a60d35e564821f2e6bf7b6c284128
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

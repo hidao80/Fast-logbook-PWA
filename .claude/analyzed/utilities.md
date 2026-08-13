@@ -2,7 +2,7 @@
 name: analyzed-utilities
 description: Inventory of exported helper functions/classes in src/lib/ (storage.ts, utils.ts, download.ts) and src/i18n/index.ts.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Utilities Inventory (src/lib/, src/i18n/)
@@ -192,4 +192,4 @@ Format: `YYYY-MM-DD HH:MM<Category>;<Detail>`
 - `^` prefix: a category whose first character is `'^'` marks that category as excluded from the "actual work time" (`sum`) aggregate in both `toHtml()` and `toMarkdown()`, but is still included in the "total time" (`total`) aggregate. **This exclusion is applied only by the two rendering functions, not by `parse()` itself** — `parse()`'s returned `Record` includes `^`-prefixed categories with fully computed `time`/`detail`/`round` values, indistinguishable in structure from any other category.
 - Duration attribution model: the time between consecutive log lines is attributed to the *earlier* line's category (i.e., each line marks "I started category X now," and the duration of X runs until the next line is logged). The final line in the log never accrues duration on its own, since there is no subsequent line to diff against.
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

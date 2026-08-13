@@ -2,7 +2,7 @@
 name: analyzed-security
 description: OWASP Top 10-style security audit of the client-only Fast-Logbook PWA (React 19 + TypeScript + IndexedDB), covering XSS injection points, dependency vulnerabilities, and missing security headers.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Security Audit — Fast-Logbook PWA
@@ -95,4 +95,4 @@ CI also runs `pnpm audit --audit-level=high` (`audit.yml`) and `flatt-security/s
 
 Did not find any error boundary or catch block that serializes raw exception objects (including stack traces) into UI-visible output within `src/App.tsx` or `src/lib/*.ts` beyond what was already reviewed above; a full line-by-line audit of every try/catch block was not performed as part of this pass — **flagged as not exhaustively verified**, recommend a dedicated follow-up if deeper coverage is desired.
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

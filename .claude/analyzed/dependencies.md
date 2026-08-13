@@ -2,7 +2,7 @@
 name: analyzed-dependencies
 description: Inventory and health check of Fast-logbook-PWA's npm dependencies (React 19 + TypeScript + Vite stack), confirmed directly against package.json, pnpm-workspace.yaml, .npmrc, and live pnpm audit/outdated output.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Dependencies
@@ -65,4 +65,4 @@ This confirms the prior pass's claim: `typescript` has a major version bump avai
 
 All other version numbers above are taken verbatim from `package.json` and are current as of this analysis; CI (`.github/workflows/audit.yml`) enforces `pnpm audit --audit-level=high` on presumably every push/PR (workflow file itself not re-read in this pass — unconfirmed trigger conditions).
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

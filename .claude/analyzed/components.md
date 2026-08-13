@@ -2,7 +2,7 @@
 name: analyzed-components
 description: Structural overview of the React 19.2 + TypeScript component tree, dependency direction between App/ConfigApp, components/, and lib/, and a note on App.tsx's size.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Components
@@ -83,4 +83,4 @@ The actual shape is a shallow DAG, not a flat independent set: `storage.ts` and 
 
 **Recommendation:** Option 2 (custom-hook extraction) first, since state/effects are the more mechanical and lower-risk win; consider option 3 afterward if the JSX portion remains large. This assessment is based on line count and import surface only — a line-by-line read of `App.tsx`'s internals (its ~973 lines) was not performed as part of this pass and would be needed to size the effort precisely.
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

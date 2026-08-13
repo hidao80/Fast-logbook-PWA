@@ -2,7 +2,7 @@
 name: analyzed-configurations
 description: Summary of build, lint, test, PWA, and deployment configuration files for the React/TypeScript/Vite version of Fast-logbook-PWA.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Configurations
@@ -46,13 +46,13 @@ No static `manifest.json` exists in the repo — it is generated at build time f
 - **Timezone**: Docker image sets `TZ=Asia/Tokyo` explicitly; no equivalent found for Netlify (platform default applies, effectively environment-dependent).
 - **Vite base path**: not overridden in `vite.config.js` (no `base` option set), so it defaults to `/` in both dev and prod builds — consistent with `netlify.toml`'s root-relative redirect and the PWA manifest's `scope: '/'`.
 
-## Known discrepancy (not a config bug — a working-tree state issue)
+## Resolved discrepancy (previously: working-tree state issue)
 
-Root `index.html` was deleted in commit `ceff98a` (this HEAD commit), but the current working tree has it back as an **untracked** file, per `git status`. This means `pnpm run build` currently succeeds locally against the working tree, even though the committed tree at HEAD lacks `index.html` (which Vite requires as its default build entry point). This is a git-tracking state fact, not a flaw in any config file reviewed here; a full write-up belongs in `known_bugs.md`.
+Root `index.html` was deleted in commit `ceff98a` and had, at that time, only existed back in the working tree as an **untracked** file. This is now resolved: commit `e021877` ("feat: add initial HTML structure and metadata for Fast Logbook PWA") committed `index.html` (63 lines, root) properly to the repo, along with an updated `docs/index.html` (31 lines). `pnpm run build` has been re-verified to succeed cleanly against the committed tree (Vite v8.2.1, `dist/` output generated including `sw.js`/workbox chunk). The root `index.html` is confirmed to be a valid Vite entry point: it contains `<div id="root"></div>` and `<script type="module" src="/src/main.tsx"></script>`, plus OGP/Twitter meta tags, a JSON-LD `WebApplication` schema block, and speculation-rules for prerender/prefetch.
 
 ## Speculative observations
 
 - The dual Netlify + Docker/nginx deployment setup may be legacy/experimental duplication rather than an intentional multi-target strategy — Unconfirmed without maintainer input. Recommend consolidating to one primary deployment path. Rating: ⭐️3 (worth asking, not urgent).
 - `Dockerfile`'s fallback branch that copies the entire build context when `dist/` is absent looks defensive but would silently serve `node_modules` and source files if the build step failed rather than erroring loudly. Recommend making the build step fail hard instead of guarding downstream. Rating: ⭐️3.
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

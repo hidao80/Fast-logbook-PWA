@@ -2,7 +2,7 @@
 name: analyzed-known_bugs
 description: Known bugs, architectural/design issues, compatibility issues, and analysis limitations for Fast-logbook-PWA
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Known Bugs & Design Issues
@@ -12,32 +12,21 @@ commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
 - [Compatibility issues](#compatibility-issues)
 - [Analysis limitations](#analysis-limitations)
 
-All findings below were independently re-verified against commit `ceff98ab997a60d35e564821f2e6bf7b6c284128` (working tree as checked out, `develop` branch) by running `git`, `pnpm build`, and reading source directly. No source files were modified as part of this analysis.
+All findings below were independently re-verified against commit `e021877bb892db6cc019f4e0520449119de3c079` (`develop` branch) by running `git`, `pnpm build`, and reading source directly. No source files were modified as part of this analysis.
 
 ## Architectural / design issues
 
-### 1. Committed HEAD has no valid application entry point (root `index.html` deleted, only restored as an untracked file)
+### 1. ~~Committed HEAD has no valid application entry point~~ — RESOLVED as of commit `e021877`
 
-**Severity: Critical** — **Recommendation: ⭐️⭐️⭐️⭐️⭐️ (commit the restored file / fix the build config immediately)**
+**Status: Fixed** — **Severity when open: Critical**
 
-This is precise, not a blanket "the build is broken" claim — the situation has two distinct layers:
+This was previously documented as a Critical bug: root `index.html` had been deleted at commit `ceff98a` with no replacement committed, so a clean `git clone` + `pnpm install && pnpm run build` failed with `[UNRESOLVED_ENTRY] Cannot resolve entry module index.html`. At the time, only an untracked, uncommitted `index.html` in the working tree masked the failure locally.
 
-- **Committed history is broken.** `git show HEAD --stat -- index.html` shows `index.html` was deleted in commit `ceff98a` ("chore: add pnpm workspace overrides..." / "feat: wrap navbar in a form element..."), removing 34 lines with no replacement added in the same commit.
-- **Verified via a real clean clone.** Cloning the repository fresh and checking out `ceff98a` (`git clone . <tmp>` then `git checkout ceff98a`) confirms `index.html` does not exist at that commit. Running `pnpm install && pnpm run build` in that clean checkout fails with:
-  ```
-  [plugin vite-plugin-pwa:build]
-  Error: Build failed with 1 error:
-  [UNRESOLVED_ENTRY] Cannot resolve entry module index.html.
-  ```
-  This is a hard, reproducible failure — Vite/Rolldown cannot resolve an entry module, so `dist/` is never produced.
-- **The current working tree is NOT broken**, because `git status` shows an **untracked** `index.html` (`?? index.html`) sitting in the working directory. Running `pnpm run build` in this working tree (not a clean clone) succeeds and produces `dist/` correctly (verified — build completed in ~320ms, `dist/index.html`, JS/CSS bundles, and the PWA service worker were all generated).
+**Fix confirmed**: commit `e021877` ("feat: add initial HTML structure and metadata for Fast Logbook PWA") adds root `index.html` (63 lines) back to the repository as a tracked file. Contents were read directly and confirmed to follow standard Vite SPA entry conventions: `<div id="root"></div>` plus `<script type="module" src="/src/main.tsx"></script>`, along with meta tags, OGP/Twitter card tags, a JSON-LD `WebApplication` schema block, and a `speculationrules` script for prerender/prefetch. `docs/index.html` (a separate, unrelated file — see screens.md) was also added/changed in the same commit but is not the Vite build entry.
 
-**Practical impact:**
-1. Anyone doing a fresh `git clone` + `pnpm run build` (a new contributor, a CI runner, a deploy pipeline that doesn't reuse this exact working directory) gets a hard build failure.
-2. No CI workflow currently runs `pnpm run build` — `.github/workflows/audit.yml` only runs `pnpm audit`, and `.github/workflows/lint.yml` only runs Biome via reviewdog. Neither workflow builds the app, so this regression would not be caught by CI on a fresh clone/PR.
-3. The working tree's fix (the restored `index.html`) is **uncommitted**. If it is discarded (`git clean`, a fresh checkout, `git stash` without applying, etc.) the build breaks again with no local trace of why.
+`pnpm run build` was re-run at the current HEAD and completed successfully (`vite v8.2.1`, 62 modules transformed, `dist/` generated including the Workbox service worker chunk, no errors) — this is a genuine fix, not just a re-masking by an untracked file. The historical finding is kept here as a record; no further action is needed unless this file is deleted again.
 
-Docker build behavior and actual Netlify/hosting deploy behavior were **not verified** (see Analysis Limitations) — a hosting provider that does a fresh clone/checkout (which is the normal deploy model) would be expected to hit the same `UNRESOLVED_ENTRY` failure, but this was not directly tested against this project's actual deploy pipeline.
+Docker build behavior and actual Netlify/hosting deploy behavior were still **not verified** in this pass (see Analysis Limitations) — the fix is expected to resolve those pipelines too, since the root cause (missing entry module) is gone, but this was not directly re-tested against the project's actual deploy pipeline.
 
 ### 2. `generateFormattedLog()` parses the log text twice
 
@@ -86,4 +75,4 @@ None identified with confirmed evidence during this pass. The `escapeHtml()`/CDN
 - **No unit tests exist to cross-check parser/escaping behavior programmatically** — findings on `parse()`, `toHtml()`, and `toMarkdown()` are based on static code reading only, not on running an isolated test against crafted malicious input.
 - **Translation resource files were not exhaustively audited** for whether any `t()` key value used with `dangerouslySetInnerHTML` is ever built from a runtime template/interpolation (e.g. `t('key', { variable })`); each occurrence found was `t('literal_key')` with no interpolation object, but resource JSON contents themselves were not fully read line-by-line.
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

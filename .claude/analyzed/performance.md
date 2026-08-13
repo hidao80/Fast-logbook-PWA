@@ -2,7 +2,7 @@
 name: analyzed-performance
 description: Performance characteristics of the Fast Logbook PWA — a client-only React/TypeScript/Vite app with IndexedDB persistence and no backend.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Performance Analysis
@@ -56,4 +56,4 @@ This is quoted verbatim from the repository's own README badge/caption. **These 
 | Sequential migration writes | Confirmed, one-time cost | ⭐️ not worth changing |
 | `flushBuffer` O(n log n) sort on full log | Confirmed pattern; real-world log size unknown | ⭐️ speculative, no action without evidence |
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

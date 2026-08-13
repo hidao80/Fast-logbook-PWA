@@ -2,7 +2,7 @@
 name: analyzed-naming_convention
 description: Documents the naming conventions actually used across the React 19.2 + TypeScript codebase — variables, functions, types/components, constants, storage keys, and i18n keys — and flags inconsistencies against Biome's configured lint rules.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Naming Convention
@@ -84,4 +84,4 @@ Confirmed by reading `en.json`:
 
 No inconsistencies were found in variable/function (camelCase), type/component (PascalCase), or module constant (UPPER_SNAKE_CASE) naming — those three conventions are applied uniformly across every file examined.
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

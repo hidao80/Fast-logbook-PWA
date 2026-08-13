@@ -2,22 +2,20 @@
 name: analyzed-notes
 description: Cross-cutting observations and documentation-freshness warnings synthesized from the other 12 analysis files for Fast-logbook-PWA, covering the broken build entry point, stale AGENTS.md content, CI coverage gaps, and duplicated version strings.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Notes
 
 Synthesis file. Does not re-derive findings already detailed in the 12 sibling files (`dependencies.md`, `infrastructure.md`, `databases.md`, `screens.md`, `configurations.md`, `components.md`, `utilities.md`, `performance.md`, `known_bugs.md`, `security.md`, `test.md`, `development-workflow.md`) — see those for full evidence and line numbers.
 
-## The single biggest cross-cutting risk: root `index.html`
+## Resolved: root `index.html` build-breakage risk
 
-Four independent files (`known_bugs.md`, `screens.md`, `infrastructure.md`, `configurations.md`) converge on the same fact from different angles:
+Previously, four independent files (`known_bugs.md`, `screens.md`, `infrastructure.md`, `configurations.md`) converged on the same headline risk from different angles: commit `ceff98a` had deleted root `index.html` with nothing restoring it in committed history, the working tree only had it back as an untracked file, and a clean clone/checkout of HEAD would fail the Vite build (`[UNRESOLVED_ENTRY]`), cascading to Netlify and Docker deploy paths with no CI job catching it.
 
-- Commit `ceff98a` deleted root `index.html` with nothing restoring it.
-- The current working tree has it back only as an **untracked** file — locally, `pnpm run build` succeeds and masks the problem.
-- A clean clone/checkout of HEAD fails the Vite build (`[UNRESOLVED_ENTRY]`), which cascades to **Netlify** (`netlify.toml` runs the same `pnpm run build`) and **Docker** (`Dockerfile`'s builder stage runs the same command, and its "fallback" path would then silently serve `node_modules`/source instead of failing loudly).
-- No CI workflow runs `pnpm run build`, so none of the three deploy paths (Netlify, Docker, or a hypothetical CI merge gate) would catch this before it reaches production.
-- Fix is trivial (`git add index.html && git commit`), rated ⭐️⭐️⭐️⭐️⭐️ consistently across all four files. This is the single highest-priority action item in the entire analysis set.
+**This is now resolved.** Commit `e021877` ("feat: add initial HTML structure and metadata for Fast Logbook PWA") committed root `index.html` (63 lines) and updated `docs/index.html` (31 lines) into the repo. `pnpm run build` was re-run against the current HEAD and confirmed to succeed cleanly (vite v8.2.1, `dist/` generated including the `sw.js` workbox chunk). The git-history-vs-working-tree gap that existed at `ceff98a` no longer exists.
+
+The **process gap remains**, though it is now a preventive-maintenance item rather than an active break: no CI workflow runs `pnpm run build`, so a similar regression (entry point deleted or misconfigured again in a future commit) would still go uncaught before reaching `main`/`develop` or the Netlify/Docker deploy paths. Recommendation: add a `build` job to CI regardless. ⭐️⭐️⭐️⭐️ (lower urgency now that the active break is fixed, but still worth doing as regression prevention).
 
 ## Documentation freshness: AGENTS.md is self-contradicting
 
@@ -31,7 +29,7 @@ Three files (`infrastructure.md`, `development-workflow.md`, `test.md`) independ
 
 1. Both `lint.yml` and `audit.yml` trigger on `push` only — no `pull_request` trigger — contradicting `AGENTS.md`'s claim of push/PR triggers.
 2. `lint.yml` uses `reviewdog-action-biome` with a PR-review reporter (`github-pr-review`) on a non-PR trigger, which is plausibly a no-op for comment-posting purposes (unconfirmed by execution).
-3. Neither workflow runs `pnpm run build`, `pnpm exec playwright test`, or a TypeScript type-check. This is the same root cause that let the `index.html` deletion reach `main`/`develop` unnoticed, and also means the (currently non-functional) E2E config-route test would not block a merge even if it existed.
+3. Neither workflow runs `pnpm run build`, `pnpm exec playwright test`, or a TypeScript type-check. This is the same root cause that previously let the `index.html` deletion reach `main`/`develop` unnoticed (now fixed by `e021877`, see above), and also means the (currently non-functional) E2E config-route test would not block a merge even if it existed.
 
 ## Test coverage is effectively zero outside screenshots
 
@@ -51,15 +49,10 @@ Three files (`infrastructure.md`, `development-workflow.md`, `test.md`) independ
 
 ## Analysis basis and scope of this pass
 
-This synthesis, and the 12 sibling files it draws from, reflect a single snapshot at commit `ceff98ab997a60d35e564821f2e6bf7b6c284128` (branch `develop`), including the specific working-tree state at that time (notably the untracked `index.html`). Re-running this analysis after further commits should treat all of the above as potentially stale, especially the `index.html` build-breakage finding, which depends on working-tree/git state rather than committed content alone.
+This synthesis, and the 12 sibling files it draws from, were originally written at commit `ceff98ab997a60d35e564821f2e6bf7b6c284128` (branch `develop`), including the specific working-tree state at that time (notably the untracked `index.html`). This pass updates the synthesis to commit `e021877bb892db6cc019f4e0520449119de3c079`, three commits ahead, primarily to reflect that `e021877` resolved the `index.html` build-breakage finding described above. Other sections were sanity-checked but not fully re-derived in this pass; treat anything not explicitly marked "resolved" here as still reflecting the `ceff98a` snapshot unless a sibling file says otherwise.
 
-**Explicitly out of scope for this update pass** (not touched, not verified, not re-synthesized here):
-- `overview.md`
-- `todo.md`
-- `naming_convention.md`
-- `use_cases.md`
-- The pre-existing `ADR.md` and `graphrag.jsonld` files under `.claude/analyzed/`
+All 17 category files plus `ADR.md` have since been brought up to date at commit `e021877` in later passes this session, so the prior "out of scope" list above no longer applies.
 
-These files were not read or updated as part of this session and may still reflect an older (possibly vanilla-JS-era) state of the repository. Anyone relying on them should independently verify freshness before trusting their content, given the same stale-documentation pattern already confirmed in `AGENTS.md` and the project's `.claude/rules/*.md` files.
+Note: `.claude/analyzed/graphrag.jsonld` (a JSON-LD call-graph file referenced by earlier documentation snapshots) has been deleted from the repository and no longer exists — any remaining reference to it elsewhere (e.g. in `AGENTS.md`) is stale.
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

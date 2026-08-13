@@ -2,7 +2,7 @@
 name: analyzed-development-workflow
 description: Development workflow for the Fast Logbook PWA — a pnpm-managed React/TypeScript/Vite project with Biome linting, Playwright E2E tests, a two-branch (main/develop) model, mixed commit conventions, and a CalVer-style version number duplicated across multiple files.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Development Workflow
@@ -52,7 +52,7 @@ Two workflows exist, both triggered **only** on `push` to `branches: [main, deve
 
 Neither workflow runs `build`, `lint` failure gating for merges (no `pull_request` trigger means lint doesn't block PR merges automatically), or the Playwright E2E suite. There is no CI job that runs `pnpm run build` or `pnpm test`. This means broken builds or E2E regressions are not caught by GitHub Actions before merge to `main`/`develop` — only lint/format issues (post-push, non-blocking for PRs) and dependency audit findings are checked.
 
-Note on build health: commit `ceff98a` in the git history removes the root `index.html`, but the current working tree has it back as an untracked file (confirmed via `git status` at task start), so the local build currently succeeds. This is a git-history vs. working-tree gap worth being aware of for CI robustness discussions — it is not evidence of an actually broken build right now, but it does mean a clean checkout from `ceff98a` without the untracked file would fail to build, and no CI job would currently catch that since there is no `build` step in either workflow. ⭐⭐⭐⭐ recommend adding a `build` (and ideally `test:e2e`) job gated on `pull_request` to `main`/`develop`.
+Note on build health (resolved): commit `ceff98a` in the git history had removed the root `index.html`. That gap is now closed — commit `e021877` ("feat: add initial HTML structure and metadata for Fast Logbook PWA") committed root `index.html` (63 lines) and updated `docs/index.html` (31 lines) back into the repo. Re-ran `pnpm run build`: it completes cleanly (vite v8.2.1, `dist/` generated including the `sw.js` workbox chunk). The git-history-vs-working-tree gap that existed at `ceff98a` no longer exists. The underlying process gap remains, though: no CI job runs `pnpm run build`, so a similar regression (entry point deleted/misconfigured) would still go uncaught before merge. ⭐⭐⭐⭐ still recommend adding a `build` (and ideally `test:e2e`) job gated on `pull_request` to `main`/`develop`, as a preventive measure rather than a fix for a currently-broken build.
 
 ## Branching model and commit conventions
 
@@ -86,11 +86,12 @@ Excluding build output and analysis docs, the version is manually duplicated acr
 
 ## Summary of workflow gaps found in this pass
 
-1. `AGENTS.md` Architecture section is stale (vanilla-JS description) and self-contradicts its own later section — confirmed present as of `ceff98a`.
+1. `AGENTS.md` Architecture section is stale (vanilla-JS description) and self-contradicts its own later section — confirmed still present as of `e021877`.
 2. CI workflows trigger on `push` only, not `pull_request`, despite `AGENTS.md` documenting push/PR triggers — confirmed via direct read of both YAML files.
 3. `lint.yml` uses a PR-review-style reviewdog reporter on a non-PR trigger — plausible misconfiguration, unconfirmed by execution.
 4. No CI job runs `build`, `test`/`test:e2e`, or `test:e2e:headed` — confirmed absent from both workflow files.
 5. Commit convention is a mix of Conventional Commits and gitmoji, undocumented anywhere — confirmed via `git log`.
 6. Version string is manually duplicated across 3 source files with no single-source mechanism, and this already caused one real typo bug — confirmed via grep and commit history.
+7. (Resolved as of `e021877`) The root `index.html` entry point, previously missing from committed history since `ceff98a`, is now committed; `pnpm run build` succeeds from a clean checkout. The gap that no CI job runs `build` still stands as a preventive-maintenance item (see item 4).
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

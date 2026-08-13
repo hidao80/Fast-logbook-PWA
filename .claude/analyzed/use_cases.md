@@ -2,7 +2,7 @@
 name: analyzed-use_cases
 description: Actor-goal inventory and use-case diagram for Fast-logbook-PWA, a single-actor client-only work-log PWA with a main logging screen and a settings screen.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Use Cases
@@ -92,4 +92,4 @@ flowchart TB
 - `generateFormattedLog()` and `downloadLog()` (in `src/lib/download.ts`) were not opened; their exact output formatting is out of scope for this use-case inventory and not claimed here beyond "produces formatted/downloadable log."
 - Whether the app functions fully offline (service worker caching strategy) is **Unconfirmed** — `sw.js` was not read as part of this task.
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

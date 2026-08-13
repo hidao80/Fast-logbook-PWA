@@ -2,7 +2,7 @@
 name: analyzed-databases
 description: Documents the client-only IndexedDB key-value persistence layer, its migration from localStorage, the log-buffer/flush flow, and the BroadcastChannel cross-tab sync mechanism.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Databases
@@ -151,4 +151,4 @@ This is an "eventual consistency via message + selective refetch" pattern: some 
 3. **Confirmed, prior-pass claim corrected**: BroadcastChannel messages carry a `{ key, value }` payload, not just a change notification — see "BroadcastChannel cross-tab sync" above.
 4. **Confirmed, prior-pass claim re-verified**: `log_buffer` / `log_buffer_date` are permanently excluded from the IndexedDB migration list in `runMigrations()` and are never read via `getItem`/`setItem` — this is intentional, not an oversight, since they represent transient per-tab state that `flushBuffer` folds into `log` before the app ever needs to read them back as durable state.
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

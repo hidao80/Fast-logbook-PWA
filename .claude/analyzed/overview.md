@@ -2,7 +2,7 @@
 name: analyzed-overview
 description: Entry-point synthesis of Fast Logbook PWA — stack, structure, request flow, scale, and links to the 16 detailed analysis documents
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Overview
@@ -103,4 +103,4 @@ Standard flow is `pnpm install` → `pnpm run dev` (Vite dev server, HTTP on loc
 
 [dependencies](dependencies.md) · [infrastructure](infrastructure.md) · [databases](databases.md) · [screens](screens.md) · [configurations](configurations.md) · [components](components.md) · [utilities](utilities.md) · [performance](performance.md) · [known_bugs](known_bugs.md) · [security](security.md) · [test](test.md) · [development-workflow](development-workflow.md) · [notes](notes.md) · [todo](todo.md) · [naming_convention](naming_convention.md) · [use_cases](use_cases.md)
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

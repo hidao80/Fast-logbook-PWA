@@ -2,16 +2,19 @@
 name: analyzed-todo
 description: Prioritized action-item list synthesized from the Security, Test, Database, Code Quality, Infrastructure, Developer Experience, and Performance analysis passes for Fast-logbook-PWA.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Todo
 
 Synthesized from the 12 sibling analysis files under `.claude/analyzed/`. Grouped by category, most important first within each group. Ratings are taken verbatim from the source file where one was given; where a source made a recommendation without an explicit star rating, a rating is added here in *italics* and marked as added-by-this-pass.
 
+## Recently Resolved
+
+- ~~Commit the untracked root `index.html` (or otherwise fix the Vite entry point)~~ — **Resolved in commit `e021877`** ("feat: add initial HTML structure and metadata for Fast Logbook PWA"), which committed root `index.html` (63 lines) and updated `docs/index.html` (31 lines). `pnpm run build` re-verified to succeed cleanly from the current HEAD. Source: previously `known_bugs.md`, `screens.md`, `infrastructure.md`.
+
 ## Security
 
-- Commit the untracked root `index.html` (or otherwise fix the Vite entry point) — while framed as a build issue, an uncommitted fix sitting in the working tree is also a supply-chain/reproducibility risk (anyone relying on a clean clone gets a different, broken artifact). Source: `known_bugs.md`, `screens.md`, `infrastructure.md`. ⭐️⭐️⭐️⭐️⭐️
 - Add `escapeHtml()` calls for `category`/`detail` inside `toMarkdown()` (`src/lib/download.ts:184`) for defense-in-depth consistency with `toHtml()`; not currently exploitable (the sole caller re-escapes downstream) but a latent XSS trap for any future caller. Source: `security.md` (M2), `known_bugs.md` (#3), `utilities.md`. ⭐️⭐️⭐️
 - Add security headers (`Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options`) via `netlify.toml`; meaningful defense-in-depth given 17 `dangerouslySetInnerHTML` call sites in `App.tsx`, even though all are currently sourced from static i18n keys, not user input. Source: `security.md` (M1). *⭐️⭐️⭐️ (added by this pass)*
 - Treat the "all `dangerouslySetInnerHTML` sites use static `t()` keys" property as a protected invariant — document it (e.g. in a code comment or dev guideline) so a future change interpolating user/log data into a translation key doesn't silently introduce 17 simultaneous XSS vectors. Source: `security.md` (L1), `known_bugs.md` (#5). ⭐️⭐️⭐️
@@ -41,7 +44,7 @@ Synthesized from the 12 sibling analysis files under `.claude/analyzed/`. Groupe
 
 ## Infrastructure
 
-- Add a `build.yml` CI workflow (or extend an existing one) that runs `pnpm run build` on push/PR — neither `lint.yml` nor `audit.yml` currently builds the app, so the missing-`index.html` entry-point break at HEAD would not have been caught. Source: `infrastructure.md`, `development-workflow.md`, `known_bugs.md` (#1). ⭐️⭐️⭐️⭐️⭐️
+- Add a `build.yml` CI workflow (or extend an existing one) that runs `pnpm run build` on push/PR — neither `lint.yml` nor `audit.yml` currently builds the app. The missing-`index.html` entry-point break this would have caught is now fixed (see Recently Resolved), but the CI gap itself remains as a preventive-maintenance item: a similar future regression still wouldn't be caught. Source: `infrastructure.md`, `development-workflow.md`, `known_bugs.md` (#1). ⭐️⭐️⭐️⭐️ (downgraded from ⭐️⭐️⭐️⭐️⭐️ now that the active break is fixed).
 - Add a `pull_request` trigger to CI workflows — both `lint.yml` and `audit.yml` currently trigger only on `push` to `main`/`develop`, contradicting `AGENTS.md`'s documented claim that CI runs "on push/PR." This also means lint/audit findings don't block PR merges. Source: `development-workflow.md`. ⭐️⭐️⭐️⭐️
 - Investigate/fix the `lint.yml` `reviewdog-action-biome` `github-pr-review` reporter, which is designed to post inline PR review comments but the workflow has no `pull_request` trigger to attach comments to — plausible misconfiguration, not confirmed by execution. Source: `development-workflow.md`. ⭐️⭐️⭐️
 - Verify whether GitHub Pages is actually enabled for this repo and document `docs/`'s intended purpose (appears to be a standalone landing page, separate from the Vite/Netlify build output) to avoid future ambiguity. Source: `infrastructure.md`. ⭐️⭐️⭐️
@@ -59,4 +62,4 @@ Synthesized from the 12 sibling analysis files under `.claude/analyzed/`. Groupe
 - Bootstrap CSS/icon fonts are statically imported in full (`main.tsx`) rather than scoped/tree-shaken. Source: `performance.md`. ⭐️
 - `flushBuffer` does an O(n log n) sort on the full log on every buffer flush; no action needed without evidence real-world logs grow large enough to matter. Source: `performance.md`. ⭐️
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

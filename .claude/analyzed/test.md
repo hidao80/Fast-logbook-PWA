@@ -2,7 +2,7 @@
 name: analyzed-test
 description: Current automated-test inventory for Fast-logbook-PWA - Playwright E2E only, no unit tests, and a verified routing bug in the config screenshot test.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Tests
@@ -88,4 +88,4 @@ I actually ran `pnpm exec playwright test` in this working tree rather than assu
 - Recommendation, rated 5/5 stars: fix the `/config.html` -> `/#/config` path in `screenshot.spec.ts` so the config screen is actually exercised.
 - Recommendation, rated 3/5 stars: add a CI workflow step that runs `pnpm exec playwright test` (with `playwright install --with-deps` first) so E2E regressions are caught automatically; lower priority than the two items above since the current E2E suite's assertions are minimal anyway.
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

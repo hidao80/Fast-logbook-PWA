@@ -2,7 +2,7 @@
 name: analyzed-screens
 description: Documents the React Router screen structure, entry point, and view components of the Fast-logbook-PWA single-page app.
 type: analysis
-commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Screens
@@ -28,15 +28,14 @@ that description is fully obsolete and has been discarded from this file.
 
 - No catch-all / 404 route is defined. Any unmatched hash path will render `react-router-dom`'s default "no route matched" error output (an unstyled error boundary), since no `errorElement` is configured on the router or on either route object.
 
-## Vite entry file (`index.html`) — status at HEAD, and current working-tree state
+## Vite entry file (`index.html`) — status at HEAD
 
-This required careful re-verification because a prior pass in this session flagged it as a critical, currently-reproducing bug. That is **not accurate for the current working tree**, though it is accurate for the last commit:
+Previously (as of commit `ceff98a`), the root `index.html` had been deleted from git history with no replacement committed, and the working tree only had an untracked, uncommitted copy masking a build-breaking bug (see `known_bugs.md` for full history). **This is resolved as of commit `e021877`** ("feat: add initial HTML structure and metadata for Fast Logbook PWA"), which commits root `index.html` (63 lines) to the repository.
 
-- `git show HEAD --stat` for commit `ceff98ab997a60d35e564821f2e6bf7b6c284128` shows `index.html | 34 --` — i.e. **the commit deleted the root `index.html`** with no replacement added under `public/` or elsewhere, and no `root` override was added to `vite.config.ts`.
-- However, `git status --porcelain` at the time of this analysis shows `?? index.html` — an **untracked** `index.html` file that currently exists in the working tree (34 lines, containing the `<div id="root">` and the `<script type="module" src="/src/main.tsx">` tag). This file is not committed.
-- Because this untracked file is present, `pnpm run build` **succeeds** right now: verified directly by running `pnpm run build`, which completed with `✓ built in 448ms` and produced `dist/index.html`, `dist/assets/*`, and a PWA precache/service worker (`dist/sw.js`, `dist/workbox-*.js`, 19 precache entries, 908.50 KiB).
-- **Conclusion**: the build-breaking bug is real in git history (the deletion was committed with nothing restoring the file), but is currently masked in this working tree by an uncommitted, untracked `index.html`. If that untracked file is discarded (`git clean`) or a fresh clone/CI checkout of HEAD is used, the build will fail again with Vite's `[UNRESOLVED_ENTRY] Cannot resolve entry module index.html` (this exact reproduction was reported by a prior pass; not re-triggered here since doing so would require deleting the untracked file, which was out of scope for a read-only analysis). This should be treated as an **outstanding known bug** at the commit/repo level regardless of the current working-tree state — recommend committing the untracked `index.html` (⭐️5, trivial and directly fixes a broken HEAD) or restoring the file via a `public/` copy plus Vite `root`/`build.rollupOptions.input` config if a different entry layout is intended (⭐️2, unnecessary complexity for this project's simple single-entry structure).
-- `vite.config.ts` (project root) confirms: no custom `root`, no `build.rollupOptions.input`, no `appType` override — it relies entirely on Vite's default convention of an `index.html` at the project root as the SPA entry.
+- `index.html` was read directly and confirmed to contain `<div id="root"></div>` and `<script type="module" src="/src/main.tsx"></script>` in `<body>`, plus `<head>` meta tags (charset, viewport, X-UA-Compatible), OGP and Twitter-card meta tags, a favicon link, a JSON-LD `WebApplication` schema block, and a `speculationrules` script (`prerender`/`prefetch`, both `eagerness: moderate`, matching `/*`).
+- `pnpm run build` was re-run at the current HEAD and succeeded cleanly: `vite v8.2.1`, 62 modules transformed, `dist/` produced with the Workbox-generated service worker chunk, no errors.
+- `vite.config.ts` (project root) confirms: no custom `root`, no `build.rollupOptions.input`, no `appType` override — it relies entirely on Vite's default convention of an `index.html` at the project root as the SPA entry, which is now satisfied by the committed file.
+- The same commit also added/changed `docs/index.html` (31 lines) — this is a separate, unrelated file (project documentation page under `docs/`, not the Vite build entry) and does not affect SPA routing.
 
 ## App.tsx — Main screen (`/`)
 
@@ -91,4 +90,4 @@ Settings page component (`export default function ConfigApp()`), per its JSDoc: 
 - No explicit `navigateFallback` option is set in the `workbox` block shown in `vite.config.ts`. For `generateSW` strategy, Workbox's default behavior is to auto-configure a navigation-fallback (typically to the precached `index.html`) when precaching HTML, enabling SPA-style offline navigation — but the exact fallback path and any exclusions were **not directly observed** in this config (no override is present, so this relies on `vite-plugin-pwa`'s default, which was not independently verified against the installed plugin version's source in this pass). **Unconfirmed**: whether offline hash-route navigation (`/#/config`) resolves correctly under the generated service worker, since hash routes are not separate navigation requests and should be transparently served by the same cached `index.html` shell — this is consistent with how `createHashRouter` is designed to work with a single cached shell, but was not tested in-browser here.
 - The build run performed for this analysis did produce `dist/sw.js` and a workbox runtime chunk (`workbox-9c191d2f.js`) with 19 precache entries (908.50 KiB), confirming the PWA build step itself completes successfully once `index.html` is present.
 
-<!-- commit-hash: ceff98ab997a60d35e564821f2e6bf7b6c284128 -->
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->
