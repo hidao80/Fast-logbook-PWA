@@ -428,6 +428,7 @@ export default function App() {
 
   return (
     <>
+      <form toolname="fast_logbook" tooldescription="The following operations are available for the work log: view, add, edit, export, and edit preset shortcuts.">
       <nav className="navbar navbar-dark bg-dark navbar-overlay">
         <div className="container-fluid">
           <button
@@ -642,6 +643,7 @@ export default function App() {
         isOpen={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
       />
+      </form>
     </>
   );
 }

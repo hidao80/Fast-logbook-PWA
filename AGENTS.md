@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## Commands
 
@@ -74,11 +74,11 @@ Write all inline comments in English.
 
 Design rationale → [`docs/design.md`](docs/design.md)
 API/function specs → [`docs/spec/`](docs/spec/)
-Session history → [`.claude/histories/YYYYMM.md`](.claude/histories/)
+Session history → [`.Codex/histories/YYYYMM.md`](.Codex/histories/)
 
 ## Analyzed Documentation Index
 
-Codebase analysis snapshots under [`.claude/analyzed/`](analyzed/) (generated at commit `d363d07`, re-verified current as of `3984370`; note that this analysis reflects the current React + TypeScript + Vite codebase — where it conflicts with the Architecture section above, the analyzed docs are newer). Only [infrastructure](analyzed/infrastructure.md) (CI Node/pnpm version bump) and [notes](analyzed/notes.md) (IME fix extended to `ConfigApp.tsx`) changed since `d363d07`; the remaining 16 files are unchanged — no other source files were touched in the intervening commits:
+Codebase analysis snapshots under [`.Codex/analyzed/`](analyzed/) (generated at commit `d363d07`, re-verified current as of `3984370`; note that this analysis reflects the current React + TypeScript + Vite codebase — where it conflicts with the Architecture section above, the analyzed docs are newer). Only [infrastructure](analyzed/infrastructure.md) (CI Node/pnpm version bump) and [notes](analyzed/notes.md) (IME fix extended to `ConfigApp.tsx`) changed since `d363d07`; the remaining 16 files are unchanged — no other source files were touched in the intervening commits:
 
 1. [dependencies](analyzed/dependencies.md) — packages, versions, licenses, audit status
 2. [infrastructure](analyzed/infrastructure.md) — CI/CD, Netlify, Docker/Nginx
