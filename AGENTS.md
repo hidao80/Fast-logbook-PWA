@@ -2,6 +2,8 @@
 
 This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
+If `graphify-out/` exists, use it in preference to other options.
+
 ## Commands
 
 ```bash
