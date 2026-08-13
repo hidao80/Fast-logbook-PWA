@@ -1,7 +1,8 @@
 node_modules/
 dist/
 graphify-out/
-.claude/histories
+.claude/analyzed/
+.claude/histories/
 .claude/settings.local.json
 package-lock.json
 
