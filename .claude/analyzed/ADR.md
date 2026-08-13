@@ -2,7 +2,7 @@
 name: analyzed-ADR
 description: Git-log-derived architecture decision timeline, supplemental ADRs for the pre-2026 era, and verification of docs/ADR.md against actual history.
 type: analysis
-commit-hash: 39843709093825c8ffe02e61d8b0d66a45783f68
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
 # Architecture Decision Records (git-log reconstruction)
@@ -11,6 +11,7 @@ commit-hash: 39843709093825c8ffe02e61d8b0d66a45783f68
 - [Decision Timeline](#decision-timeline)
 - [Supplemental ADRs (pre-2026-02 era)](#supplemental-adrs-pre-2026-02-era)
 - [Supplemental ADRs (2026-07 era, not yet in docs/ADR.md)](#supplemental-adrs-2026-07-era-not-yet-in-docsadrmd)
+- [Supplemental ADRs (2026-08 era, not yet in docs/ADR.md)](#supplemental-adrs-2026-08-era-not-yet-in-docsadrmd)
 - [Verification: docs/ADR.md vs. git log](#verification-docsadrmd-vs-git-log)
 
 ## Relation to docs/ADR.md
@@ -40,6 +41,10 @@ commit-hash: 39843709093825c8ffe02e61d8b0d66a45783f68
 | 2026-06-20 | pnpm unification; caveman-code dependency removed; TypeScript consolidation of lib modules; `.actrc` | `5b8968c`, `67b881f`, `d363d07` | docs ADR-018 |
 | 2026-07-05 | GitHub Pages landing page (`docs/index.html`) added; CI hardening: `actions/checkout@v6`, Node 24 for audit workflow | `b7c61f6`, `2e39c80`, `7ee4625`, `d8eeb5f` | ADR-109 (not yet in docs/ADR.md) |
 | 2026-07-19 | IME `isComposing` guard extended from `App.tsx` to `ConfigApp.tsx` shortcut inputs | `3c1d5dd`, `3984370` | ADR-110 (not yet in docs/ADR.md) |
+| 2026-07-19 | Version-string correction: `26.07/19` → `26.07.19` (invalid slash separator) across `package.json` and locale files | `160b39b`, `da702ec`, `68aa9d2` | ADR-111 (not yet in docs/ADR.md) |
+| 2026-08-13 | `pnpm-workspace.yaml` overrides pin transitive deps (`brace-expansion`, `fast-uri`, `nanoid`, `postcss`, `react-router`) past known-vulnerable ranges; direct deps bumped | `ceff98a` | ADR-112 (not yet in docs/ADR.md) |
+| 2026-08-13 | Agent-instruction file renamed `.claude/CLAUDE.md` → `AGENTS.md`; `.claude/rules/*` (assistant-style, code-style, security) deleted; root `CLAUDE.md` now a 1-line `@AGENTS.md` pointer | `ceff98a` | ADR-113 (not yet in docs/ADR.md) |
+| 2026-08-13 | Navbar wrapped in `<form>` carrying non-standard `toolname`/`tooldescription` attributes (AI-agent tool discoverability) | `ceff98a` | ADR-114 (not yet in docs/ADR.md) |
 
 ## Supplemental ADRs (pre-2026-02 era)
 
@@ -107,6 +112,32 @@ All Factual (reconstructed from commit messages; rationale beyond messages is in
 - Decision: Apply the ADR-105 principle (never persist a value mid-IME-conversion) to the config screen's 9 shortcut text inputs, which had no such guard; drop a shared mutable ref in favor of reading `isComposing` directly off the native input event per keystroke.
 - Consequence: Second known call site for the IME-guard pattern, alongside `App.tsx`'s Enter-key handling (ADR-105). Confirms the "do not simplify the IME check" guidance in [notes.md](notes.md) generalizes beyond the original textarea — any future text input taking IME (Japanese/Chinese/Korean) input should be checked for the same gap.
 
+## Supplemental ADRs (2026-08 era, not yet in docs/ADR.md)
+
+### ADR-111: Version-string separator fix
+- Status: Accepted
+- Date: 2026-07-19 — Commits: `160b39b` (sync commit hashes in analyzed docs), `da702ec` (bump `package.json` to `26.07/19`), `68aa9d2` (correct to `26.07.19` in `package.json`, i18n locale files, `vite.config.js`)
+- Decision: A same-day version bump first used a slash separator (`26.07/19`), which was not valid semver-adjacent formatting for this project; corrected to dot-separated (`26.07.19`) 11 minutes later.
+- Consequence: Confirms the release-versioning convention is `YY.MM.DD` with dots throughout, including i18n locale metadata and `vite.config.js`.
+
+### ADR-112: pnpm workspace overrides for transitive-dependency CVEs
+- Status: Accepted
+- Date: 2026-08-13 — Commit: `ceff98a`
+- Decision: Add `pnpm-workspace.yaml` with an `overrides:` block pinning `brace-expansion`, `fast-uri`, `nanoid`, `postcss`, and `react-router` to patched version ranges regardless of what direct/transitive dependencies request; bump direct devDependencies (`@biomejs/biome`, `@playwright/test`, `@types/react*`, `@vitejs/plugin-react`, `vite`) and dependencies (`i18next`, `react`, `react-dom`, `react-i18next`, `react-router-dom`) to their latest patch/minor versions in the same commit.
+- Consequence: Closes the audit gap the CI `pnpm audit --audit-level=high` step would otherwise flag; `pnpm-lock.yaml` was regenerated (1191-line diff). Future dependency bumps should check whether these override ranges are still needed or can be dropped once upstream packages naturally satisfy them.
+
+### ADR-113: Agent-instruction file consolidated into `AGENTS.md`
+- Status: Accepted
+- Date: 2026-08-13 — Commit: `ceff98a`
+- Decision: Rename `.claude/CLAUDE.md` to root-level `AGENTS.md` (the emerging cross-tool convention for agent instructions, also read by Codex per this project's own `AGENTS.md` header); replace it with a 1-line root `CLAUDE.md` containing `@AGENTS.md`. Delete `.claude/rules/assistant-style.md`, `.claude/rules/code-style.md`, and `.claude/rules/security.md` (137 lines total) without replacement content elsewhere in `.claude/`.
+- Consequence: Single canonical instruction file (`AGENTS.md`) now serves both Claude Code and Codex, referenced by `@AGENTS.md` import syntax. The deleted `.claude/rules/*` content is not preserved in `AGENTS.md` verbatim — if any of assistant-style/code-style/security guidance was still load-bearing, it needs to be confirmed present in `AGENTS.md` or intentionally dropped.
+
+### ADR-114: Navbar `<form>` wrapper with AI-agent tool attributes
+- Status: Accepted
+- Date: 2026-08-13 — Commit: `ceff98a`
+- Decision: Wrap the navbar (and everything through the end of the component tree) in `App.tsx` with `<form toolname="fast_logbook" tooldescription="...">`, plus a matching `#root > form` flex layout rule in `css/main.css`. `toolname`/`tooldescription` are non-standard HTML attributes intended for AI browser agents to discover available in-page operations (view/add/edit/export/edit-shortcuts).
+- Consequence: First instance of AI-agent-discoverability markup in this codebase; establishes a pattern (`<form toolname=... tooldescription=...>` as an agent-affordance wrapper) that may recur if more AI-agent-facing surfaces are added. Not part of any W3C spec — a browser or extension that does not understand it will simply ignore it.
+
 ## Verification: docs/ADR.md vs. git log
 
 Per the source-of-truth rule, discrepancies found when checking every commit reference in docs/ADR.md against the actual log:
@@ -118,6 +149,8 @@ Per the source-of-truth rule, discrepancies found when checking every commit ref
 5. All other commit hashes cited in docs ADR-001…018 resolve and match their described content. (Factual)
 6. **docs/ADR.md has no entry for the 2026-07-05 commits** (`b7c61f6`, `2e39c80`, `7ee4625`, `d8eeb5f` — landing page + CI hardening, see ADR-109 above). (Factual)
 7. **docs/ADR.md has no entry for the 2026-07-19 commits** (`3c1d5dd`, `3984370` — ConfigApp IME guard, see ADR-110 above). (Factual)
+8. **`index.html` was deleted in `ceff98a` (ADR-113/114 era) but exists again as an untracked working-tree file as of this update** — `git show ceff98a -- index.html` shows a full -34 line deletion; `git status` currently shows `index.html` as untracked (`??`). Content differs from the pre-deletion version (new `<title>` block, OGP/Twitter Card meta tags). Not yet committed — no ADR entry until it lands in a commit. (Factual)
+9. **docs/ADR.md has no entries for the 2026-07-19 version-string fix or the 2026-08-13 commit** (`ceff98a` — pnpm overrides, `AGENTS.md` rename, `<form toolname>` wrapper; see ADR-111…114 above). (Factual)
 
 Correction options for docs/ADR.md (report only — not applied):
 - Fix the two date errors in docs ADR-001/002/005. ⭐️⭐️⭐️⭐️⭐️
@@ -125,5 +158,6 @@ Correction options for docs/ADR.md (report only — not applied):
 - Back-fill the 2024–2025 era into docs/ADR.md from ADR-101…108 above. ⭐️⭐️⭐️
 - Add an ADR-019 for the 2026-07-05 landing-page/CI-hardening commits (ADR-109 above). ⭐️⭐️⭐️
 - Add an ADR-020 for the 2026-07-19 ConfigApp IME-guard commits (ADR-110 above). ⭐️⭐️
+- Add an ADR-021 for the 2026-08-13 `AGENTS.md` consolidation + pnpm security overrides (ADR-112/113 above). ⭐️⭐️⭐️
 
-39843709093825c8ffe02e61d8b0d66a45783f68
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

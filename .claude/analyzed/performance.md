@@ -1,51 +1,59 @@
 ---
 name: analyzed-performance
-description: Performance characteristics, processing costs, concurrency, and potential bottlenecks.
+description: Performance characteristics of the Fast Logbook PWA — a client-only React/TypeScript/Vite app with IndexedDB persistence and no backend.
 type: analysis
-commit-hash: d363d07ab70bdbae818bada7838fe13166f4ef08
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
-# Performance
+# Performance Analysis
 
-- [Measured vs. Analytical](#measured-vs-analytical)
-- [Processing Costs](#processing-costs)
-- [Concurrency](#concurrency)
-- [Load-time](#load-time)
-- [Potential Bottlenecks](#potential-bottlenecks)
+Scope: processing cost, timing, parallelism, and bottlenecks. This document replaces a prior Japanese-language, vanilla-JS-era analysis, which is stale (the app is now React + TypeScript + Vite).
 
-## Measured vs. Analytical
+## 1. Log parsing (`src/lib/download.ts`)
 
-No profiling data exists in the repo; everything below is **static analysis (Speculative unless marked Factual)**. No performance budget or Lighthouse CI is configured.
+- `parse(text, mins)` (lines 64–119) does a **single linear pass**: `text.split('\n')` into a `timeStamp` array plus per-category detail/time accumulation (one `forEach`), followed by one more `for` loop over `timeStamp` to compute durations between consecutive entries. This is **O(n)** in the number of log lines, not quadratic. It is a full re-parse from scratch on every call — there is no incremental/memoized parsing.
+- **Confirmed: `parse()` runs twice per export.** `generateFormattedLog()` (lines 206–211) builds its `sections` array by calling both `toHtml(log, mins)` and `toMarkdown(log, mins)`. `toHtml()` (line 125) and `toMarkdown()` (line 175) each independently call `parse(log, mins)` on the same `log`/`mins` arguments — so the identical O(n) parse work is duplicated once per view (`handleViewLog`) and once per download (`downloadLog`). For typical logbook sizes (a personal work log, likely hundreds to low thousands of lines) this is unlikely to be perceptible, but it is a straightforward, verified redundancy.
+  - **Recommendation:** parse once in `generateFormattedLog()` and pass the parsed `Record<string, ParsedCategory>` into `toHtml`/`toMarkdown` (or refactor them to accept already-parsed data). Rating: ⭐️⭐️⭐️ (cheap, correctness-neutral, only matters if log sizes grow or export is invoked frequently).
 
-## Processing Costs
+## 2. React re-render patterns (`src/App.tsx`)
 
-| Operation | Complexity | Trigger frequency |
-| --- | --- | --- |
-| `loadLogs()` — split full log, `new Date()` per line, filter | O(n) over **entire** log history | On load, date change, cross-tab message |
-| `flushBuffer()` — split, filter, merge, **sort** | O(n log n) over entire log | Tab hide, date change, load, sync message |
-| `parse()` in download.ts | O(n) single pass | Export / viewer only (user action) |
-| Textarea autosave | O(day's text), debounced 300ms | Per keystroke burst (Factual) |
+- **Confirmed:** the log textarea is uncontrolled — bound via `textareaRef` (a `ref`, not `useState`), and mutated imperatively (`ta.value = ...`) in `loadLogs`, `appendLog`, `handleConfirmDelete`. `onInput`/`onKeyDown` handlers do not put keystrokes into React state, so keystrokes do not trigger a re-render of `App`. This is a deliberate and effective avoidance of full-component re-render per keystroke in a component with many other pieces of state (`isDirty`, `shortcuts`, `targetDate`, several modal-open booleans).
+- `handleTextareaInput` (line 323) debounces `saveLogs()` by 300ms via `debounceRef`/`setTimeout`, avoiding a localStorage write on every keystroke; `setIsDirty(true)` still fires synchronously on each qualifying input event, which does cause a small re-render (only the save-status dot depends on `isDirty`, so the render cost is limited to that JSX region reconciling, not the whole tree doing real work — React re-renders the function component but the diff against the previous VDOM is cheap since only one span's className/title differ). Rating for optimizing further: ⭐️⭐️ (marginal; `isDirty` re-renders are cheap and already isolated in effect).
+- The main `useEffect` (lines 191–285) has dependencies `[runMigrations, getDateWithRollOver, flushBuffer, loadLogs, saveLogs]`. All five are `useCallback`-wrapped with stable (mostly empty) dependency arrays, so in practice this effect should only run once on mount despite the non-empty dependency list — consistent with the `initialized` ref guard pattern. Unconfirmed/speculative: under React 18 `StrictMode` (used in `main.tsx`), effects double-invoke in development, meaning `runMigrations`, `flushBuffer`, etc. execute twice on dev mount; this is a dev-only cost and does not affect production, but could mask double-execution bugs during development. Rating: ⭐️⭐️ (worth a comment, not urgent).
+- No `useMemo`/`useCallback` misuse or obviously missing memoization was found for expensive computations; the component does not perform heavy synchronous work in the render body itself (rendering is mostly static JSX plus the Help modal's content, which is large but static per tab).
 
-n = total lines ever logged. For a personal work log (~20–50 lines/day → ~18k lines/year), all of these are sub-millisecond-to-low-ms in practice (Speculative but high confidence). Log compression via `CompressionStream` is already a tracked TODO for very large logs.
+## 3. Code-splitting / lazy loading
 
-## Concurrency
+- **Confirmed via grep: zero hits for `React.lazy`, `lazy(`, or dynamic `import(` anywhere under `src/`.** Both routed pages (`App` at `/` and `ConfigApp` at `/config`, wired in `src/main.tsx` via `createHashRouter`) are statically imported, so both are included in the initial JS bundle regardless of which route the user lands on.
+- `vite.config.js` has no manual chunking (`build.rollupOptions.output.manualChunks`) or other code-splitting configuration — only the `@vitejs/plugin-react` and `vite-plugin-pwa` plugins, `resolve.dedupe`, and `optimizeDeps.include` for React/React Router. Vite/Rollup will still split some vendor code by default heuristics, but there is no deliberate route-based or component-based lazy loading.
+- **Confirmed: Bootstrap CSS is statically imported in full** — `main.tsx` line 4 imports `'bootstrap/dist/css/bootstrap.min.css'` (plus `bootstrap-icons/font/bootstrap-icons.css` on line 5) unconditionally at the entry point, not tree-shaken or scoped to used components.
+- **Speculative bottleneck:** for a small two-page app (main logbook + config screen), the absence of route-level code splitting is unlikely to matter much in practice — the total JS/CSS is probably small relative to typical SPA bundles. Rating for adding `React.lazy` route splitting: ⭐️⭐️ (low priority given app size, but easy win if bundle audits show `ConfigApp` + its deps adding meaningful weight to the initial load).
 
-- Single-threaded UI; no workers other than the Workbox service worker (cache serving off-main-thread).
-- Parallelism used: `Promise.all` for the 9 shortcut reads (Factual, `App.tsx` / `ConfigApp.tsx`).
-- Multi-tab writes are coordinated only via BroadcastChannel + last-write-wins merge in `flushBuffer()`; two tabs editing **different** days is safe by design; the same day in two tabs is last-flush-wins (Factual behavior, potential edit-loss noted in [known_bugs.md](known_bugs.md)).
+## 4. Storage layer (`src/lib/storage.ts`)
 
-## Load-time
+- **Confirmed non-blocking:** `getItem`, `setItem`, and `removeItem` are all `async` and delegate to `idb`'s Promise-based IndexedDB wrapper (`openDB` awaited once via a module-level `dbPromise`, then `.get`/`.put`/`.delete` per call). None of these synchronously block the main thread beyond the IndexedDB transaction dispatch itself.
+- `migrateFromLocalStorage` (lines 49–57) iterates keys sequentially with `await` inside a `for` loop rather than `Promise.all` — this serializes what could be parallel IndexedDB writes during the one-time migration path. Given it runs once (guarded by `MIGRATION_VERSION_KEY` in `App.tsx`) and the key list is small (a dozen keys), this is a negligible, one-time cost. Rating for parallelizing: ⭐️ (not worth the complexity).
+- `App.tsx`'s `flushBuffer` (lines 121–147) does synchronous string work (`split('\n')`, `.filter()`, `.sort()` with `localeCompare`) on the full log before an async `setItem` write. This runs on every buffer flush (visibility change, date switch, BroadcastChannel sync) and is O(n log n) due to the sort, where n is total log line count — likely fine for realistic personal-logbook sizes, but is the one place doing non-trivial synchronous work tied to storage I/O. Unconfirmed how large real-world logs get; flagged as speculative. Rating: ⭐️ (no action needed without evidence of large logs).
 
-- Vite production build: bundled/minified, Workbox precaches all `js/css/html/png/ico/svg/woff2/json` (Factual) — repeat visits are cache-served.
-- Bootstrap CSS + bootstrap-icons woff2 are the heaviest assets (Speculative; no bundle analysis in repo).
-- Speculation Rules prerender/prefetch in `index.html` accelerates in-app navigation on Chromium (Factual that it's configured).
+## 5. Lighthouse badge (quoted from README, not re-measured)
 
-## Potential Bottlenecks
+README.md (lines 11–15) states:
 
-Ranked; all currently theoretical:
+> Accessibility: 94, Best Practices: 100, Performance: 93, SEO: 90
+> "Measured on Jan 17, 2026 by [Lighthouse-badges](https://github.com/hidao80/lighthouse-badges) — [Measure now!](https://pagespeed.web.dev/analysis?url=https://fast-logbook.netlify.app/)"
 
-1. **Full-log rescan on every date change / sync message** (`loadLogs` + `flushBuffer`) — fine now; would degrade with multi-year logs. Fix option: index by day in IndexedDB (⭐️⭐️ now, ⭐️⭐️⭐️⭐️ if logs grow large).
-2. **`new Date()` per line in filters** — cheaper to compare the 16-char prefix lexically since the format is sortable (⭐️⭐️⭐️ micro-optimization, only with #1).
-3. **Modal/Drawer render help content eagerly** — HelpModal builds a large tab tree on each open; negligible (⭐️).
+This is quoted verbatim from the repository's own README badge/caption. **These scores were not re-measured or independently verified as part of this analysis** — they are reported as a third-party (self-reported, tool-generated) claim only.
 
-d363d07ab70bdbae818bada7838fe13166f4ef08
+## Summary of speculative items and ratings
+
+| Item | Status | Rating |
+|---|---|---|
+| Redundant double `parse()` per export | Confirmed | ⭐️⭐️⭐️ fix if export is hot path |
+| `isDirty` re-render on each keystroke | Confirmed, low-impact | ⭐️⭐️ optional |
+| StrictMode double-invoke of effects in dev | Speculative (React 18 default behavior, not directly observed running) | ⭐️⭐️ document only |
+| No route-level code splitting (`React.lazy`) | Confirmed absent | ⭐️⭐️ low priority for current app size |
+| Full static Bootstrap CSS import | Confirmed | ⭐️ low priority |
+| Sequential migration writes | Confirmed, one-time cost | ⭐️ not worth changing |
+| `flushBuffer` O(n log n) sort on full log | Confirmed pattern; real-world log size unknown | ⭐️ speculative, no action without evidence |
+
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

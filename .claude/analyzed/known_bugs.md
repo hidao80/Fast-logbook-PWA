@@ -1,53 +1,78 @@
 ---
 name: analyzed-known_bugs
-description: Known bugs, inconsistencies between layers, design issues, and analysis limitations.
+description: Known bugs, architectural/design issues, compatibility issues, and analysis limitations for Fast-logbook-PWA
 type: analysis
-commit-hash: d363d07ab70bdbae818bada7838fe13166f4ef08
+commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 ---
 
-# Known Bugs & Inconsistencies
+# Known Bugs & Design Issues
 
-- [Confirmed Bugs](#confirmed-bugs)
-- [Layer Inconsistencies](#layer-inconsistencies)
-- [Architectural / Design Issues](#architectural--design-issues)
-- [Compatibility Issues](#compatibility-issues)
-- [Analysis Limitations](#analysis-limitations)
+- [Security issues](#security-issues)
+- [Architectural / design issues](#architectural--design-issues)
+- [Compatibility issues](#compatibility-issues)
+- [Analysis limitations](#analysis-limitations)
 
-Canonical upstream list: [docs/spec/known_bugs.md](../../docs/spec/known_bugs.md) (already React-era, verified consistent with `src/`). This file adds findings from the current analysis.
+All findings below were independently re-verified against commit `e021877bb892db6cc019f4e0520449119de3c079` (`develop` branch) by running `git`, `pnpm build`, and reading source directly. No source files were modified as part of this analysis.
 
-## Confirmed Bugs
+## Architectural / design issues
 
-1. **`package.json` version typo `"26.06:20"`** (colon, not dot) vs. manifest `26.06.20` in [vite.config.js](../../vite.config.js#L17). The old "version drift" issue was fixed by syncing values, but the sync introduced a typo. (Factual)
-2. **E2E test targets a dead URL**: [tests/e2e/screenshot.spec.ts](../../tests/e2e/screenshot.spec.ts#L5) captures `/config.html`, but the config screen now lives at `#/config` (hash routing). The "config" screenshot is not the config screen. Per the source-of-truth rule, the test encodes the *old* contract — implementation moved and the test wasn't updated. (Factual that the URL no longer matches routing)
-3. **Exported HTML pins Bootstrap CSS `5.3.0-alpha1`** (an alpha release) and Bootstrap JS `5.2.3` — mismatched with each other and with the bundled app's 5.3.8 ([src/lib/download.ts](../../src/lib/download.ts#L218-L219)). SRI is present, so integrity is fine; versions are just stale/mixed. (Factual)
+### 1. ~~Committed HEAD has no valid application entry point~~ — RESOLVED as of commit `e021877`
 
-## Layer Inconsistencies
+**Status: Fixed** — **Severity when open: Critical**
 
-4. **Stale AI-guidance docs describe the deleted vanilla-JS codebase**: `.claude/CLAUDE.md`, `.claude/rules/code-style.md`, `.claude/rules/security.md` still reference `js/main.js`, hand-written `sw.js` (`'my-cache'` bug), `Multilingualization`, `$$one()`, `indolence.min.js` — none of which exist. `docs/spec/*` and `docs/design.md` were rewritten; the `.claude/` layer was not. (Factual)
-5. **CI trigger mismatch**: workflows run only on `push` to `main`/`develop`, yet `lint.yml` uses reviewdog reporter `github-pr-review`, which needs a pull-request context; on plain pushes it likely no-ops or fails (Speculative — behavior not verified in Actions logs). Old CLAUDE.md claims "push/PR" triggers.
-6. **Dead code / dead dependency**: `installPWA()` in [src/lib/utils.ts](../../src/lib/utils.ts#L129) has no importers; npm package `global` is never imported. (Factual, grep-verified)
+This was previously documented as a Critical bug: root `index.html` had been deleted at commit `ceff98a` with no replacement committed, so a clean `git clone` + `pnpm install && pnpm run build` failed with `[UNRESOLVED_ENTRY] Cannot resolve entry module index.html`. At the time, only an untracked, uncommitted `index.html` in the working tree masked the failure locally.
 
-## Architectural / Design Issues
+**Fix confirmed**: commit `e021877` ("feat: add initial HTML structure and metadata for Fast Logbook PWA") adds root `index.html` (63 lines) back to the repository as a tracked file. Contents were read directly and confirmed to follow standard Vite SPA entry conventions: `<div id="root"></div>` plus `<script type="module" src="/src/main.tsx"></script>`, along with meta tags, OGP/Twitter card tags, a JSON-LD `WebApplication` schema block, and a `speculationrules` script for prerender/prefetch. `docs/index.html` (a separate, unrelated file — see screens.md) was also added/changed in the same commit but is not the Vite build entry.
 
-(carried from docs/spec, still valid at this commit)
+`pnpm run build` was re-run at the current HEAD and completed successfully (`vite v8.2.1`, 62 modules transformed, `dist/` generated including the Workbox service worker chunk, no errors) — this is a genuine fix, not just a re-masking by an untracked file. The historical finding is kept here as a record; no further action is needed unless this file is deleted again.
 
-- **No CSP** on Netlify/Nginx responses — medium priority, now easy since the app shell is CDN-free.
-- **`log_buffer` reconciliation window**: crash between debounced localStorage write and `flushBuffer()` leaves edits unmerged (not lost). Same-day editing in two tabs is last-flush-wins.
-- **No unit tests** for `src/lib/` pure logic; E2E asserts almost nothing (title regex only).
-- **Docker image ships the full source tree**: `COPY --from=builder /app /usr/share/nginx/html/` then overlays `dist/` — `node_modules` excluded only via [.dockerignore](../../.dockerignore) (content unverified), and source/config files are publicly served. (Factual for the COPY; Unconfirmed how much `.dockerignore` mitigates)
-- **`saveLogs` closes over `t`** with an empty dependency array in [src/App.tsx](../../src/App.tsx#L105-L119) — quota-error alert may use a stale translation after a language change. Cosmetic. (Factual)
+Docker build behavior and actual Netlify/hosting deploy behavior were still **not verified** in this pass (see Analysis Limitations) — the fix is expected to resolve those pipelines too, since the root cause (missing entry module) is gone, but this was not directly re-tested against the project's actual deploy pipeline.
 
-## Compatibility Issues
+### 2. `generateFormattedLog()` parses the log text twice
 
-- `beforeinstallprompt` unsupported on iOS/desktop Safari and limited on Firefox → install button never appears there; no manual instructions offered.
-- Speculation Rules API: Chromium 108+ only (progressive enhancement, safe elsewhere).
-- iOS service-worker cache eviction is more aggressive (platform-inherent).
+**Severity: Low** — **Recommendation: ⭐️⭐️⭐️ (minor efficiency cleanup, not urgent)**
 
-## Analysis Limitations
+Confirmed in `src/lib/download.ts`. `generateFormattedLog()` (lines 206–211) calls both `toHtml(log, mins)` (line 208) and `toMarkdown(log, mins)` (line 210). `toHtml()` internally calls `parse(log, mins)` at line 125, and `toMarkdown()` independently calls `parse(log, mins)` again at line 175. The same raw log text is therefore parsed twice per invocation of `generateFormattedLog()`. This is purely a design/efficiency inefeciency — `parse()` is a pure synchronous string-processing function with no side effects, so there is no correctness bug, only redundant CPU work proportional to log size (called on-demand when the user views/downloads the formatted log, not on every keystroke).
 
-- No Actions run logs inspected — CI finding #5 is inference from reviewdog documentation.
-- `.dockerignore`, `.npmrc`, `css/main.css` contents not read in detail.
-- No runtime profiling performed ([performance.md](performance.md) is static analysis).
-- License fields in [dependencies.md](dependencies.md) are from package knowledge, not `node_modules` inspection.
+### 3. `toMarkdown()` does not call `escapeHtml()` on category/detail values (unlike `toHtml()`)
 
-d363d07ab70bdbae818bada7838fe13166f4ef08
+**Severity: Low** — **Recommendation: ⭐️⭐️⭐️ (inconsistent defensive coding, low real-world exposure today)**
+
+Confirmed in `src/lib/download.ts`. `toHtml()` explicitly escapes both `category` and `dataJson[category].detail` via `escapeHtml()` (lines 140–141). `toMarkdown()` (lines 174–201) interpolates the same `category` and `.detail` values directly into the output string with **no** `escapeHtml()` call (line 184).
+
+Currently the only caller of `toMarkdown()` is `generateFormattedLog()` (line 210), which sets `isCode: true` for the markdown section, causing the *entire* markdown block to be passed through `escapeHtml(section.content)` at line 229 before being embedded in the generated HTML page. This means the current, single call path is not exploitable for XSS in the generated HTML viewer — the whole markdown string gets escaped once more downstream regardless of what `toMarkdown()` itself did.
+
+The residual risk is architectural: `toMarkdown()` is an exported function, and if it is ever called directly for a standalone `.md` file export (a plausible future feature, given the function name and the existing HTML/plaintext/markdown three-way split), any category/detail text containing HTML-significant characters would be emitted unescaped into a real Markdown file. Markdown renderers that allow embedded raw HTML (many do) would then render that unescaped content. This is a latent gap, not a currently-exploitable bug.
+
+### 4. `log_buffer` / `log_buffer_date` intentionally excluded from IndexedDB migration
+
+**Not a bug — confirmed as deliberate design.**
+
+`src/lib/storage.ts` implements `migrateFromLocalStorage(keys: string[])`, a one-time migration helper that copies specific `localStorage` keys into IndexedDB (via the `idb` library, `getItem`/`setItem`/`removeItem`) and deletes them from `localStorage`. It is explicitly called with a fixed list of keys; `log_buffer` and `log_buffer_date` are not among them.
+
+Verified in `src/App.tsx` (lines 105–147): `log_buffer` and `log_buffer_date` are written synchronously to `localStorage` (`saveLogs`, lines 105–119) as a live, per-keystroke-adjacent edit buffer for the textarea, and later merged into the IndexedDB-backed `LOG_DATA_KEY` log store via `flushBuffer()` (lines 121–147), after which both `localStorage` keys are removed. This is a working temp-buffer pattern (synchronous localStorage for low-latency UI state, async IndexedDB for the durable log store) — not an oversight in the migration list.
+
+## Security issues
+
+### 5. `dangerouslySetInnerHTML` used 17 times in `App.tsx`, all sourced from i18next `t()` translation keys
+
+**Severity: Low (Informational)** — **Recommendation: ⭐️⭐️⭐️ (acceptable today; document/guard as a boundary invariant)**
+
+Re-verified independently: `grep -c dangerouslySetInnerHTML src/App.tsx` returns 17 matches, all in the form `dangerouslySetInnerHTML={{ __html: t('some_key') }}` (e.g. lines 636, 721, 726, 731, 744, 749, 754, 759, 764, 787, 793, 798, 851, 861, 907, 937, 962). Every occurrence's `__html` value is the return of `t(...)` (i18next), sourced from bundled translation resource files, not from user input, `localStorage` log content, or any runtime-controlled data. No direct XSS vector exists in the current code path.
+
+This remains an architectural fragility rather than an active vulnerability: the safety property depends entirely on translation strings staying static/bundled. If translations were ever sourced from a remote endpoint, a user-editable config, or interpolated with user-supplied variables without escaping, all 17 sites would become simultaneous XSS vectors. No such remote/dynamic translation loading was found in this codebase during this review, but this should be treated as an invariant to protect, not a closed question.
+
+## Compatibility issues
+
+None identified with confirmed evidence during this pass. The `escapeHtml()`/CDN-SRI/service-worker cache-key items referenced in project security rules (`.claude/rules/security.md`) were not re-investigated here as they fall outside this document's assigned scope (known_bugs vs. security-rules maintenance) — see Analysis Limitations.
+
+## Analysis limitations
+
+- **Docker build was not run or verified.** No `docker build` was attempted in this session; whether a Dockerfile exists and whether it would reproduce the same `UNRESOLVED_ENTRY` failure on a fresh image build was not checked.
+- **Actual Netlify/hosting deploy behavior was not verified.** No deploy was triggered or inspected; the conclusion that a fresh-clone deploy pipeline would fail is inferred from the clean-clone build reproduction, not from observing an actual failed deploy.
+- **Real browser offline/Service-Worker behavior was not tested in a live browser.** Only `pnpm run build`'s PWA plugin output (precache manifest generation) was inspected; runtime offline behavior, cache invalidation across versions, and the previously-reported `sw.js` `'my-cache'` vs `CACHE_NAME` hardcoding bug (documented in `.claude/rules/security.md`) were not re-verified in this pass.
+- **Whether `toMarkdown()` has any other callers outside `src/`** (e.g. scripts, build tooling) was checked only via a repo-wide grep for `toMarkdown` and `toHtml(` inside `src/`; call sites outside `src/` (if any) were not searched.
+- **No unit tests exist to cross-check parser/escaping behavior programmatically** — findings on `parse()`, `toHtml()`, and `toMarkdown()` are based on static code reading only, not on running an isolated test against crafted malicious input.
+- **Translation resource files were not exhaustively audited** for whether any `t()` key value used with `dangerouslySetInnerHTML` is ever built from a runtime template/interpolation (e.g. `t('key', { variable })`); each occurrence found was `t('literal_key')` with no interpolation object, but resource JSON contents themselves were not fully read line-by-line.
+
+<!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

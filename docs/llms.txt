@@ -1,0 +1,14 @@
+# Fast Logbook PWA
+
+> A client-only Progressive Web App for timestamped work logging. All data is stored locally in the browser (IndexedDB) — there is no backend server and no data is ever transmitted externally.
+
+Fast Logbook PWA lets a user record work activities as timestamped log entries (`YYYY-MM-DD HH:MM Category;Detail`), view them scoped to a logical day with a configurable roll-over time, and export a self-contained HTML report (summary table, plain text, and Markdown) for sharing or archiving. The app is built with React, TypeScript, and Vite, and is installable as a PWA via a Workbox-generated service worker for offline use.
+
+## Docs
+
+- [Technical Design Document](design.md): Architecture, PWA design, log format, export pipeline, i18n, toolchain, deployment, security, and performance decisions, with rationale.
+
+## Optional
+
+- [Architecture Decision Records](ADR.md): Chronological log of why each architectural change was made.
+- [Repository root](../AGENTS.md): Build/lint/test commands and module structure guidance for AI coding agents working in this repo.

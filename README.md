@@ -107,6 +107,7 @@ Option settings are saved automatically.
 
 - React 19 + TypeScript
 - Vite 8 (build + dev server)
+- Bootstrap 5 (UI components, dark theme)
 - vite-plugin-pwa / Workbox (Service Worker, offline support)
 - IndexedDB via `idb` (data storage)
 - i18next / react-i18next (i18n)
