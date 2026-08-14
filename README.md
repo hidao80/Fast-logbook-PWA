@@ -67,10 +67,10 @@ podman compose up --build
 ### Run locally
 
 ```bash
-pnpm install
-pnpm run dev     # dev server on http://localhost:3000
-pnpm run build   # production build → dist/
-pnpm run preview # preview production build
+bun install
+bun run dev     # dev server on http://localhost:3000
+bun run build   # production build → dist/
+bun run preview # preview production build
 ```
 
 ## :calling: How to Install

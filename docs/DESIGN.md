@@ -6,7 +6,7 @@
 
 > **Version 3 changelog**: Rewritten to reflect the React + TypeScript + Vite rewrite completed around 2026-06-13 (see [`docs/ADR.md`](ADR.md) ADR-010 through ADR-017). The "Zero-Build Principle" described in Version 2 no longer applies — see [§2.2](#22-build-principle-superseded-2026-06-13).
 >
-> **Version 3.1 changelog**: The project moved fully to pnpm as its package manager (§7.5), and the unused `@juliusbrussee/caveman-code` dependency was removed.
+> **Version 3.1 changelog**: The project moved fully to bun as its package manager (§7.5), and the unused `@juliusbrussee/caveman-code` dependency was removed.
 
 ---
 
@@ -84,14 +84,14 @@ Browser
 **Current state**:
 
 ```bash
-pnpm run dev     # Vite dev server (HMR) at http://localhost:3000
-pnpm run build   # Production build → dist/
-pnpm run preview # Serve the production build locally
+bun run dev     # Vite dev server (HMR) at http://localhost:3000
+bun run build   # Production build → dist/
+bun run preview # Serve the production build locally
 ```
 
 **Rationale for the change**: React's component model and TypeScript's type checking provide enough maintainability and correctness benefit (especially as `App.tsx` grew to handle log CRUD, date roll-over, shortcuts, cross-tab sync, and PWA install state) to outweigh the cost of introducing a build step. `vite-plugin-pwa`'s `generateSW` strategy also removes the previously hand-maintained `assets` array in `sw.js` (a known source of bugs in Version 2 — see §11.1 of that revision), since Workbox derives the precache list from the build output.
 
-**Consequence**: `pnpm install --frozen-lockfile` (or `pnpm install`) followed by `pnpm run build` is now required before the app can be served, including in Docker (see [§8.2](#82-docker--nginx-configuration)) and Netlify (see [§8.1](#81-static-hosting-netlify)) deployments.
+**Consequence**: `bun install --frozen-lockfile` (or `bun install`) followed by `bun run build` is now required before the app can be served, including in Docker (see [§8.2](#82-docker--nginx-configuration)) and Netlify (see [§8.1](#81-static-hosting-netlify)) deployments.
 
 ### 2.3 Module Structure
 
@@ -168,7 +168,7 @@ if ('serviceWorker' in navigator) {
 }
 ```
 
-`devOptions.enabled: true` makes the service worker active during `pnpm run dev` as well, so update/caching behavior can be verified without a production build.
+`devOptions.enabled: true` makes the service worker active during `bun run dev` as well, so update/caching behavior can be verified without a production build.
 
 **Rationale for switching to Workbox**: The Version 2 design carried a known constraint — the `assets` array in `sw.js` had to be updated by hand whenever a new file was added, and a real bug existed where the fetch handler wrote to a hardcoded `'my-cache'` key instead of `CACHE_NAME`. `generateSW` derives the precache manifest from the Vite build output automatically, eliminating both classes of bug.
 
@@ -371,13 +371,13 @@ Behaviorally equivalent to Version 2 (Japanese environments use `ja`; everything
 
 ### 7.3 CI/CD (GitHub Actions)
 
-Workflow structure is unchanged in shape from Version 2 (`lint.yml`, `audit.yml`), but `lint.yml` now runs Biome against `src/` instead of `js/`. The Takumi Guard supply-chain scan (added 2026-03-13, see ADR-008 in `docs/ADR.md`) predates the React rewrite and is unaffected by it. `audit.yml` now installs via `pnpm/action-setup` + `pnpm install --frozen-lockfile` and runs `pnpm audit --audit-level=high`, matching the project's full move to pnpm (§7.5).
+Workflow structure is unchanged in shape from Version 2 (`lint.yml`, `audit.yml`), but `lint.yml` now runs Biome against `src/` instead of `js/`. The Takumi Guard supply-chain scan (added 2026-03-13, see ADR-008 in `docs/ADR.md`) predates the React rewrite and is unaffected by it. `audit.yml` now installs via `oven-sh/setup-bun` + `bun install --frozen-lockfile` and runs `bun audit --audit-level=high`, matching the project's full move to bun (§7.5).
 
-### 7.5 Package Manager: Full Move to pnpm
+### 7.5 Package Manager: Full Move to bun
 
-The project originally used npm as its primary package manager (`package-lock.json` committed, `pnpm-lock.yaml` present only as a gitignored local artifact from the pnpm-based audit CI step — see ADR-008 in `docs/ADR.md`). It has since moved to **pnpm as the sole package manager**: `package-lock.json` has been removed, `pnpm-lock.yaml` is now committed, and `package.json` pins the manager via `"packageManager": "pnpm@10.33.2"`. All `npm run`/`npm ci`/`npm install`/`npm audit` invocations across `vite.config.js`'s tooling, `Dockerfile`, `netlify.toml`, `playwright.config.ts`, CI workflows, and developer-facing docs were updated to their `pnpm` equivalents.
+The project originally used npm as its primary package manager (`package-lock.json` committed, `bun.lock` present only as a gitignored local artifact from the bun-based audit CI step — see ADR-008 in `docs/ADR.md`). It has since moved to **bun as the sole package manager**: `package-lock.json` has been removed, `bun.lock` is now committed, and `package.json` pins the manager via `"packageManager": "bun@1.3.14"`. All `npm run`/`npm ci`/`npm install`/`npm audit` invocations across `vite.config.js`'s tooling, `Dockerfile`, `netlify.toml`, `playwright.config.ts`, CI workflows, and developer-facing docs were updated to their `bun` equivalents.
 
-**Rationale**: maintaining two parallel lockfiles (`package-lock.json` for local/Docker/Netlify installs, `pnpm-lock.yaml` for the audit CI step alone) risked the two diverging, and the unused `@juliusbrussee/caveman-code` dependency (removed separately — it pulled in unrelated, vulnerable transitive packages such as `undici` and `protobufjs` via `@google/genai`) was only caught because `npm audit` and `pnpm audit` reported different things against the two lockfiles. Standardizing on one tool and one lockfile removes that class of discrepancy.
+**Rationale**: maintaining two parallel lockfiles (`package-lock.json` for local/Docker/Netlify installs, `bun.lock` for the audit CI step alone) risked the two diverging, and the unused `@juliusbrussee/caveman-code` dependency (removed separately — it pulled in unrelated, vulnerable transitive packages such as `undici` and `protobufjs` via `@google/genai`) was only caught because `npm audit` and `bun audit` reported different things against the two lockfiles. Standardizing on one tool and one lockfile removes that class of discrepancy.
 
 ### 7.4 Known Version-String Mismatch
 
@@ -394,7 +394,7 @@ Unlike Version 2 ("no build process, files are served directly on `git push`"), 
 ```toml
 # netlify.toml
 [build]
-  command = "pnpm run build"
+  command = "bun run build"
   publish = "dist"
 
 [[headers]]
@@ -418,10 +418,10 @@ The Dockerfile's build stage is now a real build, not a conditional no-op:
 FROM node:24.11.1-bookworm-slim AS builder
 WORKDIR /app
 RUN corepack enable
-COPY package.json pnpm-lock.yaml* ./
-RUN if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; elif [ -f package.json ]; then pnpm install; fi
+COPY package.json bun.lock* ./
+RUN if [ -f bun.lock ]; then bun install --frozen-lockfile; elif [ -f package.json ]; then bun install; fi
 COPY . .
-RUN if grep -q "\"build\"" package.json; then pnpm run build; fi
+RUN if grep -q "\"build\"" package.json; then bun run build; fi
 
 FROM nginx:alpine
 # ...copies /app (with dist/ promoted to webroot if present)...
@@ -475,7 +475,7 @@ Unchanged: Bootstrap Icons (CSS font) over individual SVGs; no custom `font-fami
 
 ### 10.4 Build-Time Optimizations (new in Version 3)
 
-Vite's production build (`pnpm run build`) provides tree-shaking, code-splitting, and asset hashing that did not exist in the no-bundler Version 2 setup. `vite.config.js` explicitly dedupes and pre-bundles `react`, `react-dom`, `react-router`, and `react-router-dom` (`resolve.dedupe` / `optimizeDeps.include`) to avoid duplicate copies of these packages being pulled in via transitive dependencies during dev-server cold starts.
+Vite's production build (`bun run build`) provides tree-shaking, code-splitting, and asset hashing that did not exist in the no-bundler Version 2 setup. `vite.config.js` explicitly dedupes and pre-bundles `react`, `react-dom`, `react-router`, and `react-router-dom` (`resolve.dedupe` / `optimizeDeps.include`) to avoid duplicate copies of these packages being pulled in via transitive dependencies during dev-server cold starts.
 
 ---
 
@@ -485,7 +485,7 @@ Vite's production build (`pnpm run build`) provides tree-shaking, code-splitting
 
 | Constraint | Impact | Workaround |
 |------------|--------|-----------|
-| Build step required | App can no longer be run by opening `index.html` directly; `pnpm run build`/`pnpm run dev` is mandatory | Document clearly in `CLAUDE.md` / `README.md` (already done) |
+| Build step required | App can no longer be run by opening `index.html` directly; `bun run build`/`bun run dev` is mandatory | Document clearly in `CLAUDE.md` / `README.md` (already done) |
 | `package.json` version vs. manifest `version` drift (§7.4) | Displayed app version may not match the actual release | Generate one from the other at build time |
 | No cross-device sync | Cannot share logs across devices | Manual export → import |
 | No CSP configured | Weaker defense against injection attacks for the app shell | Add CSP headers (now simpler — see §9.2) |
