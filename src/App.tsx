@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { Drawer } from './components/Drawer';
 import { Modal } from './components/Modal';
 import { downloadLog, generateFormattedLog } from './lib/download';
@@ -116,7 +116,7 @@ export default function App() {
       }
     }
     setIsDirty(false);
-  }, []);
+  }, [t]);
 
   const flushBuffer = useCallback(async () => {
     const buffer = localStorage.getItem('log_buffer');
@@ -146,13 +146,16 @@ export default function App() {
     bcRef.current?.postMessage({ key: LOG_DATA_KEY, value });
   }, []);
 
-  const appendLog = useCallback((tag: string) => {
-    const ta = textareaRef.current;
-    if (!ta) return;
-    ta.value = trimNewLine(`${ta.value}\n${tag}`);
-    ta.scrollTo(0, ta.scrollHeight);
-    saveLogs();
-  }, [saveLogs]);
+  const appendLog = useCallback(
+    (tag: string) => {
+      const ta = textareaRef.current;
+      if (!ta) return;
+      ta.value = trimNewLine(`${ta.value}\n${tag}`);
+      ta.scrollTo(0, ta.scrollHeight);
+      saveLogs();
+    },
+    [saveLogs],
+  );
 
   const runMigrations = useCallback(async () => {
     const stored = await getItem(MIGRATION_VERSION_KEY);
@@ -427,8 +430,10 @@ export default function App() {
   };
 
   return (
-    <>
-      <form toolname="fast_logbook" tooldescription="The following operations are available for the work log: view, add, edit, export, and edit preset shortcuts.">
+    <form
+      toolname="fast_logbook"
+      tooldescription="The following operations are available for the work log: view, add, edit, export, and edit preset shortcuts."
+    >
       <nav className="navbar navbar-dark bg-dark navbar-overlay">
         <div className="container-fluid">
           <button
@@ -539,7 +544,8 @@ export default function App() {
                     className="form-control text-start"
                     onClick={() => {
                       const text = shortcuts[n - 1];
-                      if (text) appendLog(appendTime(text, targetDateRef.current));
+                      if (text)
+                        appendLog(appendTime(text, targetDateRef.current));
                     }}
                   >
                     {shortcuts[n - 1]}
@@ -556,7 +562,8 @@ export default function App() {
                     className="form-control text-start"
                     onClick={() => {
                       const text = shortcuts[n - 1];
-                      if (text) appendLog(appendTime(text, targetDateRef.current));
+                      if (text)
+                        appendLog(appendTime(text, targetDateRef.current));
                     }}
                   >
                     {shortcuts[n - 1]}
@@ -643,8 +650,7 @@ export default function App() {
         isOpen={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
       />
-      </form>
-    </>
+    </form>
   );
 }
 
