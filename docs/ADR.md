@@ -38,11 +38,11 @@ commit-hash: e021877bb892db6cc019f4e0520449119de3c079
 | 2026-03-13 | `.claude/` tracked; Takumi Guard; push-only CI; reviewdog (PR #6 = `8b59a81` on main) | `f1e1546`…`e0b341f` | docs ADR-007/008/009 |
 | 2026-06-06 | IndexedDB migration; GA4 **removed**; `.npmrc` hardening; date roll-over feature | `817c317`, `f7aa5a2`, `2c72408`, `c7bc733` | docs ADR-005/010/011 |
 | 2026-06-13 | React + TypeScript + Vite full rewrite; Workbox SW; i18next; Netlify config; manifest into vite.config | `738e60b`…`2afbf5b` | docs ADR-012…017 |
-| 2026-06-20 | pnpm unification; caveman-code dependency removed; TypeScript consolidation of lib modules; `.actrc` | `5b8968c`, `67b881f`, `d363d07` | docs ADR-018 |
+| 2026-06-20 | bun unification; caveman-code dependency removed; TypeScript consolidation of lib modules; `.actrc` | `5b8968c`, `67b881f`, `d363d07` | docs ADR-018 |
 | 2026-07-05 | GitHub Pages landing page (`docs/index.html`) added; CI hardening: `actions/checkout@v6`, Node 24 for audit workflow | `b7c61f6`, `2e39c80`, `7ee4625`, `d8eeb5f` | ADR-109 (not yet in docs/ADR.md) |
 | 2026-07-19 | IME `isComposing` guard extended from `App.tsx` to `ConfigApp.tsx` shortcut inputs | `3c1d5dd`, `3984370` | ADR-110 (not yet in docs/ADR.md) |
 | 2026-07-19 | Version-string correction: `26.07/19` → `26.07.19` (invalid slash separator) across `package.json` and locale files | `160b39b`, `da702ec`, `68aa9d2` | ADR-111 (not yet in docs/ADR.md) |
-| 2026-08-13 | `pnpm-workspace.yaml` overrides pin transitive deps (`brace-expansion`, `fast-uri`, `nanoid`, `postcss`, `react-router`) past known-vulnerable ranges; direct deps bumped | `ceff98a` | ADR-112 (not yet in docs/ADR.md) |
+| 2026-08-13 | `package.json overrides` overrides pin transitive deps (`brace-expansion`, `fast-uri`, `nanoid`, `postcss`, `react-router`) past known-vulnerable ranges; direct deps bumped | `ceff98a` | ADR-112 (not yet in docs/ADR.md) |
 | 2026-08-13 | Agent-instruction file renamed `.claude/CLAUDE.md` → `AGENTS.md`; `.claude/rules/*` (assistant-style, code-style, security) deleted; root `CLAUDE.md` now a 1-line `@AGENTS.md` pointer | `ceff98a` | ADR-113 (not yet in docs/ADR.md) |
 | 2026-08-13 | Navbar wrapped in `<form>` carrying non-standard `toolname`/`tooldescription` attributes (AI-agent tool discoverability) | `ceff98a` | ADR-114 (not yet in docs/ADR.md) |
 
@@ -93,7 +93,7 @@ All Factual (reconstructed from commit messages; rationale beyond messages is in
 - Consequence: Speculation Rules still present in `index.html`; harmless elsewhere.
 
 ### ADR-108: First CI/CD & containerization era (ESLint workflow, Dockerfile, CI split)
-- Status: Superseded by docs ADR-006/008/009 (Biome, Takumi Guard, reviewdog) and docs ADR-018 (pnpm)
+- Status: Superseded by docs ADR-006/008/009 (Biome, Takumi Guard, reviewdog) and docs ADR-018 (bun)
 - Date: 2025-12-09 … 2026-01-17 — Commits: `a9a35b4` (eslint workflow), `5bb781d` (Dockerfile), `6004114` (audit/docker/lint CI split), `380cee2` (Docker workflow removed same day)
 - Decision: Introduce lint CI on ESLint, a Docker/Nginx self-host option, and separate audit/lint workflows. A Bootstrap ES-module import attempt (`9390f2a`, 2025-12-13) was reverted to a global `<script>` load (`14c2fa0`, 2025-12-17) after breakage.
 - Consequence: The ESLint→Biome migration two months later (docs ADR-006) cites this era's vulnerability pain. The Docker image build workflow was abandoned but the Dockerfile itself survives.
@@ -120,11 +120,11 @@ All Factual (reconstructed from commit messages; rationale beyond messages is in
 - Decision: A same-day version bump first used a slash separator (`26.07/19`), which was not valid semver-adjacent formatting for this project; corrected to dot-separated (`26.07.19`) 11 minutes later.
 - Consequence: Confirms the release-versioning convention is `YY.MM.DD` with dots throughout, including i18n locale metadata and `vite.config.js`.
 
-### ADR-112: pnpm workspace overrides for transitive-dependency CVEs
+### ADR-112: bun workspace overrides for transitive-dependency CVEs
 - Status: Accepted
 - Date: 2026-08-13 — Commit: `ceff98a`
-- Decision: Add `pnpm-workspace.yaml` with an `overrides:` block pinning `brace-expansion`, `fast-uri`, `nanoid`, `postcss`, and `react-router` to patched version ranges regardless of what direct/transitive dependencies request; bump direct devDependencies (`@biomejs/biome`, `@playwright/test`, `@types/react*`, `@vitejs/plugin-react`, `vite`) and dependencies (`i18next`, `react`, `react-dom`, `react-i18next`, `react-router-dom`) to their latest patch/minor versions in the same commit.
-- Consequence: Closes the audit gap the CI `pnpm audit --audit-level=high` step would otherwise flag; `pnpm-lock.yaml` was regenerated (1191-line diff). Future dependency bumps should check whether these override ranges are still needed or can be dropped once upstream packages naturally satisfy them.
+- Decision: Add `package.json overrides` with an `overrides:` block pinning `brace-expansion`, `fast-uri`, `nanoid`, `postcss`, and `react-router` to patched version ranges regardless of what direct/transitive dependencies request; bump direct devDependencies (`@biomejs/biome`, `@playwright/test`, `@types/react*`, `@vitejs/plugin-react`, `vite`) and dependencies (`i18next`, `react`, `react-dom`, `react-i18next`, `react-router-dom`) to their latest patch/minor versions in the same commit.
+- Consequence: Closes the audit gap the CI `bun audit --audit-level=high` step would otherwise flag; `bun.lock` was regenerated (1191-line diff). Future dependency bumps should check whether these override ranges are still needed or can be dropped once upstream packages naturally satisfy them.
 
 ### ADR-113: Agent-instruction file consolidated into `AGENTS.md`
 - Status: Accepted
@@ -150,7 +150,7 @@ Per the source-of-truth rule, discrepancies found when checking every commit ref
 6. **docs/ADR.md has no entry for the 2026-07-05 commits** (`b7c61f6`, `2e39c80`, `7ee4625`, `d8eeb5f` — landing page + CI hardening, see ADR-109 above). (Factual)
 7. **docs/ADR.md has no entry for the 2026-07-19 commits** (`3c1d5dd`, `3984370` — ConfigApp IME guard, see ADR-110 above). (Factual)
 8. **`index.html` was deleted in `ceff98a` (ADR-113/114 era) but exists again as an untracked working-tree file as of this update** — `git show ceff98a -- index.html` shows a full -34 line deletion; `git status` currently shows `index.html` as untracked (`??`). Content differs from the pre-deletion version (new `<title>` block, OGP/Twitter Card meta tags). Not yet committed — no ADR entry until it lands in a commit. (Factual)
-9. **docs/ADR.md has no entries for the 2026-07-19 version-string fix or the 2026-08-13 commit** (`ceff98a` — pnpm overrides, `AGENTS.md` rename, `<form toolname>` wrapper; see ADR-111…114 above). (Factual)
+9. **docs/ADR.md has no entries for the 2026-07-19 version-string fix or the 2026-08-13 commit** (`ceff98a` — bun overrides, `AGENTS.md` rename, `<form toolname>` wrapper; see ADR-111…114 above). (Factual)
 
 Correction options for docs/ADR.md (report only — not applied):
 - Fix the two date errors in docs ADR-001/002/005. ⭐️⭐️⭐️⭐️⭐️
@@ -158,6 +158,6 @@ Correction options for docs/ADR.md (report only — not applied):
 - Back-fill the 2024–2025 era into docs/ADR.md from ADR-101…108 above. ⭐️⭐️⭐️
 - Add an ADR-019 for the 2026-07-05 landing-page/CI-hardening commits (ADR-109 above). ⭐️⭐️⭐️
 - Add an ADR-020 for the 2026-07-19 ConfigApp IME-guard commits (ADR-110 above). ⭐️⭐️
-- Add an ADR-021 for the 2026-08-13 `AGENTS.md` consolidation + pnpm security overrides (ADR-112/113 above). ⭐️⭐️⭐️
+- Add an ADR-021 for the 2026-08-13 `AGENTS.md` consolidation + bun security overrides (ADR-112/113 above). ⭐️⭐️⭐️
 
 <!-- commit-hash: e021877bb892db6cc019f4e0520449119de3c079 -->

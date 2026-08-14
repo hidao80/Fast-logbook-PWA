@@ -4,22 +4,22 @@ FROM node:24.11.1-bookworm-slim AS builder
 # 作業ディレクトリを設定
 WORKDIR /app
 
-# corepack 経由で pnpm を有効化
-RUN corepack enable
+# npm 経由で bun を有効化
+RUN npm install -g bun
 
-# package.json / pnpm-lock.yaml をコピー（依存関係のインストール用）
-COPY package.json pnpm-lock.yaml* ./
+# package.json / bun.lock をコピー（依存関係のインストール用）
+COPY package.json bun.lock* ./
 
 # 依存関係をインストール（存在する場合）
-RUN if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; \
-  elif [ -f package.json ]; then pnpm install; \
+RUN if [ -f bun.lock ]; then bun install --frozen-lockfile; \
+  elif [ -f package.json ]; then bun install; \
   fi
 
 # アプリケーションファイルをコピー
 COPY . .
 
 # ビルドスクリプトが存在する場合は実行
-RUN if grep -q "\"build\"" package.json; then pnpm run build; \
+RUN if grep -q "\"build\"" package.json; then bun run build; \
   else echo "No build script found, skipping build step"; \
   fi
 
