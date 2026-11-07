@@ -2,10 +2,11 @@
   "name": "fast-logbook-pwa",
   "version": "26.08.14",
   "description": "Time-stamped work notes PWA",
-  "packageManager": "bun@1.3.14",
+  "packageManager": "bun@1.4.4",
   "overrides": {
-    "brace-expansion": ">=5.0.9",
-    "fast-uri": ">=4.1.4",
+    "brace-expansion": ">=5.0.11",
+    "fast-uri": ">=4.1.5",
+    "glob": ">=14.0.2",
     "nanoid": ">=3.3.17",
     "postcss": ">=8.5.23",
     "react-router": ">=7.18.2"
@@ -16,6 +17,7 @@
     "preview": "vite preview",
     "lint": "biome check src/",
     "lint:fix": "biome check --write src/",
+    "audit": "bun audit --ignore=GHSA-gcqx-w48m-w2h4",
     "test": "playwright test",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
@@ -43,7 +45,7 @@
   "dependencies": {
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
-    "fast-uri": "^4.1.4",
+    "fast-uri": "^4.1.5",
     "global": "^4.4.0",
     "i18next": "^26.4.2",
     "idb": "^8.0.3",
