@@ -16,7 +16,7 @@ Supply-chain hardening is configured in `bunfig.toml`: dependency lifecycle scri
 ## Docs
 
 - [Landing page](index.html): Product overview, usage steps, log format, feature list, and tech stack. Available in English, Japanese, Simplified Chinese, Traditional Chinese, Spanish, German, and Russian.
-- [Technical Design Document](design.md): Architecture, PWA design, log format, export pipeline, i18n, toolchain, deployment, security, and performance decisions, with rationale.
+- [Technical Design Document](DESIGN.md): Architecture, PWA design, log format, export pipeline, i18n, toolchain, deployment, security, and performance decisions, with rationale.
 
 ## Optional
 

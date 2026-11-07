@@ -74,7 +74,7 @@ Write all inline comments in English.
 
 ### Documentation
 
-- Design rationale → [`docs/design.md`](docs/design.md)
+- Design rationale → [`docs/DESIGN.md`](docs/DESIGN.md)
 - Architecture Decision Records → [`docs/ADR.md`](docs/ADR.md)
 
 <!-- commit-hash: 39843709093825c8ffe02e61d8b0d66a45783f68 -->
