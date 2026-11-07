@@ -4,8 +4,18 @@
 
 Fast Logbook PWA lets a user record work activities as timestamped log entries (`YYYY-MM-DD HH:MM Category;Detail`), view them scoped to a logical day with a configurable roll-over time, and export a self-contained HTML report (summary table, plain text, and Markdown) for sharing or archiving. The app is built with React, TypeScript, and Vite, and is installable as a PWA via a Workbox-generated service worker for offline use.
 
+Tech stack:
+
+- Frontend: React 19, TypeScript, React Router, Bootstrap 5, Bootstrap Icons
+- Build & PWA: Vite, vite-plugin-pwa (Workbox), Bun (package manager and script runner)
+- Data & i18n: IndexedDB via `idb`, i18next / react-i18next
+- Quality: Biome (lint/format), Playwright (E2E across mobile/tablet/FHD viewports), GitHub Actions (lint, `bun audit`, and E2E workflows)
+
+Supply-chain hardening is configured in `bunfig.toml`: dependency lifecycle scripts are disabled (`ignoreScripts`) and only package versions published at least 7 days ago are installed (`minimumReleaseAge`).
+
 ## Docs
 
+- [Landing page](index.html): Product overview, usage steps, log format, feature list, and tech stack. Available in English, Japanese, Simplified Chinese, Traditional Chinese, Spanish, German, and Russian.
 - [Technical Design Document](design.md): Architecture, PWA design, log format, export pipeline, i18n, toolchain, deployment, security, and performance decisions, with rationale.
 
 ## Optional
