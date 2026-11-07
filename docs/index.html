@@ -51,6 +51,10 @@
       --border: #e2e8dc;
       --shadow: 0 2px 12px rgba(28, 36, 25, .08);
       --radius: 14px;
+      --c-ui: #2563eb;
+      --c-build: #7c3aed;
+      --c-data: #c2410c;
+      --c-qa: #0f766e;
       color-scheme: light dark;
     }
     @media (prefers-color-scheme: dark) {
@@ -63,6 +67,10 @@
         --text-sub: #a3ae9b;
         --border: #2e372a;
         --shadow: 0 2px 12px rgba(0, 0, 0, .4);
+        --c-ui: #60a5fa;
+        --c-build: #a78bfa;
+        --c-data: #fb923c;
+        --c-qa: #2dd4bf;
       }
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -92,15 +100,23 @@
       display: flex; align-items: center; gap: .6rem;
     }
     .nav img { width: 28px; height: 28px; border-radius: 6px; }
-    .nav strong { font-size: 1rem; }
+    .nav strong { font-size: 1rem; white-space: nowrap; }
     .nav .spacer { flex: 1; }
-    .nav a { text-decoration: none; color: var(--text-sub); font-size: .9rem; padding: .3rem .5rem; }
+    .nav a { text-decoration: none; color: var(--text-sub); font-size: .9rem; padding: .3rem .5rem; white-space: nowrap; }
     .nav a:hover { color: var(--accent-dark); }
     #langSwitch {
       border: 1px solid var(--border); background: var(--surface); color: var(--text);
       border-radius: 999px; padding: .25rem .8rem; font-size: .85rem; cursor: pointer;
     }
     #langSwitch:hover { border-color: var(--accent); }
+    /* Narrow screens: brand + language switch on row 1, nav links wrap below */
+    @media (max-width: 640px) {
+      .nav { flex-wrap: wrap; column-gap: .3rem; row-gap: 0; padding: .5rem 1rem; }
+      .nav .spacer { order: 1; flex-basis: 100%; height: 0; }
+      #langSwitch { margin-left: auto; }
+      .nav a { order: 2; font-size: .85rem; padding: .25rem .45rem; }
+      .nav a:first-of-type { margin-left: -.45rem; }
+    }
 
     /* --- hero --- */
     .hero { text-align: center; padding: 5rem 1.25rem 4rem; }
@@ -133,7 +149,7 @@
     }
     .btn.ghost { border: 1.5px solid var(--border); color: var(--text); background: var(--surface); }
     .hero .shot {
-      max-width: 380px; border-radius: var(--radius);
+      max-width: min(380px, 100%); border-radius: var(--radius);
       box-shadow: 0 12px 40px rgba(28, 36, 25, .18);
       border: 1px solid var(--border);
     }
@@ -162,7 +178,7 @@
     .step:nth-child(even) { flex-direction: row-reverse; }
     .step > div { flex: 1 1 280px; }
     .step img {
-      flex: 1 1 280px; max-width: 380px; margin: 0 auto;
+      flex: 1 1 280px; max-width: min(380px, 100%); margin: 0 auto;
       border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow);
     }
     .step .num {
@@ -211,6 +227,45 @@
     .privacy .big { font-size: 3rem; }
     .privacy .cta { margin-bottom: 0; }
 
+    /* --- tech stack pills --- */
+    .stack { margin: 0 auto 2.8rem; text-align: left; }
+    .stack h3 {
+      text-align: center; font-size: 1.2rem; margin-bottom: 1.2rem;
+      color: var(--text);
+    }
+    .stack-grid {
+      display: grid; gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+    }
+    .stack-group {
+      background: var(--surface); border: 1px solid var(--border);
+      border-top: 4px solid var(--c);
+      border-radius: var(--radius); padding: 1rem 1.1rem 1.15rem; box-shadow: var(--shadow);
+    }
+    .stack-group h4 {
+      font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--c); margin-bottom: .7rem;
+    }
+    .pills { list-style: none; display: flex; flex-wrap: wrap; gap: .5rem; }
+    .pills li {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .35rem .9rem; border-radius: 999px;
+      font-size: .9rem; font-weight: 600; line-height: 1.4; white-space: nowrap;
+      color: var(--text);
+      background: color-mix(in srgb, var(--c) 10%, var(--surface));
+      border: 1.5px solid color-mix(in srgb, var(--c) 45%, var(--border));
+      box-shadow: 0 1px 2px rgba(28, 36, 25, .08);
+      transition: transform .15s, border-color .15s;
+    }
+    .pills li::before {
+      content: ""; width: .5rem; height: .5rem; border-radius: 50%;
+      background: var(--c); flex-shrink: 0;
+    }
+    .pills li:hover { transform: translateY(-1px); border-color: var(--c); }
+    @media (max-width: 480px) {
+      .pills li { font-size: .85rem; padding: .3rem .75rem; }
+    }
+
     footer { text-align: center; padding: 2.5rem 1.25rem; color: var(--text-sub); font-size: .9rem; }
     footer a { color: var(--text-sub); }
 
@@ -242,6 +297,8 @@
       <span language="zh">使用方法</span>
       <span language="es">Cómo funciona</span>
       <span language="ru">Как это работает</span>
+      <span language="zh-TW">使用方式</span>
+      <span language="de">So funktioniert's</span>
     </template></a>
     <a href="#features"><template type="language-group">
       <span language="en">Features</span>
@@ -249,13 +306,17 @@
       <span language="zh">功能</span>
       <span language="es">Funciones</span>
       <span language="ru">Возможности</span>
+      <span language="zh-TW">功能</span>
+      <span language="de">Funktionen</span>
     </template></a>
     <a href="https://github.com/hidao80/Fast-logbook-PWA">GitHub</a>
     <select id="langSwitch" aria-label="Switch language">
       <option value="en">English</option>
       <option value="ja">日本語</option>
-      <option value="zh">中文</option>
+      <option value="zh">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
       <option value="es">Español</option>
+      <option value="de">Deutsch</option>
       <option value="ru">Русский</option>
     </select>
   </nav>
@@ -269,6 +330,8 @@
     <span language="zh"><em>一键</em>记录，<br><em>即时</em>统计。</span>
     <span language="es">Registra con <em>un toque</em>.<br>Calcula <em>al instante</em>.</span>
     <span language="ru">Запись в <em>одно касание</em>.<br>Подсчёт <em>мгновенно</em>.</span>
+    <span language="zh-TW"><em>一鍵</em>記錄，<br><em>即時</em>統計。</span>
+    <span language="de">Mit <em>einem Tipp</em> erfassen.<br><em>Sofort</em> auswerten.</span>
   </template></h1>
   <p class="sub"><template type="language-group">
     <span language="en">Fast Logbook is a lightweight work-log PWA that runs entirely in your browser. No installation, no account, no server — your data never leaves your device.</span>
@@ -276,6 +339,8 @@
     <span language="zh">Fast Logbook 是一款轻量级工作日志 PWA，完全在浏览器中运行。无需安装、无需账号、无需服务器——您的数据不会离开您的设备。</span>
     <span language="es">Fast Logbook es una PWA ligera para registrar horas de trabajo que funciona totalmente en tu navegador. Sin instalación, sin cuenta, sin servidor: tus datos nunca salen de tu dispositivo.</span>
     <span language="ru">Fast Logbook — это лёгкое PWA-приложение для учёта рабочего времени, полностью работающее в браузере. Без установки, без аккаунта, без сервера — ваши данные никогда не покидают устройство.</span>
+    <span language="zh-TW">Fast Logbook 是一款輕量級工作日誌 PWA，完全在瀏覽器中執行。無需安裝、無需帳號、無需伺服器——您的資料不會離開您的裝置。</span>
+    <span language="de">Fast Logbook ist eine schlanke Arbeitsprotokoll-PWA, die vollständig in Ihrem Browser läuft. Keine Installation, kein Konto, kein Server – Ihre Daten verlassen niemals Ihr Gerät.</span>
   </template></p>
   <div class="cta">
     <a class="btn primary" href="https://fast-logbook.netlify.app/"><template type="language-group">
@@ -284,6 +349,8 @@
       <span language="zh">🚀 立即体验演示</span>
       <span language="es">🚀 Probar la demo en vivo</span>
       <span language="ru">🚀 Попробовать демо</span>
+      <span language="zh-TW">🚀 立即體驗示範</span>
+      <span language="de">🚀 Live-Demo ausprobieren</span>
     </template></a>
     <a class="btn ghost" href="https://github.com/hidao80/Fast-logbook-PWA"><template type="language-group">
       <span language="en">View on GitHub</span>
@@ -291,6 +358,8 @@
       <span language="zh">在 GitHub 查看</span>
       <span language="es">Ver en GitHub</span>
       <span language="ru">Открыть на GitHub</span>
+      <span language="zh-TW">在 GitHub 查看</span>
+      <span language="de">Auf GitHub ansehen</span>
     </template></a>
   </div>
   <img class="shot" src="https://github.com/user-attachments/assets/c990ed5d-1973-42c5-b36c-1c9910ca0e7a" alt="Fast Logbook input screen" loading="eager" fetchpriority="high">
@@ -306,6 +375,8 @@
         <span language="zh">快速</span>
         <span language="es">Rápido</span>
         <span language="ru">Быстро</span>
+        <span language="zh-TW">快速</span>
+        <span language="de">Schnell</span>
       </template></h3>
       <p><template type="language-group">
         <span language="en">Stamp a timestamped entry with a single tap — or just press keys 1–9. Logging takes literally one second.</span>
@@ -313,6 +384,8 @@
         <span language="zh">只需一次点击即可打上带时间戳的记录——或直接按下数字键 <kbd>1</kbd>–<kbd>9</kbd>。记录用时不到一秒。</span>
         <span language="es">Registra una entrada con marca de tiempo con un solo toque, o simplemente pulsa las teclas <kbd>1</kbd>–<kbd>9</kbd>. El registro tarda literalmente un segundo.</span>
         <span language="ru">Отметьте запись с меткой времени одним касанием — или просто нажмите клавиши <kbd>1</kbd>–<kbd>9</kbd>. Запись занимает буквально одну секунду.</span>
+        <span language="zh-TW">只需輕觸一次即可新增帶時間戳記的記錄——或直接按下數字鍵 <kbd>1</kbd>–<kbd>9</kbd>。記錄只需一秒。</span>
+        <span language="de">Ein Eintrag mit Zeitstempel per Fingertipp – oder einfach die Tasten <kbd>1</kbd>–<kbd>9</kbd> drücken. Das Erfassen dauert buchstäblich eine Sekunde.</span>
       </template></p>
     </div>
     <div class="card">
@@ -323,6 +396,8 @@
         <span language="zh">汇总</span>
         <span language="es">Resumen</span>
         <span language="ru">Сводка</span>
+        <span language="zh-TW">彙總</span>
+        <span language="de">Auswertung</span>
       </template></h3>
       <p><template type="language-group">
         <span language="en">Totals and grand totals per category are calculated instantly. Break time is excluded automatically with the <code>^</code> prefix.</span>
@@ -330,6 +405,8 @@
         <span language="zh">各类别的合计与总计即时计算完成。带有 <code>^</code> 前缀的休息时间会自动从工作时长中排除。</span>
         <span language="es">Los totales y el total general por categoría se calculan al instante. El tiempo de descanso se excluye automáticamente con el prefijo <code>^</code>.</span>
         <span language="ru">Итоги и общие суммы по категориям рассчитываются мгновенно. Время перерыва автоматически исключается с помощью префикса <code>^</code>.</span>
+        <span language="zh-TW">各類別的小計與總計即時算出。加上 <code>^</code> 前綴的休息時間會自動從工作時數中排除。</span>
+        <span language="de">Summen und Gesamtsummen pro Kategorie werden sofort berechnet. Pausenzeiten werden mit dem Präfix <code>^</code> automatisch ausgeschlossen.</span>
       </template></p>
     </div>
     <div class="card">
@@ -340,6 +417,8 @@
         <span language="zh">隐私</span>
         <span language="es">Privado</span>
         <span language="ru">Приватность</span>
+        <span language="zh-TW">隱私</span>
+        <span language="de">Privat</span>
       </template></h3>
       <p><template type="language-group">
         <span language="en">100% client-side. Data stays in your browser (IndexedDB). No server, no account, nothing to leak.</span>
@@ -347,6 +426,8 @@
         <span language="zh">100% 客户端运行。数据仅保存在浏览器中 (IndexedDB)。没有服务器，没有账号，无可泄露之物。</span>
         <span language="es">100% del lado del cliente. Los datos permanecen en tu navegador (IndexedDB). Sin servidor, sin cuenta, nada que filtrar.</span>
         <span language="ru">100% на стороне клиента. Данные хранятся только в браузере (IndexedDB). Нет сервера, нет аккаунта — нечему утекать.</span>
+        <span language="zh-TW">100% 用戶端執行。資料僅儲存在瀏覽器中 (IndexedDB)。沒有伺服器、沒有帳號，無從外洩。</span>
+        <span language="de">100 % clientseitig. Die Daten bleiben in Ihrem Browser (IndexedDB). Kein Server, kein Konto, nichts, was durchsickern könnte.</span>
       </template></p>
     </div>
   </div>
@@ -360,6 +441,8 @@
       <span language="zh">使用方法</span>
       <span language="es">Cómo funciona</span>
       <span language="ru">Как это работает</span>
+      <span language="zh-TW">使用方式</span>
+      <span language="de">So funktioniert's</span>
     </template></h2>
     <p class="section-lead"><template type="language-group">
       <span language="en">Set up once, then just tap. Your daily report writes itself.</span>
@@ -367,6 +450,8 @@
       <span language="zh">只需设置一次，之后只需点击。您的日报将自动生成。</span>
       <span language="es">Configúralo una vez y luego solo toca. Tu informe diario se escribe solo.</span>
       <span language="ru">Настройте один раз — дальше просто нажимайте. Ежедневный отчёт создаётся сам.</span>
+      <span language="zh-TW">只需設定一次，之後輕觸即可。日報會自動完成。</span>
+      <span language="de">Einmal einrichten, dann nur noch tippen. Ihr Tagesbericht schreibt sich von selbst.</span>
     </template></p>
 
     <div class="step">
@@ -378,6 +463,8 @@
           <span language="zh">注册任务</span>
           <span language="es">Registra tus tareas</span>
           <span language="ru">Зарегистрируйте задачи</span>
+          <span language="zh-TW">註冊任務</span>
+          <span language="de">Aufgaben registrieren</span>
         </template></h3>
         <p><template type="language-group">
           <span language="en">Assign your routine tasks to keys 1–9 on the config screen. Prefix a task with <kbd>^</kbd> (e.g. break time) to exclude it from working-hour totals.</span>
@@ -385,6 +472,8 @@
           <span language="zh">在设置页面将常用任务分配到数字键 <kbd>1</kbd>–<kbd>9</kbd>。为任务添加 <kbd>^</kbd> 前缀（例如休息时间）即可将其从工作时长统计中排除。</span>
           <span language="es">Asigna tus tareas habituales a las teclas <kbd>1</kbd>–<kbd>9</kbd> en la pantalla de configuración. Antepón <kbd>^</kbd> a una tarea (por ejemplo, el descanso) para excluirla de los totales de horas trabajadas.</span>
           <span language="ru">Назначьте часто используемые задачи клавишам <kbd>1</kbd>–<kbd>9</kbd> на экране настроек. Добавьте префикс <kbd>^</kbd> к задаче (например, к перерыву), чтобы исключить её из подсчёта рабочего времени.</span>
+          <span language="zh-TW">在設定畫面將常用任務指派給數字鍵 <kbd>1</kbd>–<kbd>9</kbd>。在任務前加上 <kbd>^</kbd>（例如休息時間）即可將其從工作時數統計中排除。</span>
+          <span language="de">Weisen Sie Ihre wiederkehrenden Aufgaben im Einstellungsbildschirm den Tasten <kbd>1</kbd>–<kbd>9</kbd> zu. Stellen Sie einer Aufgabe <kbd>^</kbd> voran (z. B. Pause), um sie von der Arbeitszeitsumme auszuschließen.</span>
         </template></p>
       </div>
       <img src="https://github.com/user-attachments/assets/ccc564a6-bff9-407c-ba66-974193939823" alt="Configuration screen" loading="lazy">
@@ -399,6 +488,8 @@
           <span language="zh">切换工作时打卡</span>
           <span language="es">Marca mientras trabajas</span>
           <span language="ru">Отмечайте во время работы</span>
+          <span language="zh-TW">切換工作時打卡</span>
+          <span language="de">Beim Arbeiten stempeln</span>
         </template></h3>
         <p><template type="language-group">
           <span language="en">Switching tasks? Tap the label — the current time is stamped automatically. Need something ad-hoc? Use the free-input field on <kbd>0</kbd>. Every entry stays editable.</span>
@@ -406,6 +497,8 @@
           <span language="zh">切换任务时只需点击标签——系统会自动记录当前时间。需要临时输入？可使用 <kbd>0</kbd> 对应的自由输入框。记录后的文本可自由编辑。</span>
           <span language="es">¿Cambias de tarea? Toca la etiqueta: la hora actual se registra automáticamente. ¿Necesitas algo puntual? Usa el campo de entrada libre en <kbd>0</kbd>. Cada entrada se puede editar.</span>
           <span language="ru">Переключаете задачу? Нажмите на метку — текущее время отметится автоматически. Нужно что-то нестандартное? Используйте поле свободного ввода на клавише <kbd>0</kbd>. Любую запись можно редактировать.</span>
+          <span language="zh-TW">切換任務時只需輕觸標籤——系統會自動記錄目前時間。需要臨時輸入？請使用 <kbd>0</kbd> 對應的自由輸入欄。每筆記錄都可隨時編輯。</span>
+          <span language="de">Aufgabe gewechselt? Tippen Sie auf das Label – die aktuelle Uhrzeit wird automatisch gestempelt. Etwas Spontanes? Nutzen Sie das Freitextfeld auf <kbd>0</kbd>. Jeder Eintrag bleibt bearbeitbar.</span>
         </template></p>
       </div>
       <img src="https://github.com/user-attachments/assets/748b4f02-452a-4fee-8642-27c035245d03" alt="Input screen with task labels" loading="lazy">
@@ -420,6 +513,8 @@
           <span language="zh">查看或下载汇总</span>
           <span language="es">Consulta o descarga el resumen</span>
           <span language="ru">Просмотр или скачивание сводки</span>
+          <span language="zh-TW">檢視或下載彙總</span>
+          <span language="de">Zusammenfassung ansehen oder herunterladen</span>
         </template></h3>
         <p><template type="language-group">
           <span language="en">One click generates a self-contained HTML report with an HTML table, plain text, and a Markdown table — each with a copy button. Paste it straight into your daily report.</span>
@@ -427,6 +522,8 @@
           <span language="zh">一键生成独立的 HTML 报告，内含 HTML 表格、纯文本和 Markdown 表格，每种格式均附带复制按钮。可直接粘贴到您的日报中。</span>
           <span language="es">Un clic genera un informe HTML autónomo con una tabla HTML, texto plano y una tabla Markdown, cada uno con su botón de copiar. Pégalo directamente en tu informe diario.</span>
           <span language="ru">Один клик создаёт автономный HTML-отчёт с HTML-таблицей, обычным текстом и таблицей Markdown — каждый с кнопкой копирования. Вставьте прямо в ежедневный отчёт.</span>
+          <span language="zh-TW">一鍵產生獨立的 HTML 報告，內含 HTML 表格、純文字與 Markdown 表格，每種格式皆附有複製按鈕。可直接貼到您的日報中。</span>
+          <span language="de">Ein Klick erzeugt einen eigenständigen HTML-Bericht mit HTML-Tabelle, Klartext und Markdown-Tabelle – jeweils mit Kopier-Schaltfläche. Direkt in Ihren Tagesbericht einfügen.</span>
         </template></p>
       </div>
       <img src="https://github.com/user-attachments/assets/650c8fd4-dc39-4c16-ae6b-d92ba7ddc236" alt="Exported summary HTML with totals" loading="lazy">
@@ -442,6 +539,8 @@
       <span language="zh">人类可读的日志格式</span>
       <span language="es">Un formato de registro legible</span>
       <span language="ru">Формат журнала, понятный человеку</span>
+      <span language="zh-TW">人類可讀的日誌格式</span>
+      <span language="de">Ein lesbares Protokollformat</span>
     </template></h2>
     <p class="section-lead"><template type="language-group">
       <span language="en">Everything is stored as plain text — one line per entry. No lock-in, ever.</span>
@@ -449,14 +548,47 @@
       <span language="zh">所有数据均以纯文本保存——每条记录一行。永不锁定。</span>
       <span language="es">Todo se guarda como texto plano, una línea por entrada. Sin ataduras, nunca.</span>
       <span language="ru">Всё хранится как обычный текст — одна строка на запись. Никакой привязки к формату.</span>
+      <span language="zh-TW">所有資料皆以純文字儲存——每筆記錄一行。永遠不會被綁定。</span>
+      <span language="de">Alles wird als Klartext gespeichert – eine Zeile pro Eintrag. Kein Lock-in, niemals.</span>
     </template></p>
     <div class="logfmt">
       <div class="bar"><i></i><i></i><i></i></div>
-      <pre><span class="dt">2026-07-05 09:00</span><span class="cat">Meeting</span>;Daily stand-up
+      <pre><template type="language-group"><span language="en"><span class="dt">2026-07-05 09:00</span><span class="cat">Meeting</span>;Daily stand-up
 <span class="dt">2026-07-05 09:15</span><span class="cat">Coding</span>;Fix login validation
 <span class="brk"><span class="dt">2026-07-05 12:00</span>^Break;Lunch</span>
 <span class="dt">2026-07-05 13:00</span><span class="cat">Coding</span>;Refactor storage module
-<span class="dt">2026-07-05 17:30</span><span class="cat">Review</span>;PR #42</pre>
+<span class="dt">2026-07-05 17:30</span><span class="cat">Review</span>;PR #42</span>
+<span language="ja"><span class="dt">2026-07-05 09:00</span><span class="cat">会議</span>;朝会
+<span class="dt">2026-07-05 09:15</span><span class="cat">開発</span>;ログイン検証の修正
+<span class="brk"><span class="dt">2026-07-05 12:00</span>^休憩;昼食</span>
+<span class="dt">2026-07-05 13:00</span><span class="cat">開発</span>;ストレージモジュールのリファクタリング
+<span class="dt">2026-07-05 17:30</span><span class="cat">レビュー</span>;PR #42</span>
+<span language="zh"><span class="dt">2026-07-05 09:00</span><span class="cat">会议</span>;每日站会
+<span class="dt">2026-07-05 09:15</span><span class="cat">编码</span>;修复登录验证
+<span class="brk"><span class="dt">2026-07-05 12:00</span>^休息;午餐</span>
+<span class="dt">2026-07-05 13:00</span><span class="cat">编码</span>;重构存储模块
+<span class="dt">2026-07-05 17:30</span><span class="cat">评审</span>;PR #42</span>
+<span language="zh-TW"><span class="dt">2026-07-05 09:00</span><span class="cat">會議</span>;每日站會
+<span class="dt">2026-07-05 09:15</span><span class="cat">開發</span>;修正登入驗證
+<span class="brk"><span class="dt">2026-07-05 12:00</span>^休息;午餐</span>
+<span class="dt">2026-07-05 13:00</span><span class="cat">開發</span>;重構儲存模組
+<span class="dt">2026-07-05 17:30</span><span class="cat">審查</span>;PR #42</span>
+<span language="es"><span class="dt">2026-07-05 09:00</span><span class="cat">Reunión</span>;Reunión diaria
+<span class="dt">2026-07-05 09:15</span><span class="cat">Programación</span>;Corregir validación de inicio de sesión
+<span class="brk"><span class="dt">2026-07-05 12:00</span>^Descanso;Almuerzo</span>
+<span class="dt">2026-07-05 13:00</span><span class="cat">Programación</span>;Refactorizar módulo de almacenamiento
+<span class="dt">2026-07-05 17:30</span><span class="cat">Revisión</span>;PR #42</span>
+<span language="de"><span class="dt">2026-07-05 09:00</span><span class="cat">Meeting</span>;Daily Stand-up
+<span class="dt">2026-07-05 09:15</span><span class="cat">Entwicklung</span>;Login-Validierung korrigieren
+<span class="brk"><span class="dt">2026-07-05 12:00</span>^Pause;Mittagessen</span>
+<span class="dt">2026-07-05 13:00</span><span class="cat">Entwicklung</span>;Speichermodul refaktorisieren
+<span class="dt">2026-07-05 17:30</span><span class="cat">Review</span>;PR #42</span>
+<span language="ru"><span class="dt">2026-07-05 09:00</span><span class="cat">Встреча</span>;Ежедневный стендап
+<span class="dt">2026-07-05 09:15</span><span class="cat">Разработка</span>;Исправить проверку входа
+<span class="brk"><span class="dt">2026-07-05 12:00</span>^Перерыв;Обед</span>
+<span class="dt">2026-07-05 13:00</span><span class="cat">Разработка</span>;Рефакторинг модуля хранения
+<span class="dt">2026-07-05 17:30</span><span class="cat">Ревью</span>;PR #42</span>
+</template></pre>
     </div>
   </div>
 </section>
@@ -469,6 +601,8 @@
       <span language="zh">应有尽有，毫无冗余</span>
       <span language="es">Todo lo que necesitas, nada que no</span>
       <span language="ru">Всё что нужно, и ничего лишнего</span>
+      <span language="zh-TW">應有盡有，毫無多餘</span>
+      <span language="de">Alles, was Sie brauchen – nichts, was Sie nicht brauchen</span>
     </template></h2>
     <div class="features">
       <div class="card"><div class="icon">📱</div>
@@ -478,6 +612,8 @@
           <span language="zh">可安装 PWA</span>
           <span language="es">PWA instalable</span>
           <span language="ru">Устанавливаемое PWA</span>
+          <span language="zh-TW">可安裝 PWA</span>
+          <span language="de">Installierbare PWA</span>
         </template></h3>
         <p><template type="language-group">
           <span language="en">Works offline; installs as an app on PC and mobile.</span>
@@ -485,6 +621,8 @@
           <span language="zh">支持离线运行；可作为应用安装到电脑和手机。</span>
           <span language="es">Funciona sin conexión; se instala como app en PC y móvil.</span>
           <span language="ru">Работает офлайн; устанавливается как приложение на ПК и мобильных.</span>
+          <span language="zh-TW">支援離線使用；可在電腦與手機上安裝為應用程式。</span>
+          <span language="de">Funktioniert offline; lässt sich auf PC und Mobilgerät als App installieren.</span>
         </template></p></div>
       <div class="card"><div class="icon">⌨️</div>
         <h3><template type="language-group">
@@ -493,6 +631,8 @@
           <span language="zh">键盘优先</span>
           <span language="es">Prioridad al teclado</span>
           <span language="ru">Приоритет клавиатуры</span>
+          <span language="zh-TW">鍵盤優先</span>
+          <span language="de">Tastatur zuerst</span>
         </template></h3>
         <p><template type="language-group">
           <span language="en">Keys 1–9 stamp presets; 0 jumps to free input.</span>
@@ -500,6 +640,8 @@
           <span language="zh">数字键 <kbd>1</kbd>–<kbd>9</kbd> 打卡预设任务；<kbd>0</kbd> 键跳转至自由输入。</span>
           <span language="es">Las teclas <kbd>1</kbd>–<kbd>9</kbd> marcan preajustes; <kbd>0</kbd> salta a la entrada libre.</span>
           <span language="ru">Клавиши <kbd>1</kbd>–<kbd>9</kbd> отмечают предустановки; <kbd>0</kbd> переходит к свободному вводу.</span>
+          <span language="zh-TW">數字鍵 <kbd>1</kbd>–<kbd>9</kbd> 打卡預設任務；<kbd>0</kbd> 鍵跳至自由輸入。</span>
+          <span language="de">Die Tasten <kbd>1</kbd>–<kbd>9</kbd> stempeln Vorlagen; <kbd>0</kbd> springt zur freien Eingabe.</span>
         </template></p></div>
       <div class="card"><div class="icon">📋</div>
         <h3><template type="language-group">
@@ -508,6 +650,8 @@
           <span language="zh">三合一导出</span>
           <span language="es">Exportación 3 en 1</span>
           <span language="ru">Экспорт «3 в 1»</span>
+          <span language="zh-TW">三合一匯出</span>
+          <span language="de">3-in-1-Export</span>
         </template></h3>
         <p><template type="language-group">
           <span language="en">HTML table + plain text + Markdown, with copy buttons.</span>
@@ -515,6 +659,8 @@
           <span language="zh">HTML 表格 + 纯文本 + Markdown，均附带复制按钮。</span>
           <span language="es">Tabla HTML + texto plano + Markdown, con botones de copiar.</span>
           <span language="ru">HTML-таблица + обычный текст + Markdown, с кнопками копирования.</span>
+          <span language="zh-TW">HTML 表格 + 純文字 + Markdown，皆附有複製按鈕。</span>
+          <span language="de">HTML-Tabelle + Klartext + Markdown, mit Kopier-Schaltflächen.</span>
         </template></p></div>
       <div class="card"><div class="icon">☕</div>
         <h3><template type="language-group">
@@ -523,6 +669,8 @@
           <span language="zh">休息时间排除</span>
           <span language="es">Exclusión de descansos</span>
           <span language="ru">Исключение перерывов</span>
+          <span language="zh-TW">排除休息時間</span>
+          <span language="de">Pausen ausschließen</span>
         </template></h3>
         <p><template type="language-group">
           <span language="en">The <code>^</code> prefix excludes entries from work-time totals.</span>
@@ -530,6 +678,8 @@
           <span language="zh"><code>^</code> 前缀可将条目从工作时长统计中排除。</span>
           <span language="es">El prefijo <code>^</code> excluye entradas de los totales de horas trabajadas.</span>
           <span language="ru">Префикс <code>^</code> исключает записи из подсчёта рабочего времени.</span>
+          <span language="zh-TW"><code>^</code> 前綴可將項目從工作時數統計中排除。</span>
+          <span language="de">Das Präfix <code>^</code> schließt Einträge von der Arbeitszeitsumme aus.</span>
         </template></p></div>
       <div class="card"><div class="icon">🌙</div>
         <h3><template type="language-group">
@@ -538,6 +688,8 @@
           <span language="zh">深色模式</span>
           <span language="es">Modo oscuro</span>
           <span language="ru">Тёмная тема</span>
+          <span language="zh-TW">深色模式</span>
+          <span language="de">Dunkelmodus</span>
         </template></h3>
         <p><template type="language-group">
           <span language="en">Follows your system theme automatically.</span>
@@ -545,6 +697,8 @@
           <span language="zh">自动跟随系统主题。</span>
           <span language="es">Sigue el tema de tu sistema automáticamente.</span>
           <span language="ru">Автоматически следует теме системы.</span>
+          <span language="zh-TW">自動跟隨系統主題。</span>
+          <span language="de">Folgt automatisch dem Farbschema Ihres Systems.</span>
         </template></p></div>
       <div class="card"><div class="icon">🌏</div>
         <h3><template type="language-group">
@@ -553,6 +707,8 @@
           <span language="zh">内置多语言</span>
           <span language="es">Multilingüe integrado</span>
           <span language="ru">Встроенная локализация</span>
+          <span language="zh-TW">內建多語系</span>
+          <span language="de">Mehrsprachigkeit integriert</span>
         </template></h3>
         <p><template type="language-group">
           <span language="en">English and Japanese, switched by browser locale.</span>
@@ -560,6 +716,8 @@
           <span language="zh">支持英语和日语，根据浏览器语言自动切换。</span>
           <span language="es">Inglés y japonés, según el idioma del navegador.</span>
           <span language="ru">Английский и японский, переключаются по языку браузера.</span>
+          <span language="zh-TW">支援英文與日文，依瀏覽器語言自動切換。</span>
+          <span language="de">Englisch und Japanisch, je nach Browsersprache.</span>
         </template></p></div>
     </div>
   </div>
@@ -574,29 +732,118 @@
       <span language="zh">您的数据绝不离开您的设备</span>
       <span language="es">Tus datos nunca salen de tu dispositivo</span>
       <span language="ru">Ваши данные никогда не покидают устройство</span>
+      <span language="zh-TW">您的資料絕不離開您的裝置</span>
+      <span language="de">Ihre Daten verlassen niemals Ihr Gerät</span>
     </template></h2>
     <p class="section-lead"><template type="language-group">
       <span language="en">
         Fast Logbook has no backend. Logs live in your browser's IndexedDB and nowhere else.
-        Built with React 19 + TypeScript + Vite, served as static files. The entire source is MIT-licensed and open.
+        Served as static files. The entire source is MIT-licensed and open.
       </span>
       <span language="ja">
         Fast Logbook にバックエンドはありません。ログはブラウザの IndexedDB のみに保存されます。
-        React 19 + TypeScript + Vite 製の静的ファイル配信で、ソースコードは MIT ライセンスで全公開されています。
+        静的ファイルとして配信され、ソースコードは MIT ライセンスで全公開されています。
       </span>
       <span language="zh">
         Fast Logbook 没有后端。日志仅保存在浏览器的 IndexedDB 中，别无他处。
-        基于 React 19 + TypeScript + Vite 构建，以静态文件形式提供。完整源代码以 MIT 许可证开放。
+        以静态文件形式提供。完整源代码以 MIT 许可证开放。
       </span>
       <span language="es">
         Fast Logbook no tiene backend. Los registros viven únicamente en el IndexedDB de tu navegador.
-        Construido con React 19 + TypeScript + Vite, servido como archivos estáticos. Todo el código fuente es de código abierto bajo licencia MIT.
+        Se sirve como archivos estáticos. Todo el código fuente es de código abierto bajo licencia MIT.
       </span>
       <span language="ru">
         У Fast Logbook нет backend. Журналы хранятся только в IndexedDB вашего браузера.
-        Собрано на React 19 + TypeScript + Vite, раздаётся как статические файлы. Весь исходный код открыт по лицензии MIT.
+        Раздаётся как статические файлы. Весь исходный код открыт по лицензии MIT.
+      </span>
+      <span language="zh-TW">
+        Fast Logbook 沒有後端。日誌僅儲存在瀏覽器的 IndexedDB 中，別無他處。
+        以靜態檔案提供。完整原始碼以 MIT 授權開放。
+      </span>
+      <span language="de">
+        Fast Logbook hat kein Backend. Protokolle liegen ausschließlich in der IndexedDB Ihres Browsers.
+        Ausgeliefert als statische Dateien. Der gesamte Quellcode ist offen und MIT-lizenziert.
       </span>
     </template></p>
+    <div class="stack" aria-labelledby="stackTitle">
+      <h3 id="stackTitle"><template type="language-group">
+        <span language="en">Built with</span>
+        <span language="ja">利用技術</span>
+        <span language="zh">技术栈</span>
+        <span language="es">Tecnologías</span>
+        <span language="ru">Технологии</span>
+        <span language="zh-TW">使用技術</span>
+        <span language="de">Technologien</span>
+      </template></h3>
+      <div class="stack-grid">
+        <div class="stack-group" style="--c: var(--c-ui)">
+          <h4><template type="language-group">
+            <span language="en">Frontend</span>
+            <span language="ja">フロントエンド</span>
+            <span language="zh">前端</span>
+            <span language="es">Frontend</span>
+            <span language="ru">Интерфейс</span>
+            <span language="zh-TW">前端</span>
+            <span language="de">Frontend</span>
+          </template></h4>
+          <ul class="pills">
+            <li>React 19</li>
+            <li>TypeScript</li>
+            <li>React Router</li>
+            <li>Bootstrap 5</li>
+            <li>Bootstrap Icons</li>
+          </ul>
+        </div>
+        <div class="stack-group" style="--c: var(--c-build)">
+          <h4><template type="language-group">
+            <span language="en">Build &amp; PWA</span>
+            <span language="ja">ビルド・PWA</span>
+            <span language="zh">构建与 PWA</span>
+            <span language="es">Compilación y PWA</span>
+            <span language="ru">Сборка и PWA</span>
+            <span language="zh-TW">建置與 PWA</span>
+            <span language="de">Build &amp; PWA</span>
+          </template></h4>
+          <ul class="pills">
+            <li>Vite</li>
+            <li>vite-plugin-pwa</li>
+            <li>Workbox</li>
+            <li>Bun</li>
+          </ul>
+        </div>
+        <div class="stack-group" style="--c: var(--c-data)">
+          <h4><template type="language-group">
+            <span language="en">Data &amp; i18n</span>
+            <span language="ja">データ・多言語</span>
+            <span language="zh">数据与多语言</span>
+            <span language="es">Datos e i18n</span>
+            <span language="ru">Данные и i18n</span>
+            <span language="zh-TW">資料與多語系</span>
+            <span language="de">Daten &amp; i18n</span>
+          </template></h4>
+          <ul class="pills">
+            <li>IndexedDB (idb)</li>
+            <li>i18next</li>
+          </ul>
+        </div>
+        <div class="stack-group" style="--c: var(--c-qa)">
+          <h4><template type="language-group">
+            <span language="en">Quality</span>
+            <span language="ja">品質管理</span>
+            <span language="zh">质量保障</span>
+            <span language="es">Calidad</span>
+            <span language="ru">Качество</span>
+            <span language="zh-TW">品質保證</span>
+            <span language="de">Qualität</span>
+          </template></h4>
+          <ul class="pills">
+            <li>Biome</li>
+            <li>Playwright</li>
+            <li>GitHub Actions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
     <div class="cta">
       <a class="btn primary" href="https://fast-logbook.netlify.app/"><template type="language-group">
         <span language="en">🚀 Start logging now</span>
@@ -604,6 +851,8 @@
         <span language="zh">🚀 立即开始记录</span>
         <span language="es">🚀 Empieza a registrar ahora</span>
         <span language="ru">🚀 Начать вести журнал</span>
+        <span language="zh-TW">🚀 立即開始記錄</span>
+        <span language="de">🚀 Jetzt mit dem Protokollieren beginnen</span>
       </template></a>
     </div>
   </div>
@@ -618,13 +867,15 @@
 
 <script src="https://unpkg.com/multilanguagejs@2.0.1/dist/multilanguagejs.umd.cjs"></script>
 <script>
-  var LANGS = ["en", "ja", "zh", "es", "ru"];
+  var LANGS = ["en", "ja", "zh", "zh-TW", "es", "de", "ru"];
   var META = {
     en: { title: "Fast Logbook PWA — Record with one tap. Instantly tally.", description: "A lightweight PWA for recording and aggregating daily work logs. One-tap stamping, instant totals, 100% in-browser — no server, no account." },
     ja: { title: "Fast Logbook PWA — ワンタップで記録。その場で集計。", description: "日々の作業ログを記録・集計する軽量PWA。ワンタップ打刻、即時集計、100%ブラウザ内完結——サーバーもアカウントも不要。" },
     zh: { title: "Fast Logbook PWA — 一键记录，即时统计。", description: "一款用于记录和汇总每日工作日志的轻量级 PWA。一键打卡，即时统计，100% 在浏览器内完成——无需服务器，无需账号。" },
     es: { title: "Fast Logbook PWA — Registra con un toque. Calcula al instante.", description: "Una PWA ligera para registrar y resumir tus registros de trabajo diarios. Marca con un toque, totales al instante, 100% en el navegador: sin servidor, sin cuenta." },
-    ru: { title: "Fast Logbook PWA — Запись в одно касание. Мгновенный подсчёт.", description: "Лёгкое PWA-приложение для записи и подсчёта ежедневных рабочих журналов. Отметка в одно касание, мгновенные итоги, 100% в браузере — без сервера, без аккаунта." }
+    ru: { title: "Fast Logbook PWA — Запись в одно касание. Мгновенный подсчёт.", description: "Лёгкое PWA-приложение для записи и подсчёта ежедневных рабочих журналов. Отметка в одно касание, мгновенные итоги, 100% в браузере — без сервера, без аккаунта." },
+    "zh-TW": { title: "Fast Logbook PWA — 一鍵記錄，即時統計。", description: "一款用於記錄與彙總每日工作日誌的輕量級 PWA。一鍵打卡、即時統計、100% 在瀏覽器內完成——無需伺服器，無需帳號。" },
+    de: { title: "Fast Logbook PWA — Mit einem Tipp erfassen. Sofort auswerten.", description: "Eine schlanke PWA zum Erfassen und Auswerten täglicher Arbeitsprotokolle. Stempeln mit einem Tipp, sofortige Summen, 100 % im Browser – kein Server, kein Konto." }
   };
 
   var ml = new MultilanguageJS({ languages: LANGS, defaultLanguage: "en" });
@@ -637,7 +888,10 @@
   function detectLang() {
     var saved = store.get();
     if (saved && LANGS.indexOf(saved) !== -1) return saved;
-    var nav = (navigator.language || "en").slice(0, 2).toLowerCase();
+    var full = (navigator.language || "en").toLowerCase();
+    // Traditional Chinese locales (Taiwan, Hong Kong, Macau, or explicit Hant script)
+    if (/^zh-(tw|hk|mo|hant)/.test(full)) return "zh-TW";
+    var nav = full.slice(0, 2);
     return LANGS.indexOf(nav) !== -1 ? nav : "en";
   }
 
